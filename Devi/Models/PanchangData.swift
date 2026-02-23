@@ -1,0 +1,390 @@
+// MARK: - Models/PanchangData.swift
+// Core data structures for panchang information
+
+import Foundation
+import CoreLocation
+
+// MARK: - Tithi (Lunar Day)
+
+enum Paksha: String, Codable {
+    case shukla = "Shukla"  // Waxing moon (bright half)
+    case krishna = "Krishna" // Waning moon (dark half)
+}
+
+struct Tithi: Codable {
+    let number: Int          // 1-15 within each paksha
+    let name: String         // "Pratipada", "Dwitiya", etc.
+    let paksha: Paksha
+    let endTime: Date        // When this tithi ends
+    
+    var displayName: String {
+        "\(paksha.rawValue) \(name)"
+    }
+    
+    var isFastingDay: Bool {
+        // Ekadashi (11th), Pradosh (13th), Purnima (15th Shukla), Amavasya (15th Krishna)
+        number == 11 || number == 13 || number == 15
+    }
+    
+    var fastingType: String? {
+        switch number {
+        case 11: return "Ekadashi"
+        case 13: return "Pradosh Vrat"
+        case 15 where paksha == .shukla: return "Purnima"
+        case 15 where paksha == .krishna: return "Amavasya"
+        default: return nil
+        }
+    }
+}
+
+// MARK: - Nakshatra (Lunar Mansion)
+
+struct Nakshatra: Codable {
+    let number: Int          // 1-27
+    let name: String         // "Ashwini", "Bharani", etc.
+    let ruler: String        // Ruling planet
+    let deity: String        // Presiding deity
+    let endTime: Date
+}
+
+// MARK: - Yoga & Karana (minor panchang elements)
+
+struct Yoga: Codable {
+    let number: Int
+    let name: String
+    let endTime: Date
+}
+
+struct Karana: Codable {
+    let number: Int
+    let name: String
+    let endTime: Date
+}
+
+// MARK: - Time Windows
+
+struct TimeWindow: Codable, Identifiable {
+    var id: String { type.rawValue }
+    let type: WindowType
+    let start: Date
+    let end: Date
+    
+    enum WindowType: String, Codable {
+        case abhijitMuhurta = "Abhijit Muhurta"
+        case rahuKalam = "Rahu Kalam"
+        case gulikaKalam = "Gulika Kalam"
+        case yamaganda = "Yamaganda"
+        case brahmaMuhurta = "Brahma Muhurta"
+    }
+    
+    var isAuspicious: Bool {
+        type == .abhijitMuhurta || type == .brahmaMuhurta
+    }
+    
+    var isActive: Bool {
+        let now = Date()
+        return now >= start && now <= end
+    }
+    
+    var statusColor: WindowColor {
+        switch type {
+        case .abhijitMuhurta, .brahmaMuhurta: return .auspicious
+        case .rahuKalam: return .inauspicious
+        case .gulikaKalam, .yamaganda: return .caution
+        }
+    }
+    
+    enum WindowColor {
+        case auspicious   // Green
+        case inauspicious // Red
+        case caution      // Yellow/amber
+    }
+}
+
+// MARK: - Solar Data
+
+struct SolarData: Codable {
+    let sunrise: Date
+    let sunset: Date
+    let moonrise: Date?
+    let moonset: Date?
+    
+    /// 0.0 at sunrise, 0.5 at solar noon, 1.0 at sunset
+    var sunProgress: Double {
+        let now = Date()
+        guard now >= sunrise && now <= sunset else {
+            return now < sunrise ? 0.0 : 1.0
+        }
+        let total = sunset.timeIntervalSince(sunrise)
+        let elapsed = now.timeIntervalSince(sunrise)
+        return elapsed / total
+    }
+    
+    var isDaytime: Bool {
+        let now = Date()
+        return now >= sunrise && now <= sunset
+    }
+    
+    /// Seconds until next sunrise or sunset
+    var nextTransitionCountdown: TimeInterval {
+        let now = Date()
+        if isDaytime {
+            return sunset.timeIntervalSince(now)
+        } else {
+            // Find next sunrise (could be today's if before sunrise, or tomorrow's)
+            if now < sunrise {
+                return sunrise.timeIntervalSince(now)
+            } else {
+                // After sunset — next sunrise is tomorrow, handled by data layer
+                return 0 // Will be recalculated with tomorrow's data
+            }
+        }
+    }
+    
+    var nextTransitionLabel: String {
+        isDaytime ? "SUNSET IN" : "SUNRISE IN"
+    }
+}
+
+// MARK: - Daily Panchang (the main model)
+
+struct DailyPanchang: Codable, Identifiable {
+    var id: String { dateString }
+    
+    let dateString: String   // "2026-03-20" ISO format
+    let tithi: Tithi
+    let nakshatra: Nakshatra
+    let yoga: Yoga
+    let karana: Karana
+    let solar: SolarData
+    let timeWindows: [TimeWindow]
+    let lunarMonth: String   // "Chaitra", "Vaishakha", etc.
+    let festivals: [String]  // Any festivals on this day
+    
+    /// The Hindu weekday lord
+    var varaDeity: String {
+        let calendar = Calendar.current
+        guard let date = ISO8601DateFormatter().date(from: dateString + "T00:00:00Z") else { return "" }
+        let weekday = calendar.component(.weekday, from: date)
+        switch weekday {
+        case 1: return "Surya (Sun)"
+        case 2: return "Chandra (Moon)"
+        case 3: return "Mangala (Mars)"
+        case 4: return "Budha (Mercury)"
+        case 5: return "Guru (Jupiter)"
+        case 6: return "Shukra (Venus)"
+        case 7: return "Shani (Saturn)"
+        default: return ""
+        }
+    }
+}
+
+// MARK: - Navratri
+
+struct NavratriDay: Identifiable {
+    var id: Int { dayNumber }
+    
+    let dayNumber: Int       // 1-9
+    let goddessName: String
+    let goddessEpithet: String
+    let colorName: String
+    let colorHex: String
+    let offering: String
+    let mantra: String       // In Devanagari
+    let mantraTranslit: String
+    
+    static let chaitraNavratri2026: [NavratriDay] = [
+        NavratriDay(
+            dayNumber: 1,
+            goddessName: "Shailputri",
+            goddessEpithet: "Daughter of the Mountain",
+            colorName: "Yellow",
+            colorHex: "#f0c040",
+            offering: "Ghee",
+            mantra: "ॐ देवी शैलपुत्र्यै नमः",
+            mantraTranslit: "Om Devi Shailaputryai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 2,
+            goddessName: "Brahmacharini",
+            goddessEpithet: "The Ascetic Goddess",
+            colorName: "Green",
+            colorHex: "#2d8a4e",
+            offering: "Sugar",
+            mantra: "ॐ देवी ब्रह्मचारिण्यै नमः",
+            mantraTranslit: "Om Devi Brahmacharinyai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 3,
+            goddessName: "Chandraghanta",
+            goddessEpithet: "The Moon-Bell Goddess",
+            colorName: "Grey",
+            colorHex: "#8a8a8a",
+            offering: "Milk",
+            mantra: "ॐ देवी चन्द्रघण्टायै नमः",
+            mantraTranslit: "Om Devi Chandraghantayai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 4,
+            goddessName: "Kushmanda",
+            goddessEpithet: "Creator of the Universe",
+            colorName: "Orange",
+            colorHex: "#d4742a",
+            offering: "Malpua",
+            mantra: "ॐ देवी कूष्माण्डायै नमः",
+            mantraTranslit: "Om Devi Kushmandayai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 5,
+            goddessName: "Skandamata",
+            goddessEpithet: "Mother of Skanda",
+            colorName: "White",
+            colorHex: "#f0f0f0",
+            offering: "Banana",
+            mantra: "ॐ देवी स्कन्दमातायै नमः",
+            mantraTranslit: "Om Devi Skandamatayai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 6,
+            goddessName: "Katyayani",
+            goddessEpithet: "The Warrior Goddess",
+            colorName: "Red",
+            colorHex: "#c42a2a",
+            offering: "Honey",
+            mantra: "ॐ देवी कात्यायन्यै नमः",
+            mantraTranslit: "Om Devi Katyayanyai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 7,
+            goddessName: "Kalaratri",
+            goddessEpithet: "Destroyer of Darkness",
+            colorName: "Royal Blue",
+            colorHex: "#1a3a8a",
+            offering: "Jaggery",
+            mantra: "ॐ देवी कालरात्र्यै नमः",
+            mantraTranslit: "Om Devi Kalaratryai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 8,
+            goddessName: "Mahagauri",
+            goddessEpithet: "The Brilliantly White",
+            colorName: "Pink",
+            colorHex: "#d42a6b",
+            offering: "Coconut",
+            mantra: "ॐ देवी महागौर्यै नमः",
+            mantraTranslit: "Om Devi Mahagauryai Namah"
+        ),
+        NavratriDay(
+            dayNumber: 9,
+            goddessName: "Siddhidatri",
+            goddessEpithet: "Bestower of Supernatural Powers",
+            colorName: "Purple",
+            colorHex: "#6b2a8a",
+            offering: "Sesame Seeds",
+            mantra: "ॐ देवी सिद्धिदात्र्यै नमः",
+            mantraTranslit: "Om Devi Siddhidatryai Namah"
+        )
+    ]
+}
+
+// MARK: - Navratri Period
+
+struct NavratriPeriod {
+    let name: String          // "Chaitra Navratri 2026"
+    let startDate: String     // ISO date
+    let endDate: String       // ISO date
+    
+    func dayNumber(for dateString: String) -> Int? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let start = formatter.date(from: startDate),
+              let current = formatter.date(from: dateString) else { return nil }
+        let days = Calendar.current.dateComponents([.day], from: start, to: current).day ?? -1
+        guard days >= 0 && days < 9 else { return nil }
+        return days + 1
+    }
+    
+    static let chaitraNavratri2026 = NavratriPeriod(
+        name: "Chaitra Navratri",
+        startDate: "2026-03-19",
+        endDate: "2026-03-27"
+    )
+    
+    static let sharadNavratri2026 = NavratriPeriod(
+        name: "Sharad Navratri",
+        startDate: "2026-10-11",
+        endDate: "2026-10-19"
+    )
+}
+
+// MARK: - Upcoming Event
+
+struct UpcomingEvent: Identifiable {
+    var id: String { name + dateString }
+    let name: String
+    let dateString: String
+    let daysAway: Int
+    let type: EventType
+    
+    enum EventType {
+        case festival
+        case fasting
+        case eclipse
+    }
+}
+
+// MARK: - User Location
+
+struct UserCity: Codable, Identifiable, Hashable {
+    var id: String { "\(name)-\(country)" }
+    let name: String
+    let country: String
+    let latitude: Double
+    let longitude: Double
+    let timezoneIdentifier: String
+    
+    static let defaults: [UserCity] = [
+        // US cities
+        UserCity(name: "New York", country: "US", latitude: 40.7128, longitude: -74.0060, timezoneIdentifier: "America/New_York"),
+        UserCity(name: "Los Angeles", country: "US", latitude: 34.0522, longitude: -118.2437, timezoneIdentifier: "America/Los_Angeles"),
+        UserCity(name: "Chicago", country: "US", latitude: 41.8781, longitude: -87.6298, timezoneIdentifier: "America/Chicago"),
+        UserCity(name: "Houston", country: "US", latitude: 29.7604, longitude: -95.3698, timezoneIdentifier: "America/Chicago"),
+        UserCity(name: "San Francisco", country: "US", latitude: 37.7749, longitude: -122.4194, timezoneIdentifier: "America/Los_Angeles"),
+        UserCity(name: "Dallas", country: "US", latitude: 32.7767, longitude: -96.7970, timezoneIdentifier: "America/Chicago"),
+        UserCity(name: "Edison", country: "US", latitude: 40.5187, longitude: -74.4121, timezoneIdentifier: "America/New_York"),
+        // India cities
+        UserCity(name: "Mumbai", country: "IN", latitude: 19.0760, longitude: 72.8777, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Delhi", country: "IN", latitude: 28.7041, longitude: 77.1025, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Bangalore", country: "IN", latitude: 12.9716, longitude: 77.5946, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Chennai", country: "IN", latitude: 13.0827, longitude: 80.2707, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Hyderabad", country: "IN", latitude: 17.3850, longitude: 78.4867, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Kolkata", country: "IN", latitude: 22.5726, longitude: 88.3639, timezoneIdentifier: "Asia/Kolkata"),
+        // UK
+        UserCity(name: "London", country: "UK", latitude: 51.5074, longitude: -0.1278, timezoneIdentifier: "Europe/London"),
+        // Canada
+        UserCity(name: "Toronto", country: "CA", latitude: 43.6532, longitude: -79.3832, timezoneIdentifier: "America/Toronto"),
+        // Singapore
+        UserCity(name: "Singapore", country: "SG", latitude: 1.3521, longitude: 103.8198, timezoneIdentifier: "Asia/Singapore"),
+    ]
+    
+    /// Find nearest city to a coordinate
+    static func nearest(to location: CLLocation) -> UserCity {
+        defaults.min(by: { cityA, cityB in
+            let locA = CLLocation(latitude: cityA.latitude, longitude: cityA.longitude)
+            let locB = CLLocation(latitude: cityB.latitude, longitude: cityB.longitude)
+            return location.distance(from: locA) < location.distance(from: locB)
+        }) ?? defaults[0]
+    }
+}
+
+// MARK: - Notification Preferences
+
+struct NotificationPreferences: Codable {
+    var brahmaMuhurta: Bool = false
+    var sunrise: Bool = true
+    var abhijitMuhurta: Bool = false
+    var rahuKalamWarning: Bool = true
+    var sunset: Bool = true
+    var navratriMorning: Bool = true    // Auto-enabled during Navratri
+    var minutesBefore: Int = 10         // How early to fire the notification
+}

@@ -1,0 +1,398 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		033C35B8D8C67417071612C3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443E05B8B65D4E3900BC0BDE /* HomeView.swift */; };
+		07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */; };
+		0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406B7EE63A21C444D045C89E /* SunArcView.swift */; };
+		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
+		45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */; };
+		4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D21D4B060787531B830527 /* OnboardingView.swift */; };
+		53EB548AF45411CA45FFB15A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = 8770626AEDBE1DA0D475369D /* Solar */; };
+		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
+		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
+		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
+		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		406B7EE63A21C444D045C89E /* SunArcView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunArcView.swift; sourceTree = "<group>"; };
+		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWindowsCard.swift; sourceTree = "<group>"; };
+		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
+		7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
+		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
+		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
+		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5AA97A4A8B5305455BD0F778 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53EB548AF45411CA45FFB15A /* Solar in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		24431773675F89C667CBFE20 /* Devi */ = {
+			isa = PBXGroup;
+			children = (
+				9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */,
+				63D4C2FC48BFDEA82A2DC0A7 /* Models */,
+				AFAA87FA2E7674A778B7F622 /* Utils */,
+				8481CF9F392B620436155731 /* Views */,
+			);
+			path = Devi;
+			sourceTree = "<group>";
+		};
+		4914BAD1C99EF5D62BB857EB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
+				406B7EE63A21C444D045C89E /* SunArcView.swift */,
+				5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		63D4C2FC48BFDEA82A2DC0A7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
+				D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		8481CF9F392B620436155731 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				443E05B8B65D4E3900BC0BDE /* HomeView.swift */,
+				F7D21D4B060787531B830527 /* OnboardingView.swift */,
+				7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */,
+				4914BAD1C99EF5D62BB857EB /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AFAA87FA2E7674A778B7F622 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				2ED73DBA852A3A4BC9C00E5E /* Theme.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		E6DB0AC33D7B074937D6B05E = {
+			isa = PBXGroup;
+			children = (
+				24431773675F89C667CBFE20 /* Devi */,
+				FF301D0F60B60F4F9D9C4B95 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FF301D0F60B60F4F9D9C4B95 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B5F37171BB5BCFC490113269 /* Devi.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		62CF76CE48BD90253DCD44E0 /* Devi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C363D8B438CF27CAD3DFAA67 /* Build configuration list for PBXNativeTarget "Devi" */;
+			buildPhases = (
+				BA73B945ED4921F1409CAEB0 /* Sources */,
+				5AA97A4A8B5305455BD0F778 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Devi;
+			packageProductDependencies = (
+				8770626AEDBE1DA0D475369D /* Solar */,
+			);
+			productName = Devi;
+			productReference = B5F37171BB5BCFC490113269 /* Devi.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FB09475CAD690A281AA404CC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = EA283B955B8D233891C1A448 /* Build configuration list for PBXProject "Devi" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E6DB0AC33D7B074937D6B05E;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */,
+			);
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				62CF76CE48BD90253DCD44E0 /* Devi */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BA73B945ED4921F1409CAEB0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */,
+				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
+				45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */,
+				4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */,
+				36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */,
+				892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */,
+				90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */,
+				0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */,
+				AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */,
+				07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		205BFB0288989740D79542D9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		90424D97263C7A3AB342E7DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deviapp.Devi;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		96982CE975652EFB1A51832D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.deviapp.Devi;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BE8857E34E83CADC1AAE12C8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C363D8B438CF27CAD3DFAA67 /* Build configuration list for PBXNativeTarget "Devi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				90424D97263C7A3AB342E7DA /* Debug */,
+				96982CE975652EFB1A51832D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		EA283B955B8D233891C1A448 /* Build configuration list for PBXProject "Devi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				205BFB0288989740D79542D9 /* Debug */,
+				BE8857E34E83CADC1AAE12C8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ceeK/Solar";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8770626AEDBE1DA0D475369D /* Solar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */;
+			productName = Solar;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = FB09475CAD690A281AA404CC /* Project object */;
+}

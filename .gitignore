@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Xcode user data (per-user settings, not shareable)
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Xcode build artifacts
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager (resolved file is regenerable)
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+
+# Python virtual environment
+.venv/
+
+# Archives
+files.zip
+
+# Screenshots (local reference only)
+latest-screens/
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/*
