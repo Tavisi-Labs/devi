@@ -6,11 +6,11 @@ import SwiftUI
 struct NavratriCard: View {
     let day: NavratriDay
     let theme: DeviTheme
-    
+
     private var dayColor: Color {
         Color(hex: day.colorHex)
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Header: day indicator
@@ -18,14 +18,14 @@ struct NavratriCard: View {
                 Image(systemName: "sparkle")
                     .font(.system(size: 14))
                     .foregroundColor(dayColor)
-                
+
                 Text("NAVRATRI DAY \(day.dayNumber)")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(dayColor)
                     .tracking(2)
-                
+
                 Spacer()
-                
+
                 // Day dots (9 dots, filled up to current day)
                 HStack(spacing: 4) {
                     ForEach(1...9, id: \.self) { num in
@@ -35,18 +35,18 @@ struct NavratriCard: View {
                     }
                 }
             }
-            
-            // Goddess name
+
+            // Goddess name (bumped to 30pt serif)
             VStack(alignment: .leading, spacing: 4) {
                 Text(day.goddessName)
-                    .font(.system(size: 26, weight: .semibold, design: .serif))
+                    .font(.system(size: 30, weight: .semibold, design: .serif))
                     .foregroundColor(theme.primaryText)
-                
+
                 Text(day.goddessEpithet)
                     .font(.system(size: 15, weight: .regular))
                     .foregroundColor(theme.secondaryText)
             }
-            
+
             // Color and offering
             HStack(spacing: 24) {
                 // Color to wear
@@ -58,7 +58,7 @@ struct NavratriCard: View {
                             Circle()
                                 .stroke(theme.primaryText.opacity(0.3), lineWidth: 1)
                         )
-                    
+
                     VStack(alignment: .leading, spacing: 1) {
                         Text("WEAR")
                             .font(.system(size: 10, weight: .medium))
@@ -69,13 +69,13 @@ struct NavratriCard: View {
                             .foregroundColor(theme.primaryText)
                     }
                 }
-                
+
                 // Offering
                 HStack(spacing: 8) {
                     Image(systemName: "leaf.fill")
                         .font(.system(size: 12))
                         .foregroundColor(dayColor.opacity(0.7))
-                    
+
                     VStack(alignment: .leading, spacing: 1) {
                         Text("OFFERING")
                             .font(.system(size: 10, weight: .medium))
@@ -87,33 +87,26 @@ struct NavratriCard: View {
                     }
                 }
             }
-            
-            // Mantra
+
+            // Mantra (wrapped in flat inner card)
             VStack(alignment: .leading, spacing: 6) {
-                Divider()
-                    .background(theme.primaryText.opacity(0.1))
-                
                 Text(day.mantra)
                     .font(.system(size: 17, weight: .regular))
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
-                
+
                 Text(day.mantraTranslit)
                     .font(.system(size: 13, weight: .regular, design: .serif))
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
         }
         .padding(20)
         .background(
             ZStack {
-                // Card background
-                theme.cardBackground
-                
-                // Subtle inner glow from the day's color
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(dayColor.opacity(0.2), lineWidth: 1)
-                
                 // Corner accent glow
                 RadialGradient(
                     colors: [dayColor.opacity(0.08), .clear],
@@ -123,10 +116,10 @@ struct NavratriCard: View {
                 )
             }
         )
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .deviCard(theme: theme, elevation: .prominent, cornerRadius: 24)
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(theme.primaryText.opacity(0.12), lineWidth: 0.5)
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(dayColor.opacity(0.2), lineWidth: 1)
         )
         .deviEntrance()
     }
@@ -136,8 +129,8 @@ struct NavratriCard: View {
 
 #Preview {
     ZStack {
-        Color(hex: "4a1942").ignoresSafeArea()
-        
+        Color(hex: "0F1B33").ignoresSafeArea()
+
         NavratriCard(
             day: NavratriDay.chaitraNavratri2026[4], // Day 5 - Skandamata
             theme: DeviTheme.forPeriod(.evening)

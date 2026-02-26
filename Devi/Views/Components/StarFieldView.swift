@@ -60,7 +60,7 @@ struct StarFieldView: View {
                         context.opacity = alpha
                         context.fill(
                             Ellipse().path(in: rect),
-                            with: .color(.white)
+                            with: .color(star.tintColor)
                         )
                     }
                 }
@@ -68,7 +68,7 @@ struct StarFieldView: View {
             .allowsHitTesting(false)
             .onAppear {
                 if stars.isEmpty {
-                    stars = (0..<120).map { _ in Star.random() }
+                    stars = (0..<200).map { _ in Star.random() }
                 }
             }
         }
@@ -89,12 +89,17 @@ private struct Star {
     let driftPeriodY: Double
     let phaseX: Double
     let phaseY: Double
+    let tintColor: Color
 
     static func random() -> Star {
-        Star(
+        // 10% of stars get a warm bisque tint
+        let isWarm = Double.random(in: 0...1) < 0.10
+        let color: Color = isWarm ? Color(hex: "FFE4C4") : .white
+
+        return Star(
             normalizedX: Double.random(in: 0...1),
             normalizedY: Double.random(in: 0...1),
-            size: Double.random(in: 1...2),
+            size: Double.random(in: 1...3),
             baseBrightness: Double.random(in: 0.3...1.0),
             twinkleSpeed: Double.random(in: 0.5...2.0),
             twinklePhase: Double.random(in: 0...(.pi * 2)),
@@ -102,7 +107,8 @@ private struct Star {
             driftPeriodX: Double.random(in: 30...60),
             driftPeriodY: Double.random(in: 30...60),
             phaseX: Double.random(in: 0...(.pi * 2)),
-            phaseY: Double.random(in: 0...(.pi * 2))
+            phaseY: Double.random(in: 0...(.pi * 2)),
+            tintColor: color
         )
     }
 }
@@ -111,7 +117,7 @@ private struct Star {
 
 #Preview {
     ZStack {
-        Color(hex: "0a0612").ignoresSafeArea()
+        Color(hex: "060B18").ignoresSafeArea()
         StarFieldView(isDaytime: false, timePeriod: .night)
             .ignoresSafeArea()
     }

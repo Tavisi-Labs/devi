@@ -139,7 +139,7 @@ class PanchangViewModel: ObservableObject {
         guard let solar = todayPanchang?.solar else { return }
         let newPeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
         if newPeriod != timePeriod {
-            withAnimation(.easeInOut(duration: 30)) { // 30s gradient transition
+            withAnimation(.easeInOut(duration: 8)) { // 8s gradient transition
                 timePeriod = newPeriod
                 theme = DeviTheme.forPeriod(newPeriod)
             }

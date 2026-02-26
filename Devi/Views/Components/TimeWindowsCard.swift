@@ -7,19 +7,29 @@ struct TimeWindowsCard: View {
     let windows: [TimeWindow]
     let theme: DeviTheme
     let timezoneIdentifier: String
+    var onTapWindow: ((TimeWindow) -> Void)? = nil
 
     var body: some View {
         VStack(spacing: 0) {
             ForEach(Array(windows.enumerated()), id: \.element.id) { index, window in
-                TimeWindowRow(window: window, theme: theme, timezoneIdentifier: timezoneIdentifier)
-                
+                if let onTap = onTapWindow {
+                    Button {
+                        onTap(window)
+                    } label: {
+                        TimeWindowRow(window: window, theme: theme, timezoneIdentifier: timezoneIdentifier, showChevron: true)
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    TimeWindowRow(window: window, theme: theme, timezoneIdentifier: timezoneIdentifier)
+                }
+
                 if index < windows.count - 1 {
                     Divider()
-                        .background(theme.primaryText.opacity(0.1))
+                        .background(theme.primaryText.opacity(0.08))
                 }
             }
         }
-        .deviCard(theme: theme)
+        .deviCard(theme: theme, elevation: .raised)
         .deviEntrance(delay: 0.08)
     }
 }
@@ -28,7 +38,8 @@ struct TimeWindowRow: View {
     let window: TimeWindow
     let theme: DeviTheme
     let timezoneIdentifier: String
-    
+    var showChevron: Bool = false
+
     private var statusColor: Color {
         switch window.statusColor {
         case .auspicious: return theme.auspiciousColor
@@ -36,7 +47,7 @@ struct TimeWindowRow: View {
         case .caution: return theme.cautionColor
         }
     }
-    
+
     private var statusIcon: String {
         switch window.statusColor {
         case .auspicious: return "checkmark.circle.fill"
@@ -44,21 +55,21 @@ struct TimeWindowRow: View {
         case .caution: return "exclamationmark.circle.fill"
         }
     }
-    
+
     var body: some View {
         HStack(spacing: 12) {
             // Status indicator
             Image(systemName: statusIcon)
                 .font(.system(size: 10))
                 .foregroundColor(statusColor)
-            
+
             // Window name
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(window.type.rawValue)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(theme.primaryText)
-                    
+
                     if window.isActive {
                         Text("NOW")
                             .font(.system(size: 10, weight: .bold))
@@ -69,23 +80,30 @@ struct TimeWindowRow: View {
                             .clipShape(Capsule())
                     }
                 }
-                
+
                 Text("\(formatTime(window.start)) — \(formatTime(window.end))")
                     .font(.system(size: 13, weight: .regular))
                     .foregroundColor(theme.secondaryText)
             }
-            
+
             Spacer()
+
+            if showChevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(theme.secondaryText.opacity(0.4))
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+        .contentShape(Rectangle())
         .opacity(isPast ? 0.4 : 1.0)
     }
-    
+
     private var isPast: Bool {
         Date() > window.end
     }
-    
+
     private func formatTime(_ date: Date) -> String {
         deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
     }
@@ -98,7 +116,7 @@ struct TimeWindowRow: View {
     let today = cal.startOfDay(for: Date())
 
     ZStack {
-        Color(hex: "1a0a2e").ignoresSafeArea()
+        Color(hex: "0B1026").ignoresSafeArea()
 
         TimeWindowsCard(
             windows: [
@@ -113,7 +131,8 @@ struct TimeWindowRow: View {
                           end: cal.date(bySettingHour: 13, minute: 30, second: 0, of: today)!),
             ],
             theme: DeviTheme.forPeriod(.brahmaMuhurta),
-            timezoneIdentifier: "America/New_York"
+            timezoneIdentifier: "America/New_York",
+            onTapWindow: { _ in }
         )
         .padding()
     }

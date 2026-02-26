@@ -18,8 +18,8 @@ struct OrnamentalDivider: View {
 
             if let label {
                 Text("\u{2726}")
-                    .font(.system(size: 8))
-                    .foregroundColor(theme.accentColor.opacity(0.6))
+                    .font(.system(size: 12))
+                    .foregroundColor(theme.accentColor.opacity(0.8))
 
                 Text(label)
                     .font(.system(size: 13, weight: .medium))
@@ -28,12 +28,12 @@ struct OrnamentalDivider: View {
                     .tracking(1.5)
 
                 Text("\u{2726}")
-                    .font(.system(size: 8))
-                    .foregroundColor(theme.accentColor.opacity(0.6))
+                    .font(.system(size: 12))
+                    .foregroundColor(theme.accentColor.opacity(0.8))
             } else {
                 Text("\u{25C6}")
-                    .font(.system(size: 6))
-                    .foregroundColor(theme.accentColor.opacity(0.6))
+                    .font(.system(size: 12))
+                    .foregroundColor(theme.accentColor.opacity(0.8))
             }
 
             line
@@ -43,8 +43,8 @@ struct OrnamentalDivider: View {
 
     private var line: some View {
         Rectangle()
-            .fill(theme.primaryText.opacity(0.15))
-            .frame(height: 0.5)
+            .fill(theme.primaryText.opacity(0.25))
+            .frame(height: 1.0)
     }
 }
 
@@ -52,7 +52,7 @@ struct OrnamentalDivider: View {
 
 #Preview {
     ZStack {
-        Color(hex: "1a0a2e").ignoresSafeArea()
+        Color(hex: "0B1026").ignoresSafeArea()
 
         VStack(spacing: 40) {
             OrnamentalDivider("TODAY", theme: DeviTheme.forPeriod(.brahmaMuhurta))

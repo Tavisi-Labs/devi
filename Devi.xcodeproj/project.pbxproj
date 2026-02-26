@@ -20,6 +20,9 @@
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
 		C1A2B3D4E5F6071829304152 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */; };
 		D2B3C4E5F6071829304152A1 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6071829304152A1 /* StarFieldView.swift */; };
+		E3A4B5C6D7E8091A2B3C4D5E /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */; };
+		F4B5C6D7E8F9102A3B4C5D6E /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */; };
+		A5C6D7E8F9A0213B4C5D6E7F /* PanchangDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +39,9 @@
 		A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		B2C3D4E5F6071829304152A1 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
+		D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
+		E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +72,7 @@
 			children = (
 				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
 				A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */,
+				E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */,
 				B2C3D4E5F6071829304152A1 /* StarFieldView.swift */,
 				406B7EE63A21C444D045C89E /* SunArcView.swift */,
 				5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */,
@@ -77,6 +84,8 @@
 			isa = PBXGroup;
 			children = (
 				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
+				C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */,
+				D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */,
 				D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */,
 			);
 			path = Models;
@@ -187,6 +196,9 @@
 				0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */,
 				AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */,
 				07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */,
+				E3A4B5C6D7E8091A2B3C4D5E /* PanchangElement.swift in Sources */,
+				F4B5C6D7E8F9102A3B4C5D6E /* PanchangDescriptions.swift in Sources */,
+				A5C6D7E8F9A0213B4C5D6E7F /* PanchangDetailSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

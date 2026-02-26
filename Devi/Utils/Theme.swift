@@ -1,5 +1,5 @@
 // MARK: - Utils/Theme.swift
-// Time-of-day adaptive color system
+// Time-of-day adaptive color system — atmospheric realism palette
 
 import SwiftUI
 
@@ -11,15 +11,15 @@ enum TimePeriod {
     case afternoon      // noon - sunset
     case evening        // sunset - 9 PM
     case night          // 9 PM - 3:30 AM
-    
+
     static func current(sunrise: Date, sunset: Date) -> TimePeriod {
         let now = Date()
         let calendar = Calendar.current
         let hour = calendar.component(.hour, from: now)
-        
+
         // Brahma muhurta: ~96 min before sunrise (simplified to 3:30 AM - sunrise)
         let brahmaMuhurtaStart = calendar.date(bySettingHour: 3, minute: 30, second: 0, of: now)!
-        
+
         if now >= brahmaMuhurtaStart && now < sunrise {
             return .brahmaMuhurta
         } else if now >= sunrise && hour < 12 {
@@ -38,91 +38,82 @@ enum TimePeriod {
 
 struct DeviTheme {
     let backgroundGradientTop: Color
+    let backgroundGradientMid: Color
     let backgroundGradientBottom: Color
     let accentColor: Color
     let primaryText: Color
     let secondaryText: Color
-    let cardBackground: Color
-    let auspiciousColor: Color
-    let inauspiciousColor: Color
-    let cautionColor: Color
-    
+
+    // Consistent semantic status colors across all themes
+    let auspiciousColor: Color = Color(hex: "3DA66A")
+    let inauspiciousColor: Color = Color(hex: "C45050")
+    let cautionColor: Color = Color(hex: "D4A040")
+
     // MARK: - Time-based themes
-    
+
     static func forPeriod(_ period: TimePeriod) -> DeviTheme {
         switch period {
         case .brahmaMuhurta:
             return DeviTheme(
-                backgroundGradientTop: Color(hex: "1a0a2e"),
-                backgroundGradientBottom: Color(hex: "2d1854"),
-                accentColor: Color(hex: "d4a857"),
-                primaryText: Color(hex: "f5f0e8"),
-                secondaryText: Color(hex: "f5f0e8").opacity(0.6),
-                cardBackground: Color.white.opacity(0.08),
-                auspiciousColor: Color(hex: "4ade80"),
-                inauspiciousColor: Color(hex: "b85c5c"),
-                cautionColor: Color(hex: "d4a857")
+                backgroundGradientTop: Color(hex: "0B1026"),
+                backgroundGradientMid: Color(hex: "162044"),
+                backgroundGradientBottom: Color(hex: "2B3A5E"),
+                accentColor: Color(hex: "C9A96E"),
+                primaryText: Color(hex: "E8E4DC"),
+                secondaryText: Color(hex: "E8E4DC").opacity(0.6)
             )
         case .morning:
             return DeviTheme(
-                backgroundGradientTop: Color(hex: "c54b2a"),
-                backgroundGradientBottom: Color(hex: "d4862a"),
-                accentColor: Color(hex: "6b1d1d"),
-                primaryText: Color(hex: "faf3e8"),
-                secondaryText: Color(hex: "faf3e8").opacity(0.7),
-                cardBackground: Color.black.opacity(0.15),
-                auspiciousColor: Color(hex: "2d8a4e"),
-                inauspiciousColor: Color(hex: "8b3a3a"),
-                cautionColor: Color(hex: "d4a857")
+                backgroundGradientTop: Color(hex: "1E3A5F"),
+                backgroundGradientMid: Color(hex: "D4854A"),
+                backgroundGradientBottom: Color(hex: "E8A74D"),
+                accentColor: Color(hex: "8B3E1C"),
+                primaryText: Color(hex: "FAF3E8"),
+                secondaryText: Color(hex: "FAF3E8").opacity(0.7)
             )
         case .afternoon:
             return DeviTheme(
-                backgroundGradientTop: Color(hex: "a8441a"),
-                backgroundGradientBottom: Color(hex: "7a3018"),
-                accentColor: Color(hex: "c9a84c"),
-                primaryText: Color(hex: "f0e8d8"),
-                secondaryText: Color(hex: "f0e8d8").opacity(0.65),
-                cardBackground: Color.black.opacity(0.15),
-                auspiciousColor: Color(hex: "4ade80"),
-                inauspiciousColor: Color(hex: "b85c5c"),
-                cautionColor: Color(hex: "d4a857")
+                backgroundGradientTop: Color(hex: "1B4B7A"),
+                backgroundGradientMid: Color(hex: "3B7CB8"),
+                backgroundGradientBottom: Color(hex: "8FB8D4"),
+                accentColor: Color(hex: "B8860B"),
+                primaryText: Color(hex: "1A1A2E"),
+                secondaryText: Color(hex: "1A1A2E").opacity(0.55)
             )
         case .evening:
             return DeviTheme(
-                backgroundGradientTop: Color(hex: "4a1942"),
-                backgroundGradientBottom: Color(hex: "2a0e22"),
-                accentColor: Color(hex: "b87333"),
-                primaryText: Color(hex: "f5ede0"),
-                secondaryText: Color(hex: "f5ede0").opacity(0.6),
-                cardBackground: Color.white.opacity(0.08),
-                auspiciousColor: Color(hex: "4ade80"),
-                inauspiciousColor: Color(hex: "b85c5c"),
-                cautionColor: Color(hex: "d4a857")
+                backgroundGradientTop: Color(hex: "0F1B33"),
+                backgroundGradientMid: Color(hex: "3D2245"),
+                backgroundGradientBottom: Color(hex: "6B3040"),
+                accentColor: Color(hex: "C4813D"),
+                primaryText: Color(hex: "F5EDE0"),
+                secondaryText: Color(hex: "F5EDE0").opacity(0.6)
             )
         case .night:
             return DeviTheme(
-                backgroundGradientTop: Color(hex: "0a0612"),
-                backgroundGradientBottom: Color(hex: "121028"),
-                accentColor: Color(hex: "a8b8d4"),
-                primaryText: Color(hex: "e8e4dc"),
-                secondaryText: Color(hex: "e8e4dc").opacity(0.5),
-                cardBackground: Color.white.opacity(0.06),
-                auspiciousColor: Color(hex: "4ade80"),
-                inauspiciousColor: Color(hex: "b85c5c"),
-                cautionColor: Color(hex: "d4a857")
+                backgroundGradientTop: Color(hex: "060B18"),
+                backgroundGradientMid: Color(hex: "0D1528"),
+                backgroundGradientBottom: Color(hex: "141E33"),
+                accentColor: Color(hex: "8A9BB8"),
+                primaryText: Color(hex: "E8E4DC"),
+                secondaryText: Color(hex: "E8E4DC").opacity(0.5)
             )
         }
     }
-    
-    // The full background gradient (used as main view background)
+
+    // The full background gradient (3-stop atmospheric sky)
     var backgroundGradient: LinearGradient {
         LinearGradient(
-            colors: [backgroundGradientTop, backgroundGradientBottom],
+            stops: [
+                .init(color: backgroundGradientTop, location: 0.0),
+                .init(color: backgroundGradientMid, location: 0.55),
+                .init(color: backgroundGradientBottom, location: 1.0)
+            ],
             startPoint: .top,
             endPoint: .bottom
         )
     }
-    
+
     // Arc gradient for the sun timer
     var arcGradient: LinearGradient {
         LinearGradient(
@@ -134,6 +125,90 @@ struct DeviTheme {
             startPoint: .leading,
             endPoint: .trailing
         )
+    }
+}
+
+// MARK: - Card Elevation System
+
+enum DeviCardElevation {
+    case flat
+    case raised
+    case prominent
+}
+
+struct DeviCardModifier: ViewModifier {
+    let theme: DeviTheme
+    let elevation: DeviCardElevation
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        let effectiveRadius = elevation == .prominent ? max(cornerRadius, 24) : cornerRadius
+
+        content
+            .background {
+                switch elevation {
+                case .flat:
+                    RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                        .fill(theme.primaryText.opacity(0.04))
+                case .raised:
+                    ZStack {
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .fill(.ultraThinMaterial.opacity(0.5))
+
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .fill(theme.primaryText.opacity(0.06))
+                    }
+                case .prominent:
+                    ZStack {
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .fill(.ultraThinMaterial.opacity(0.6))
+
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .fill(theme.primaryText.opacity(0.08))
+
+                        // Inner gradient for prominent cards
+                        LinearGradient(
+                            colors: [theme.accentColor.opacity(0.06), .clear],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous))
+                    }
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous))
+            .overlay(
+                Group {
+                    switch elevation {
+                    case .flat:
+                        EmptyView()
+                    case .raised:
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .stroke(theme.primaryText.opacity(0.10), lineWidth: 1)
+                    case .prominent:
+                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
+                            .stroke(theme.accentColor.opacity(0.15), lineWidth: 1)
+                    }
+                }
+            )
+            .shadow(
+                color: {
+                    switch elevation {
+                    case .flat: return .clear
+                    case .raised: return Color.black.opacity(0.15)
+                    case .prominent: return Color.black.opacity(0.20)
+                    }
+                }(),
+                radius: elevation == .prominent ? 12 : 8,
+                x: 0,
+                y: elevation == .prominent ? 6 : 4
+            )
+    }
+}
+
+extension View {
+    func deviCard(theme: DeviTheme, elevation: DeviCardElevation = .raised, cornerRadius: CGFloat = 20) -> some View {
+        modifier(DeviCardModifier(theme: theme, elevation: elevation, cornerRadius: cornerRadius))
     }
 }
 
@@ -234,17 +309,18 @@ extension Color {
 struct ThemedLabel: ViewModifier {
     let style: LabelStyle
     let theme: DeviTheme
-    
+
     enum LabelStyle {
         case hero        // 48pt countdown
-        case title       // 28pt tithi name
-        case section     // 13pt uppercase label
-        case body        // 17pt regular
-        case detail      // 15pt secondary
-        case sacredTitle // 28pt medium serif
-        case sacredBody  // 15pt medium serif
+        case sacredTitle // 32pt serif (tithi name, goddess)
+        case title       // 22pt semibold sans (section headers)
+        case section     // 12pt uppercase label, tracking 2.0
+        case body        // 16pt regular
+        case sacredBody  // 16pt regular serif
+        case detail      // 14pt secondary
+        case caption     // 12pt timestamps
     }
-    
+
     func body(content: Content) -> some View {
         switch style {
         case .hero:
@@ -252,32 +328,36 @@ struct ThemedLabel: ViewModifier {
                 .font(.system(size: 48, weight: .light, design: .rounded))
                 .foregroundColor(theme.primaryText)
                 .monospacedDigit()
+        case .sacredTitle:
+            content
+                .font(.system(size: 32, weight: .regular, design: .serif))
+                .foregroundColor(theme.primaryText)
         case .title:
             content
-                .font(.system(size: 28, weight: .medium))
+                .font(.system(size: 22, weight: .semibold))
                 .foregroundColor(theme.primaryText)
         case .section:
             content
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundColor(theme.secondaryText)
                 .textCase(.uppercase)
-                .tracking(1.5)
+                .tracking(2.0)
         case .body:
             content
-                .font(.system(size: 17, weight: .regular))
-                .foregroundColor(theme.primaryText)
-        case .detail:
-            content
-                .font(.system(size: 15, weight: .regular))
-                .foregroundColor(theme.secondaryText)
-        case .sacredTitle:
-            content
-                .font(.system(size: 28, weight: .medium, design: .serif))
+                .font(.system(size: 16, weight: .regular))
                 .foregroundColor(theme.primaryText)
         case .sacredBody:
             content
-                .font(.system(size: 15, weight: .medium, design: .serif))
+                .font(.system(size: 16, weight: .regular, design: .serif))
                 .foregroundColor(theme.primaryText)
+        case .detail:
+            content
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(theme.secondaryText)
+        case .caption:
+            content
+                .font(.system(size: 12, weight: .regular))
+                .foregroundColor(theme.secondaryText)
         }
     }
 }
@@ -285,39 +365,6 @@ struct ThemedLabel: ViewModifier {
 extension View {
     func deviLabel(_ style: ThemedLabel.LabelStyle, theme: DeviTheme) -> some View {
         modifier(ThemedLabel(style: style, theme: theme))
-    }
-}
-
-// MARK: - Glassmorphic Card Modifier
-
-struct DeviCardModifier: ViewModifier {
-    let theme: DeviTheme
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .background(
-                ZStack {
-                    theme.cardBackground
-
-                    LinearGradient(
-                        colors: [theme.primaryText.opacity(0.04), .clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .stroke(theme.primaryText.opacity(0.12), lineWidth: 0.5)
-            )
-    }
-}
-
-extension View {
-    func deviCard(theme: DeviTheme, cornerRadius: CGFloat = 16) -> some View {
-        modifier(DeviCardModifier(theme: theme, cornerRadius: cornerRadius))
     }
 }
 

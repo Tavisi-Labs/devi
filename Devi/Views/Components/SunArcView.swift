@@ -13,47 +13,25 @@ struct SunArcView: View {
     let countdownLabel: String
     let theme: DeviTheme
     let timezoneIdentifier: String
-    
+
     // Animation state for the sun dot pulse
     @State private var isPulsing = false
-    
-    private let arcSize: CGFloat = 280
-    
+
+    private let arcSize: CGFloat = 320
+
     var body: some View {
         VStack(spacing: 8) {
             // The arc + sun dot + time display
             ZStack {
-                // Arc track glow (blurred behind track)
+                // Dashed track arc (textured background)
                 SunArcShape()
                     .stroke(
-                        theme.primaryText.opacity(0.05),
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                    )
-                    .frame(width: arcSize, height: arcSize / 2)
-                    .blur(radius: 4)
-
-                // Background arc (track)
-                SunArcShape()
-                    .stroke(
-                        theme.primaryText.opacity(0.1),
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                        theme.primaryText.opacity(0.12),
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [4, 6])
                     )
                     .frame(width: arcSize, height: arcSize / 2)
 
-                // Progress arc glow (blurred behind progress arc)
-                if isDaytime {
-                    SunArcShape()
-                        .trim(from: 0, to: progress)
-                        .stroke(
-                            theme.arcGradient,
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                        )
-                        .frame(width: arcSize, height: arcSize / 2)
-                        .blur(radius: 8)
-                        .opacity(0.4)
-                }
-
-                // Filled arc (progress)
+                // Progress arc (clean single stroke with shadow)
                 if isDaytime {
                     SunArcShape()
                         .trim(from: 0, to: progress)
@@ -62,6 +40,7 @@ struct SunArcView: View {
                             style: StrokeStyle(lineWidth: 3, lineCap: .round)
                         )
                         .frame(width: arcSize, height: arcSize / 2)
+                        .shadow(color: Color(hex: "f0c040").opacity(0.35), radius: 6, x: 0, y: 0)
                 }
 
                 // Sun/Moon dot
@@ -88,10 +67,10 @@ struct SunArcView: View {
                         .monospacedDigit()
                         .contentTransition(.numericText())
                 }
-                .offset(y: 20) // Push down from arc center
+                .offset(y: 30) // More breathing room from arc center
             }
-            .frame(height: arcSize / 2 + 50)
-            
+            .frame(height: arcSize / 2 + 60)
+
             // Sunrise / Sunset labels below the arc
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
@@ -100,9 +79,9 @@ struct SunArcView: View {
                     Text(formatTime(isDaytime ? sunrise : sunset))
                         .deviLabel(.body, theme: theme)
                 }
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: 2) {
                     Text(isDaytime ? "Sunset" : "Moonset")
                         .deviLabel(.section, theme: theme)
@@ -110,15 +89,15 @@ struct SunArcView: View {
                         .deviLabel(.body, theme: theme)
                 }
             }
-            .padding(.horizontal, 40)
+            .padding(.horizontal, 48)
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
                 isPulsing = true
             }
         }
     }
-    
+
     private func formatTime(_ date: Date) -> String {
         deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
     }
@@ -131,7 +110,7 @@ struct SunArcShape: Shape {
         var path = Path()
         let center = CGPoint(x: rect.midX, y: rect.maxY)
         let radius = min(rect.width, rect.height * 2) / 2
-        
+
         path.addArc(
             center: center,
             radius: radius,
@@ -139,7 +118,7 @@ struct SunArcShape: Shape {
             endAngle: .degrees(0),
             clockwise: false
         )
-        
+
         return path
     }
 }
@@ -177,13 +156,13 @@ struct SunDot: View {
                         )
                     )
                     .frame(width: 40, height: 40)
-                    .scaleEffect(isPulsing ? 1.2 : 1.0)
+                    .scaleEffect(isPulsing ? 1.08 : 1.0)
 
                 // Outer ring
                 Circle()
                     .fill(sunGold.opacity(0.3))
                     .frame(width: 28, height: 28)
-                    .scaleEffect(isPulsing ? 1.1 : 1.0)
+                    .scaleEffect(isPulsing ? 1.04 : 1.0)
 
                 // Inner dot
                 Circle()
@@ -206,7 +185,7 @@ struct SunDot: View {
                         )
                     )
                     .frame(width: 36, height: 36)
-                    .scaleEffect(isPulsing ? 1.15 : 1.0)
+                    .scaleEffect(isPulsing ? 1.08 : 1.0)
 
                 // Moon icon
                 Image(systemName: "moon.fill")
@@ -223,9 +202,9 @@ struct SunDot: View {
 
 #Preview {
     ZStack {
-        Color(hex: "1a0a2e")
+        Color(hex: "0B1026")
             .ignoresSafeArea()
-        
+
         SunArcView(
             progress: 0.65,
             isDaytime: true,
