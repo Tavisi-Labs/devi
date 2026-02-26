@@ -6,30 +6,46 @@ import SwiftUI
 struct OnboardingView: View {
     @ObservedObject var vm: PanchangViewModel
     @State private var currentPage = 0
-    
+    @State private var showCityPicker = false
+
+    // Notification toggle states
+    @State private var notifSunrise = true
+    @State private var notifSunset = true
+    @State private var notifRahuKalam = true
+    @State private var notifAbhijit = false
+    @State private var notifBrahma = false
+
     var body: some View {
-        ZStack {
-            // Background
-            LinearGradient(
-                colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
-            
-            TabView(selection: $currentPage) {
-                welcomePage.tag(0)
-                notificationPage.tag(1)
+        GeometryReader { geo in
+            ZStack {
+                // Background
+                LinearGradient(
+                    colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+
+                TabView(selection: $currentPage) {
+                    welcomePage(size: geo.size).tag(0)
+                    notificationPage(size: geo.size).tag(1)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .ignoresSafeArea(edges: .bottom)
+        }
+        .ignoresSafeArea()
+        .sheet(isPresented: $showCityPicker) {
+            CityPickerView(selectedCity: vm.currentCity) { city in
+                vm.selectCity(city)
+                showCityPicker = false
+                withAnimation { currentPage = 1 }
+            }
         }
     }
-    
+
     // MARK: - Page 1: Welcome + Location
 
-    private var welcomePage: some View {
-        GeometryReader { geo in
+    private func welcomePage(size: CGSize) -> some View {
         VStack(spacing: 0) {
             Spacer()
 
@@ -69,16 +85,11 @@ struct OnboardingView: View {
                     withAnimation { currentPage = 1 }
                 } label: {
                     Text("Allow Location")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(hex: "1a0a2e"))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 52)
-                        .background(Color(hex: "d4a857"))
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
+                .deviButton(.primary)
 
                 Button {
-                    withAnimation { currentPage = 1 }
+                    showCityPicker = true
                 } label: {
                     Text("Choose city manually")
                         .font(.system(size: 15, weight: .medium))
@@ -88,14 +99,12 @@ struct OnboardingView: View {
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
         }
-        .frame(width: geo.size.width, height: geo.size.height)
-        }
+        .frame(width: size.width, height: size.height)
     }
 
     // MARK: - Page 2: Notifications
-    
-    private var notificationPage: some View {
-        GeometryReader { geo in
+
+    private func notificationPage(size: CGSize) -> some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 24) {
@@ -116,15 +125,15 @@ struct OnboardingView: View {
 
                     // Notification toggles
                     VStack(spacing: 0) {
-                        notifToggle("Sunrise", icon: "sunrise.fill", isOn: true)
+                        notifToggle("Sunrise", icon: "sunrise.fill", isOn: $notifSunrise)
                         Divider().background(Color.white.opacity(0.1))
-                        notifToggle("Sunset", icon: "sunset.fill", isOn: true)
+                        notifToggle("Sunset", icon: "sunset.fill", isOn: $notifSunset)
                         Divider().background(Color.white.opacity(0.1))
-                        notifToggle("Rahu Kalam Warning", icon: "exclamationmark.circle", isOn: true)
+                        notifToggle("Rahu Kalam Warning", icon: "exclamationmark.circle", isOn: $notifRahuKalam)
                         Divider().background(Color.white.opacity(0.1))
-                        notifToggle("Abhijit Muhurta", icon: "checkmark.circle", isOn: false)
+                        notifToggle("Abhijit Muhurta", icon: "checkmark.circle", isOn: $notifAbhijit)
                         Divider().background(Color.white.opacity(0.1))
-                        notifToggle("Brahma Muhurta", icon: "moon.stars", isOn: false)
+                        notifToggle("Brahma Muhurta", icon: "moon.stars", isOn: $notifBrahma)
                     }
                     .background(Color.white.opacity(0.06))
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -138,38 +147,39 @@ struct OnboardingView: View {
             .scrollBounceBehavior(.basedOnSize)
 
             Button {
+                vm.saveOnboardingNotificationPreferences(
+                    sunrise: notifSunrise,
+                    sunset: notifSunset,
+                    rahuKalam: notifRahuKalam,
+                    abhijit: notifAbhijit,
+                    brahma: notifBrahma
+                )
                 vm.completeOnboarding()
                 vm.loadData()
             } label: {
                 Text("Begin")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(hex: "1a0a2e"))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 52)
-                    .background(Color(hex: "d4a857"))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
+            .deviButton(.primary)
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
         }
-        .frame(width: geo.size.width, height: geo.size.height)
-        }
+        .frame(width: size.width, height: size.height)
     }
 
-    private func notifToggle(_ label: String, icon: String, isOn: Bool) -> some View {
+    private func notifToggle(_ label: String, icon: String, isOn: Binding<Bool>) -> some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.system(size: 16))
                 .foregroundColor(Color(hex: "d4a857"))
                 .frame(width: 24)
-            
+
             Text(label)
                 .font(.system(size: 15, weight: .regular))
                 .foregroundColor(Color(hex: "f5f0e8"))
-            
+
             Spacer()
-            
-            Toggle("", isOn: .constant(isOn))
+
+            Toggle("", isOn: isOn)
                 .tint(Color(hex: "d4a857"))
                 .labelsHidden()
         }

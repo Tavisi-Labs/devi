@@ -6,11 +6,12 @@ import SwiftUI
 struct TimeWindowsCard: View {
     let windows: [TimeWindow]
     let theme: DeviTheme
-    
+    let timezoneIdentifier: String
+
     var body: some View {
         VStack(spacing: 0) {
             ForEach(Array(windows.enumerated()), id: \.element.id) { index, window in
-                TimeWindowRow(window: window, theme: theme)
+                TimeWindowRow(window: window, theme: theme, timezoneIdentifier: timezoneIdentifier)
                 
                 if index < windows.count - 1 {
                     Divider()
@@ -26,6 +27,7 @@ struct TimeWindowsCard: View {
 struct TimeWindowRow: View {
     let window: TimeWindow
     let theme: DeviTheme
+    let timezoneIdentifier: String
     
     private var statusColor: Color {
         switch window.statusColor {
@@ -85,9 +87,7 @@ struct TimeWindowRow: View {
     }
     
     private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: date)
+        deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
     }
 }
 
@@ -96,10 +96,10 @@ struct TimeWindowRow: View {
 #Preview {
     let cal = Calendar.current
     let today = cal.startOfDay(for: Date())
-    
+
     ZStack {
         Color(hex: "1a0a2e").ignoresSafeArea()
-        
+
         TimeWindowsCard(
             windows: [
                 TimeWindow(type: .abhijitMuhurta,
@@ -112,7 +112,8 @@ struct TimeWindowRow: View {
                           start: cal.date(bySettingHour: 12, minute: 0, second: 0, of: today)!,
                           end: cal.date(bySettingHour: 13, minute: 30, second: 0, of: today)!),
             ],
-            theme: DeviTheme.forPeriod(.brahmaMuhurta)
+            theme: DeviTheme.forPeriod(.brahmaMuhurta),
+            timezoneIdentifier: "America/New_York"
         )
         .padding()
     }

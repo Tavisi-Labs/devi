@@ -137,6 +137,70 @@ struct DeviTheme {
     }
 }
 
+// MARK: - Button Style
+
+enum DeviButtonVariant {
+    case primary
+    case secondary
+}
+
+struct DeviButtonStyle: ButtonStyle {
+    let variant: DeviButtonVariant
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 17, weight: .semibold))
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .foregroundColor(variant == .primary ? Color(hex: "1a0a2e") : Color(hex: "d4a857"))
+            .background(
+                Group {
+                    if variant == .primary {
+                        LinearGradient(
+                            colors: [Color(hex: "d4a857"), Color(hex: "c49a4a")],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    } else {
+                        Color.clear
+                    }
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                Group {
+                    if variant == .secondary {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
+                    }
+                }
+            )
+            .shadow(
+                color: variant == .primary ? Color(hex: "d4a857").opacity(0.3) : .clear,
+                radius: 8,
+                x: 0,
+                y: 4
+            )
+            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+extension View {
+    func deviButton(_ variant: DeviButtonVariant) -> some View {
+        self.buttonStyle(DeviButtonStyle(variant: variant))
+    }
+}
+
+// MARK: - Timezone-Aware Time Formatting
+
+func deviFormatTime(_ date: Date, timezoneIdentifier: String) -> String {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "h:mm a"
+    formatter.timeZone = TimeZone(identifier: timezoneIdentifier) ?? .current
+    return formatter.string(from: date)
+}
+
 // MARK: - Color Extension for Hex
 
 extension Color {

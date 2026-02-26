@@ -34,7 +34,8 @@ struct HomeView: View {
                             currentTime: vm.currentTimeText,
                             countdownText: vm.countdownText,
                             countdownLabel: vm.countdownLabel,
-                            theme: vm.theme
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier
                         )
                     }
                     
@@ -47,7 +48,8 @@ struct HomeView: View {
                     if !vm.activeTimeWindows.isEmpty {
                         TimeWindowsCard(
                             windows: vm.activeTimeWindows,
-                            theme: vm.theme
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier
                         )
                         .padding(.horizontal)
                     }
@@ -64,18 +66,22 @@ struct HomeView: View {
                     // MARK: - Upcoming
                     upcomingSection
                     
-                    // Bottom padding for scroll
-                    Spacer(minLength: 40)
                 }
+                .padding(.bottom, 60)
                 .padding(.top, 8)
             }
         }
         .onAppear {
             vm.requestLocation()
             vm.loadData()
+            vm.startTimer()
+        }
+        .onDisappear {
+            vm.stopTimer()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(vm: vm)
+                .presentationBackground(.background)
         }
     }
     
@@ -231,11 +237,9 @@ struct HomeView: View {
     }
     
     // MARK: - Helpers
-    
+
     private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: date)
+        deviFormatTime(date, timezoneIdentifier: vm.currentCity.timezoneIdentifier)
     }
 }
 

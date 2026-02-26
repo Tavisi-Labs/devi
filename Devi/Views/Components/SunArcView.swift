@@ -12,6 +12,7 @@ struct SunArcView: View {
     let countdownText: String
     let countdownLabel: String
     let theme: DeviTheme
+    let timezoneIdentifier: String
     
     // Animation state for the sun dot pulse
     @State private var isPulsing = false
@@ -97,9 +98,7 @@ struct SunArcView: View {
     }
     
     private func formatTime(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        return formatter.string(from: date)
+        deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
     }
 }
 
@@ -176,7 +175,8 @@ struct SunDot: View {
             currentTime: "6:42 PM",
             countdownText: "10:33:00",
             countdownLabel: "SUNSET IN",
-            theme: DeviTheme.forPeriod(.evening)
+            theme: DeviTheme.forPeriod(.evening),
+            timezoneIdentifier: "America/New_York"
         )
     }
 }

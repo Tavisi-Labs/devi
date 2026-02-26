@@ -21,7 +21,17 @@ class PanchangViewModel: ObservableObject {
     @Published var currentTimeText: String = "6:00 PM"
     @Published var isLocationAuthorized: Bool = false
     @Published var hasCompletedOnboarding: Bool = false
-    
+
+    // MARK: - Notification Preferences (persisted via UserDefaults)
+
+    @Published var notifSunrise: Bool = true { didSet { UserDefaults.standard.set(notifSunrise, forKey: "notif.sunrise") } }
+    @Published var notifSunset: Bool = true { didSet { UserDefaults.standard.set(notifSunset, forKey: "notif.sunset") } }
+    @Published var notifRahuKalamWarning: Bool = true { didSet { UserDefaults.standard.set(notifRahuKalamWarning, forKey: "notif.rahuKalam") } }
+    @Published var notifAbhijitMuhurta: Bool = false { didSet { UserDefaults.standard.set(notifAbhijitMuhurta, forKey: "notif.abhijit") } }
+    @Published var notifBrahmaMuhurta: Bool = false { didSet { UserDefaults.standard.set(notifBrahmaMuhurta, forKey: "notif.brahma") } }
+    @Published var notifNavratriMorning: Bool = true { didSet { UserDefaults.standard.set(notifNavratriMorning, forKey: "notif.navratri") } }
+    @Published var notifMinutesBefore: Int = 10 { didSet { UserDefaults.standard.set(notifMinutesBefore, forKey: "notif.minutesBefore") } }
+
     // MARK: - Private
     
     private let locationManager = LocationManager()
@@ -50,17 +60,32 @@ class PanchangViewModel: ObservableObject {
     
     init() {
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
-        startTimer()
+
+        // Load persisted notification preferences
+        let ud = UserDefaults.standard
+        if ud.object(forKey: "notif.sunrise") != nil { notifSunrise = ud.bool(forKey: "notif.sunrise") }
+        if ud.object(forKey: "notif.sunset") != nil { notifSunset = ud.bool(forKey: "notif.sunset") }
+        if ud.object(forKey: "notif.rahuKalam") != nil { notifRahuKalamWarning = ud.bool(forKey: "notif.rahuKalam") }
+        if ud.object(forKey: "notif.abhijit") != nil { notifAbhijitMuhurta = ud.bool(forKey: "notif.abhijit") }
+        if ud.object(forKey: "notif.brahma") != nil { notifBrahmaMuhurta = ud.bool(forKey: "notif.brahma") }
+        if ud.object(forKey: "notif.navratri") != nil { notifNavratriMorning = ud.bool(forKey: "notif.navratri") }
+        if ud.object(forKey: "notif.minutesBefore") != nil { notifMinutesBefore = ud.integer(forKey: "notif.minutesBefore") }
     }
     
     // MARK: - Timer (updates every second)
-    
-    private func startTimer() {
+
+    func startTimer() {
+        guard timerCancellable == nil else { return }
         timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
                 self?.tick()
             }
+    }
+
+    func stopTimer() {
+        timerCancellable?.cancel()
+        timerCancellable = nil
     }
     
     private func tick() {
@@ -70,9 +95,7 @@ class PanchangViewModel: ObservableObject {
     }
     
     private func updateCurrentTime() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a"
-        currentTimeText = formatter.string(from: Date())
+        currentTimeText = deviFormatTime(Date(), timezoneIdentifier: currentCity.timezoneIdentifier)
     }
     
     private func updateCountdown() {
@@ -187,7 +210,17 @@ class PanchangViewModel: ObservableObject {
     }
     
     // MARK: - Onboarding
-    
+
+    func saveOnboardingNotificationPreferences(
+        sunrise: Bool, sunset: Bool, rahuKalam: Bool, abhijit: Bool, brahma: Bool
+    ) {
+        notifSunrise = sunrise
+        notifSunset = sunset
+        notifRahuKalamWarning = rahuKalam
+        notifAbhijitMuhurta = abhijit
+        notifBrahmaMuhurta = brahma
+    }
+
     func completeOnboarding() {
         hasCompletedOnboarding = true
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")

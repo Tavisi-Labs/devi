@@ -7,7 +7,6 @@ struct SettingsView: View {
     @ObservedObject var vm: PanchangViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showCityPicker = false
-    @State private var notifPrefs = NotificationPreferences()
     
     var body: some View {
         NavigationStack {
@@ -36,28 +35,28 @@ struct SettingsView: View {
                 
                 // MARK: - Notifications
                 Section {
-                    Toggle(isOn: $notifPrefs.sunrise) {
+                    Toggle(isOn: $vm.notifSunrise) {
                         Label("Sunrise", systemImage: "sunrise.fill")
                     }
-                    Toggle(isOn: $notifPrefs.sunset) {
+                    Toggle(isOn: $vm.notifSunset) {
                         Label("Sunset / Sandhya", systemImage: "sunset.fill")
                     }
-                    Toggle(isOn: $notifPrefs.rahuKalamWarning) {
+                    Toggle(isOn: $vm.notifRahuKalamWarning) {
                         Label("Rahu Kalam Warning", systemImage: "exclamationmark.circle")
                     }
-                    Toggle(isOn: $notifPrefs.abhijitMuhurta) {
+                    Toggle(isOn: $vm.notifAbhijitMuhurta) {
                         Label("Abhijit Muhurta", systemImage: "checkmark.circle")
                     }
-                    Toggle(isOn: $notifPrefs.brahmaMuhurta) {
+                    Toggle(isOn: $vm.notifBrahmaMuhurta) {
                         Label("Brahma Muhurta", systemImage: "moon.stars")
                     }
-                    Toggle(isOn: $notifPrefs.navratriMorning) {
+                    Toggle(isOn: $vm.notifNavratriMorning) {
                         Label("Navratri Daily", systemImage: "sparkle")
                     }
                 } header: {
                     Text("Notifications")
                 } footer: {
-                    Text("Notifications are sent \(notifPrefs.minutesBefore) minutes before each event.")
+                    Text("Notifications are sent \(vm.notifMinutesBefore) minutes before each event.")
                 }
                 
                 // MARK: - About
