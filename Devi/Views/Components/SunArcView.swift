@@ -23,6 +23,15 @@ struct SunArcView: View {
         VStack(spacing: 8) {
             // The arc + sun dot + time display
             ZStack {
+                // Arc track glow (blurred behind track)
+                SunArcShape()
+                    .stroke(
+                        theme.primaryText.opacity(0.05),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
+                    .frame(width: arcSize, height: arcSize / 2)
+                    .blur(radius: 4)
+
                 // Background arc (track)
                 SunArcShape()
                     .stroke(
@@ -30,7 +39,20 @@ struct SunArcView: View {
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
                     .frame(width: arcSize, height: arcSize / 2)
-                
+
+                // Progress arc glow (blurred behind progress arc)
+                if isDaytime {
+                    SunArcShape()
+                        .trim(from: 0, to: progress)
+                        .stroke(
+                            theme.arcGradient,
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        )
+                        .frame(width: arcSize, height: arcSize / 2)
+                        .blur(radius: 8)
+                        .opacity(0.4)
+                }
+
                 // Filled arc (progress)
                 if isDaytime {
                     SunArcShape()
@@ -41,7 +63,7 @@ struct SunArcView: View {
                         )
                         .frame(width: arcSize, height: arcSize / 2)
                 }
-                
+
                 // Sun/Moon dot
                 SunDot(
                     progress: isDaytime ? progress : 0,
@@ -50,16 +72,16 @@ struct SunArcView: View {
                     theme: theme,
                     isPulsing: isPulsing
                 )
-                
+
                 // Center content: current time + countdown
                 VStack(spacing: 4) {
                     Text(currentTime)
                         .font(.system(size: 24, weight: .light, design: .rounded))
                         .foregroundColor(theme.primaryText.opacity(0.8))
-                    
+
                     Text(countdownLabel)
                         .deviLabel(.section, theme: theme)
-                    
+
                     Text(countdownText)
                         .font(.system(size: 48, weight: .light, design: .rounded))
                         .foregroundColor(theme.primaryText)
@@ -68,7 +90,7 @@ struct SunArcView: View {
                 }
                 .offset(y: 20) // Push down from arc center
             }
-            .frame(height: arcSize / 2 + 40)
+            .frame(height: arcSize / 2 + 50)
             
             // Sunrise / Sunset labels below the arc
             HStack {
@@ -130,31 +152,68 @@ struct SunDot: View {
     let isDaytime: Bool
     let theme: DeviTheme
     let isPulsing: Bool
-    
+
+    private let sunGold = Color(hex: "f0c040")
+    private let moonSilver = Color(hex: "a8b8d4")
+
     var body: some View {
-        let angle = Angle.degrees(180 + (progress * 180)) // 180° to 360°
+        let angle = Angle.degrees(180 + (progress * 180))
         let radius = arcSize / 2
         let center = CGPoint(x: arcSize / 2, y: arcSize / 2)
-        
+
         let x = center.x + radius * CGFloat(cos(angle.radians))
         let y = center.y + radius * CGFloat(sin(angle.radians))
-        
+
         ZStack {
-            // Outer glow
-            Circle()
-                .fill(theme.accentColor.opacity(0.3))
-                .frame(width: 24, height: 24)
-                .scaleEffect(isPulsing ? 1.3 : 1.0)
-            
-            // Inner dot
-            Circle()
-                .fill(theme.accentColor)
-                .frame(width: 12, height: 12)
-            
-            // Center highlight
-            Circle()
-                .fill(Color.white.opacity(0.6))
-                .frame(width: 4, height: 4)
+            if isDaytime {
+                // Warm radial glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [sunGold.opacity(0.4), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 20
+                        )
+                    )
+                    .frame(width: 40, height: 40)
+                    .scaleEffect(isPulsing ? 1.2 : 1.0)
+
+                // Outer ring
+                Circle()
+                    .fill(sunGold.opacity(0.3))
+                    .frame(width: 28, height: 28)
+                    .scaleEffect(isPulsing ? 1.1 : 1.0)
+
+                // Inner dot
+                Circle()
+                    .fill(theme.accentColor)
+                    .frame(width: 14, height: 14)
+
+                // Center highlight
+                Circle()
+                    .fill(Color.white.opacity(0.6))
+                    .frame(width: 5, height: 5)
+            } else {
+                // Cool radial glow
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [moonSilver.opacity(0.3), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 18
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+                    .scaleEffect(isPulsing ? 1.15 : 1.0)
+
+                // Moon icon
+                Image(systemName: "moon.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(moonSilver)
+                    .shadow(color: moonSilver.opacity(0.5), radius: 4)
+            }
         }
         .position(x: x, y: y)
     }

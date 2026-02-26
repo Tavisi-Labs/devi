@@ -236,11 +236,13 @@ struct ThemedLabel: ViewModifier {
     let theme: DeviTheme
     
     enum LabelStyle {
-        case hero       // 72pt countdown
-        case title      // 28pt tithi name
-        case section    // 13pt uppercase label
-        case body       // 17pt regular
-        case detail     // 15pt secondary
+        case hero        // 48pt countdown
+        case title       // 28pt tithi name
+        case section     // 13pt uppercase label
+        case body        // 17pt regular
+        case detail      // 15pt secondary
+        case sacredTitle // 28pt medium serif
+        case sacredBody  // 15pt medium serif
     }
     
     func body(content: Content) -> some View {
@@ -268,6 +270,14 @@ struct ThemedLabel: ViewModifier {
             content
                 .font(.system(size: 15, weight: .regular))
                 .foregroundColor(theme.secondaryText)
+        case .sacredTitle:
+            content
+                .font(.system(size: 28, weight: .medium, design: .serif))
+                .foregroundColor(theme.primaryText)
+        case .sacredBody:
+            content
+                .font(.system(size: 15, weight: .medium, design: .serif))
+                .foregroundColor(theme.primaryText)
         }
     }
 }
@@ -275,5 +285,62 @@ struct ThemedLabel: ViewModifier {
 extension View {
     func deviLabel(_ style: ThemedLabel.LabelStyle, theme: DeviTheme) -> some View {
         modifier(ThemedLabel(style: style, theme: theme))
+    }
+}
+
+// MARK: - Glassmorphic Card Modifier
+
+struct DeviCardModifier: ViewModifier {
+    let theme: DeviTheme
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                ZStack {
+                    theme.cardBackground
+
+                    LinearGradient(
+                        colors: [theme.primaryText.opacity(0.04), .clear],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(theme.primaryText.opacity(0.12), lineWidth: 0.5)
+            )
+    }
+}
+
+extension View {
+    func deviCard(theme: DeviTheme, cornerRadius: CGFloat = 16) -> some View {
+        modifier(DeviCardModifier(theme: theme, cornerRadius: cornerRadius))
+    }
+}
+
+// MARK: - Entrance Animation Modifier
+
+struct DeviEntranceModifier: ViewModifier {
+    let delay: Double
+    @State private var isAppearing = false
+
+    func body(content: Content) -> some View {
+        content
+            .offset(y: isAppearing ? 0 : 20)
+            .opacity(isAppearing ? 1 : 0)
+            .onAppear {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(delay)) {
+                    isAppearing = true
+                }
+            }
+    }
+}
+
+extension View {
+    func deviEntrance(delay: Double = 0) -> some View {
+        modifier(DeviEntranceModifier(delay: delay))
     }
 }

@@ -22,12 +22,17 @@ struct OnboardingView: View {
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
         .background {
-            LinearGradient(
-                colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            ZStack {
+                LinearGradient(
+                    colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+
+                StarFieldView(isDaytime: false, timePeriod: .brahmaMuhurta)
+                    .ignoresSafeArea()
+            }
         }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: vm.currentCity) { city in
@@ -129,8 +134,7 @@ struct OnboardingView: View {
                         Divider().background(Color.white.opacity(0.1))
                         notifToggle("Brahma Muhurta", icon: "moon.stars", isOn: $notifBrahma)
                     }
-                    .background(Color.white.opacity(0.06))
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .deviCard(theme: DeviTheme.forPeriod(.brahmaMuhurta))
                     .padding(.horizontal, 24)
 
                     Text("You can change these anytime in settings")

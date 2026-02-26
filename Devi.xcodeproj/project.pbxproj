@@ -18,6 +18,8 @@
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
+		C1A2B3D4E5F6071829304152 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */; };
+		D2B3C4E5F6071829304152A1 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6071829304152A1 /* StarFieldView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +33,8 @@
 		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6071829304152A1 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -61,6 +65,8 @@
 			isa = PBXGroup;
 			children = (
 				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
+				A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */,
+				B2C3D4E5F6071829304152A1 /* StarFieldView.swift */,
 				406B7EE63A21C444D045C89E /* SunArcView.swift */,
 				5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */,
 			);
@@ -173,6 +179,8 @@
 				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
 				45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */,
 				4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */,
+				C1A2B3D4E5F6071829304152 /* OrnamentalDivider.swift in Sources */,
+				D2B3C4E5F6071829304152A1 /* StarFieldView.swift in Sources */,
 				36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */,
 				892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */,
 				90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */,

@@ -7,8 +7,6 @@ struct NavratriCard: View {
     let day: NavratriDay
     let theme: DeviTheme
     
-    @State private var isAppearing = false
-    
     private var dayColor: Color {
         Color(hex: day.colorHex)
     }
@@ -41,7 +39,7 @@ struct NavratriCard: View {
             // Goddess name
             VStack(alignment: .leading, spacing: 4) {
                 Text(day.goddessName)
-                    .font(.system(size: 26, weight: .semibold))
+                    .font(.system(size: 26, weight: .semibold, design: .serif))
                     .foregroundColor(theme.primaryText)
                 
                 Text(day.goddessEpithet)
@@ -126,13 +124,11 @@ struct NavratriCard: View {
             }
         )
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .offset(y: isAppearing ? 0 : 20)
-        .opacity(isAppearing ? 1 : 0)
-        .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-                isAppearing = true
-            }
-        }
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(theme.primaryText.opacity(0.12), lineWidth: 0.5)
+        )
+        .deviEntrance()
     }
 }
 

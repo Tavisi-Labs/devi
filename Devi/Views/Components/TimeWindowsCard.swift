@@ -19,8 +19,8 @@ struct TimeWindowsCard: View {
                 }
             }
         }
-        .background(theme.cardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .deviCard(theme: theme)
+        .deviEntrance(delay: 0.08)
     }
 }
 

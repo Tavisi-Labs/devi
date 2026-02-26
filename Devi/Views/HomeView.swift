@@ -35,6 +35,7 @@ struct HomeView: View {
                 // MARK: - Fasting indicator (if applicable)
                 if let fastType = vm.todayPanchang?.tithi.fastingType {
                     fastingBanner(fastType)
+                        .deviEntrance()
                 }
 
                 // MARK: - Time Windows
@@ -63,11 +64,17 @@ struct HomeView: View {
             .padding(.bottom, 60)
             .padding(.top, 8)
         }
-        // Full-screen adaptive gradient background
+        // Full-screen adaptive gradient + star field background
         .background {
-            vm.theme.backgroundGradient
-                .ignoresSafeArea()
-                .animation(.easeInOut(duration: 30), value: vm.timePeriod)
+            ZStack {
+                vm.theme.backgroundGradient
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 30), value: vm.timePeriod)
+
+                StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod)
+                    .ignoresSafeArea()
+                    .animation(.easeInOut(duration: 5), value: vm.timePeriod)
+            }
         }
         .onAppear {
             vm.requestLocation()
@@ -116,14 +123,16 @@ struct HomeView: View {
         VStack(spacing: 6) {
             if let panchang = vm.todayPanchang {
                 Text("\(panchang.lunarMonth), \(panchang.tithi.paksha.rawValue) Paksha")
-                    .deviLabel(.detail, theme: vm.theme)
-                
+                    .font(.system(size: 15, weight: .regular, design: .serif))
+                    .foregroundColor(vm.theme.secondaryText)
+
                 Text(panchang.tithi.name.uppercased())
-                    .deviLabel(.title, theme: vm.theme)
+                    .deviLabel(.sacredTitle, theme: vm.theme)
                     .tracking(2)
-                
+
                 Text("\(panchang.nakshatra.name) Nakshatra")
-                    .deviLabel(.detail, theme: vm.theme)
+                    .font(.system(size: 15, weight: .regular, design: .serif))
+                    .foregroundColor(vm.theme.secondaryText)
             }
         }
     }
@@ -145,7 +154,7 @@ struct HomeView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(Color(hex: "c54b2a").opacity(0.15))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .deviCard(theme: vm.theme, cornerRadius: 12)
         .padding(.horizontal)
     }
     
@@ -153,62 +162,51 @@ struct HomeView: View {
     
     private var todayDetails: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Section header
-            HStack {
-                Rectangle()
-                    .fill(vm.theme.primaryText.opacity(0.2))
-                    .frame(height: 1)
-                
-                Text("TODAY")
-                    .deviLabel(.section, theme: vm.theme)
-                
-                Rectangle()
-                    .fill(vm.theme.primaryText.opacity(0.2))
-                    .frame(height: 1)
-            }
-            .padding(.horizontal)
-            
+            OrnamentalDivider("TODAY", theme: vm.theme)
+
             if let panchang = vm.todayPanchang {
                 VStack(spacing: 12) {
-                    detailRow("Yoga", value: panchang.yoga.name)
-                    detailRow("Karana", value: panchang.karana.name)
-                    
+                    detailRow("Yoga", value: panchang.yoga.name, sacredValue: true)
+                    detailRow("Karana", value: panchang.karana.name, sacredValue: true)
+
                     if let moonrise = panchang.solar.moonrise {
                         detailRow("Moonrise", value: formatTime(moonrise))
                     }
                     if let moonset = panchang.solar.moonset {
                         detailRow("Moonset", value: formatTime(moonset))
                     }
-                    
-                    detailRow("Vara", value: panchang.varaDeity)
+
+                    detailRow("Vara", value: panchang.varaDeity, sacredValue: true)
                 }
-                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .deviCard(theme: vm.theme)
+                .padding(.horizontal)
             }
         }
+        .deviEntrance(delay: 0.16)
     }
     
-    private func detailRow(_ label: String, value: String) -> some View {
+    private func detailRow(_ label: String, value: String, sacredValue: Bool = false) -> some View {
         HStack {
             Text(label)
                 .font(.system(size: 15, weight: .regular))
                 .foregroundColor(vm.theme.secondaryText)
-            
+
             Spacer()
-            
+
             Text(value)
-                .font(.system(size: 15, weight: .medium))
+                .font(.system(size: 15, weight: .medium, design: sacredValue ? .serif : .default))
                 .foregroundColor(vm.theme.primaryText)
         }
+        .padding(.horizontal, 20)
     }
     
     // MARK: - Upcoming Events
     
     private var upcomingSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Upcoming")
-                .deviLabel(.section, theme: vm.theme)
-                .padding(.horizontal, 20)
-            
+            OrnamentalDivider("UPCOMING", theme: vm.theme)
+
             VStack(spacing: 0) {
                 ForEach(vm.upcomingEvents) { event in
                     HStack {
@@ -232,8 +230,9 @@ struct HomeView: View {
                 }
             }
         }
+        .deviEntrance(delay: 0.24)
     }
-    
+
     // MARK: - Helpers
 
     private func formatTime(_ date: Date) -> String {
