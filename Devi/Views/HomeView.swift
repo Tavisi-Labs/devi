@@ -8,68 +8,66 @@ struct HomeView: View {
     @State private var showSettings = false
     
     var body: some View {
-        ZStack {
-            // Full-screen adaptive gradient background
+        ScrollView(.vertical, showsIndicators: false) {
+            VStack(spacing: 28) {
+
+                // MARK: - Header (location + settings)
+                headerSection
+
+                // MARK: - Tithi & Nakshatra
+                tithiSection
+
+                // MARK: - Sun Arc Timer (hero)
+                if let solar = vm.todayPanchang?.solar {
+                    SunArcView(
+                        progress: vm.sunProgress,
+                        isDaytime: vm.isDaytime,
+                        sunrise: solar.sunrise,
+                        sunset: solar.sunset,
+                        currentTime: vm.currentTimeText,
+                        countdownText: vm.countdownText,
+                        countdownLabel: vm.countdownLabel,
+                        theme: vm.theme,
+                        timezoneIdentifier: vm.currentCity.timezoneIdentifier
+                    )
+                }
+
+                // MARK: - Fasting indicator (if applicable)
+                if let fastType = vm.todayPanchang?.tithi.fastingType {
+                    fastingBanner(fastType)
+                }
+
+                // MARK: - Time Windows
+                if !vm.activeTimeWindows.isEmpty {
+                    TimeWindowsCard(
+                        windows: vm.activeTimeWindows,
+                        theme: vm.theme,
+                        timezoneIdentifier: vm.currentCity.timezoneIdentifier
+                    )
+                    .padding(.horizontal)
+                }
+
+                // MARK: - Navratri Card (conditional)
+                if let navDay = vm.currentNavratriDay {
+                    NavratriCard(day: navDay, theme: vm.theme)
+                        .padding(.horizontal)
+                }
+
+                // MARK: - Today's Details
+                todayDetails
+
+                // MARK: - Upcoming
+                upcomingSection
+
+            }
+            .padding(.bottom, 60)
+            .padding(.top, 8)
+        }
+        // Full-screen adaptive gradient background
+        .background {
             vm.theme.backgroundGradient
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 30), value: vm.timePeriod)
-            
-            // Content
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 28) {
-                    
-                    // MARK: - Header (location + settings)
-                    headerSection
-                    
-                    // MARK: - Tithi & Nakshatra
-                    tithiSection
-                    
-                    // MARK: - Sun Arc Timer (hero)
-                    if let solar = vm.todayPanchang?.solar {
-                        SunArcView(
-                            progress: vm.sunProgress,
-                            isDaytime: vm.isDaytime,
-                            sunrise: solar.sunrise,
-                            sunset: solar.sunset,
-                            currentTime: vm.currentTimeText,
-                            countdownText: vm.countdownText,
-                            countdownLabel: vm.countdownLabel,
-                            theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier
-                        )
-                    }
-                    
-                    // MARK: - Fasting indicator (if applicable)
-                    if let fastType = vm.todayPanchang?.tithi.fastingType {
-                        fastingBanner(fastType)
-                    }
-                    
-                    // MARK: - Time Windows
-                    if !vm.activeTimeWindows.isEmpty {
-                        TimeWindowsCard(
-                            windows: vm.activeTimeWindows,
-                            theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier
-                        )
-                        .padding(.horizontal)
-                    }
-                    
-                    // MARK: - Navratri Card (conditional)
-                    if let navDay = vm.currentNavratriDay {
-                        NavratriCard(day: navDay, theme: vm.theme)
-                            .padding(.horizontal)
-                    }
-                    
-                    // MARK: - Today's Details
-                    todayDetails
-                    
-                    // MARK: - Upcoming
-                    upcomingSection
-                    
-                }
-                .padding(.bottom, 60)
-                .padding(.top, 8)
-            }
         }
         .onAppear {
             vm.requestLocation()

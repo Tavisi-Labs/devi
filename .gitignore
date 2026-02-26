@@ -30,3 +30,4 @@ latest-screens/
 # Claude Code local settings
 .claude/settings.local.json
 .claude/*
+plans/*

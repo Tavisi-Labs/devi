@@ -16,24 +16,19 @@ struct OnboardingView: View {
     @State private var notifBrahma = false
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack {
-                // Background
-                LinearGradient(
-                    colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .ignoresSafeArea()
-
-                TabView(selection: $currentPage) {
-                    welcomePage(size: geo.size).tag(0)
-                    notificationPage(size: geo.size).tag(1)
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-            }
+        TabView(selection: $currentPage) {
+            welcomePage.tag(0)
+            notificationPage.tag(1)
         }
-        .ignoresSafeArea()
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .background {
+            LinearGradient(
+                colors: [Color(hex: "1a0a2e"), Color(hex: "2d1854")],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+        }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: vm.currentCity) { city in
                 vm.selectCity(city)
@@ -45,7 +40,7 @@ struct OnboardingView: View {
 
     // MARK: - Page 1: Welcome + Location
 
-    private func welcomePage(size: CGSize) -> some View {
+    private var welcomePage: some View {
         VStack(spacing: 0) {
             Spacer()
 
@@ -99,12 +94,11 @@ struct OnboardingView: View {
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
         }
-        .frame(width: size.width, height: size.height)
     }
 
     // MARK: - Page 2: Notifications
 
-    private func notificationPage(size: CGSize) -> some View {
+    private var notificationPage: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 24) {
@@ -163,7 +157,6 @@ struct OnboardingView: View {
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
         }
-        .frame(width: size.width, height: size.height)
     }
 
     private func notifToggle(_ label: String, icon: String, isOn: Binding<Bool>) -> some View {
