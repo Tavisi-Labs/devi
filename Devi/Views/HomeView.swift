@@ -82,7 +82,6 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            vm.requestLocation()
             vm.loadData()
             vm.startTimer()
         }

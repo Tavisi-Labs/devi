@@ -70,6 +70,18 @@ class PanchangViewModel: ObservableObject {
         if ud.object(forKey: "notif.brahma") != nil { notifBrahmaMuhurta = ud.bool(forKey: "notif.brahma") }
         if ud.object(forKey: "notif.navratri") != nil { notifNavratriMorning = ud.bool(forKey: "notif.navratri") }
         if ud.object(forKey: "notif.minutesBefore") != nil { notifMinutesBefore = ud.integer(forKey: "notif.minutesBefore") }
+
+        // Load persisted city (if user previously selected one)
+        if let cityName = ud.string(forKey: "city.name"),
+           let country = ud.string(forKey: "city.country"),
+           let tz = ud.string(forKey: "city.timezoneIdentifier") {
+            currentCity = UserCity(
+                name: cityName, country: country,
+                latitude: ud.double(forKey: "city.latitude"),
+                longitude: ud.double(forKey: "city.longitude"),
+                timezoneIdentifier: tz
+            )
+        }
     }
     
     // MARK: - Timer (updates every second)
@@ -198,6 +210,7 @@ class PanchangViewModel: ObservableObject {
                 self?.locationManager.getCurrentLocation { location in
                     let nearest = UserCity.nearest(to: location)
                     self?.currentCity = nearest
+                    self?.persistCity(nearest)
                     self?.loadData()
                 }
             }
@@ -206,9 +219,19 @@ class PanchangViewModel: ObservableObject {
     
     func selectCity(_ city: UserCity) {
         currentCity = city
+        persistCity(city)
         loadData()
     }
-    
+
+    private func persistCity(_ city: UserCity) {
+        let ud = UserDefaults.standard
+        ud.set(city.name, forKey: "city.name")
+        ud.set(city.country, forKey: "city.country")
+        ud.set(city.latitude, forKey: "city.latitude")
+        ud.set(city.longitude, forKey: "city.longitude")
+        ud.set(city.timezoneIdentifier, forKey: "city.timezoneIdentifier")
+    }
+
     // MARK: - Onboarding
 
     func saveOnboardingNotificationPreferences(
