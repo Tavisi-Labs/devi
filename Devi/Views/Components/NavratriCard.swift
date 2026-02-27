@@ -26,6 +26,12 @@ struct NavratriCard: View {
 
                 Spacer()
 
+                ShareLink(item: ShareTextBuilder.navratriDay(day)) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(dayColor)
+                }
+
                 // Day dots (9 dots, filled up to current day)
                 HStack(spacing: 4) {
                     ForEach(1...9, id: \.self) { num in

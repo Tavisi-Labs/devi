@@ -9,76 +9,91 @@ struct HomeView: View {
     @State private var selectedElement: PanchangElement?
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 32) {
+        ZStack {
+            // Full-screen adaptive gradient + star field background
+            // ZStack siblings with .ignoresSafeArea() are more reliable than .background { }
+            vm.theme.backgroundGradient
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 8), value: vm.timePeriod)
 
-                // MARK: - Header (date + location + settings)
-                headerSection
+            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod)
+                .ignoresSafeArea()
+                .animation(.easeInOut(duration: 5), value: vm.timePeriod)
 
-                // MARK: - Tithi & Nakshatra
-                tithiSection
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 32) {
 
-                // MARK: - Sun Arc Timer (hero)
-                if let solar = vm.todayPanchang?.solar {
-                    SunArcView(
-                        progress: vm.sunProgress,
-                        isDaytime: vm.isDaytime,
-                        sunrise: solar.sunrise,
-                        sunset: solar.sunset,
-                        currentTime: vm.currentTimeText,
-                        countdownText: vm.countdownText,
-                        countdownLabel: vm.countdownLabel,
-                        theme: vm.theme,
-                        timezoneIdentifier: vm.currentCity.timezoneIdentifier
-                    )
-                    .padding(.top, 4)
-                }
+                    // MARK: - Header (date + location + settings)
+                    headerSection
 
-                // MARK: - Fasting indicator (if applicable)
-                if let fastType = vm.todayPanchang?.tithi.fastingType {
-                    fastingBanner(fastType)
-                        .deviEntrance()
-                }
+                    // MARK: - Tithi & Nakshatra
+                    tithiSection
 
-                // MARK: - Time Windows
-                if !vm.activeTimeWindows.isEmpty {
-                    TimeWindowsCard(
-                        windows: vm.activeTimeWindows,
-                        theme: vm.theme,
-                        timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                        onTapWindow: { window in
-                            selectedElement = .timeWindow(window)
-                        }
-                    )
-                    .padding(.horizontal)
-                }
+                    // MARK: - Sun Arc Timer (hero)
+                    if let solar = vm.todayPanchang?.solar {
+                        SunArcView(
+                            progress: vm.sunProgress,
+                            isDaytime: vm.isDaytime,
+                            sunrise: solar.sunrise,
+                            sunset: solar.sunset,
+                            currentTime: vm.currentTimeText,
+                            countdownText: vm.countdownText,
+                            countdownLabel: vm.countdownLabel,
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier
+                        )
+                        .padding(.top, 4)
+                    }
 
-                // MARK: - Navratri Card (conditional)
-                if let navDay = vm.currentNavratriDay {
-                    NavratriCard(day: navDay, theme: vm.theme)
+                    // MARK: - Fasting indicator (if applicable)
+                    if let fastType = vm.todayPanchang?.tithi.fastingType {
+                        fastingBanner(fastType)
+                            .deviEntrance()
+                    }
+
+                    // MARK: - Eclipse Card (imminent or today)
+                    if let eclipse = vm.imminentEclipse {
+                        EclipseCard(
+                            eclipse: eclipse,
+                            todayDateString: todayDateString,
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                            cityName: vm.currentCity.name,
+                            onTap: {
+                                selectedElement = .eclipse(eclipse)
+                            }
+                        )
                         .padding(.horizontal)
+                    }
+
+                    // MARK: - Time Windows
+                    if !vm.activeTimeWindows.isEmpty {
+                        TimeWindowsCard(
+                            windows: vm.activeTimeWindows,
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                            onTapWindow: { window in
+                                selectedElement = .timeWindow(window)
+                            }
+                        )
+                        .padding(.horizontal)
+                    }
+
+                    // MARK: - Navratri Card (conditional)
+                    if let navDay = vm.currentNavratriDay {
+                        NavratriCard(day: navDay, theme: vm.theme)
+                            .padding(.horizontal)
+                    }
+
+                    // MARK: - Today's Details
+                    todayDetails
+
+                    // MARK: - Upcoming
+                    upcomingSection
+
                 }
-
-                // MARK: - Today's Details
-                todayDetails
-
-                // MARK: - Upcoming
-                upcomingSection
-
-            }
-            .padding(.bottom, 60)
-            .padding(.top, 8)
-        }
-        // Full-screen adaptive gradient + star field background
-        .background {
-            ZStack {
-                vm.theme.backgroundGradient
-                    .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 8), value: vm.timePeriod)
-
-                StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod)
-                    .ignoresSafeArea()
-                    .animation(.easeInOut(duration: 5), value: vm.timePeriod)
+                .padding(.bottom, 60)
+                .padding(.top, 8)
             }
         }
         .onAppear {
@@ -96,7 +111,8 @@ struct HomeView: View {
             PanchangDetailSheet(
                 element: element,
                 theme: vm.theme,
-                timezoneIdentifier: vm.currentCity.timezoneIdentifier
+                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                cityName: vm.currentCity.name
             )
         }
     }
@@ -121,6 +137,21 @@ struct HomeView: View {
             }
 
             Spacer()
+
+            if let panchang = vm.todayPanchang {
+                ShareLink(item: ShareTextBuilder.dailySummary(
+                    panchang: panchang,
+                    city: vm.currentCity,
+                    navratriDay: vm.currentNavratriDay
+                )) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(vm.theme.secondaryText)
+                        .frame(width: 36, height: 36)
+                        .background(vm.theme.primaryText.opacity(0.06))
+                        .clipShape(Circle())
+                }
+            }
 
             Button {
                 showSettings = true
@@ -282,8 +313,7 @@ struct HomeView: View {
                 ForEach(vm.upcomingEvents) { event in
                     HStack {
                         Circle()
-                            .fill(event.type == .fasting ?
-                                  Color(hex: "c54b2a") : vm.theme.accentColor)
+                            .fill(eventDotColor(event.type))
                             .frame(width: 6, height: 6)
 
                         Text(event.name)
@@ -306,8 +336,22 @@ struct HomeView: View {
 
     // MARK: - Helpers
 
+    private func eventDotColor(_ type: UpcomingEvent.EventType) -> Color {
+        switch type {
+        case .fasting: return Color(hex: "c54b2a")
+        case .eclipse: return Color(hex: "7B8EC4")
+        case .festival: return vm.theme.accentColor
+        }
+    }
+
     private func formatTime(_ date: Date) -> String {
         deviFormatTime(date, timezoneIdentifier: vm.currentCity.timezoneIdentifier)
+    }
+
+    private var todayDateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 
     private var formattedDate: String {

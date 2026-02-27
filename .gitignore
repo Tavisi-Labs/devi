@@ -31,3 +31,6 @@ latest-screens/
 .claude/settings.local.json
 .claude/*
 plans/*
+CLAUDE.md
+
+tasks/*

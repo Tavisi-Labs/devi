@@ -90,6 +90,10 @@ CITIES = [
     {"name": "Chennai", "country": "IN", "lat": 13.0827, "lon": 80.2707, "tz": "Asia/Kolkata"},
     {"name": "Hyderabad", "country": "IN", "lat": 17.3850, "lon": 78.4867, "tz": "Asia/Kolkata"},
     {"name": "Kolkata", "country": "IN", "lat": 22.5726, "lon": 88.3639, "tz": "Asia/Kolkata"},
+    {"name": "Kochi", "country": "IN", "lat": 9.9312, "lon": 76.2673, "tz": "Asia/Kolkata"},
+    {"name": "Thiruvananthapuram", "country": "IN", "lat": 8.5241, "lon": 76.9366, "tz": "Asia/Kolkata"},
+    {"name": "Kozhikode", "country": "IN", "lat": 11.2588, "lon": 75.7804, "tz": "Asia/Kolkata"},
+    {"name": "Thrissur", "country": "IN", "lat": 10.5276, "lon": 76.2144, "tz": "Asia/Kolkata"},
     {"name": "London", "country": "UK", "lat": 51.5074, "lon": -0.1278, "tz": "Europe/London"},
     {"name": "Toronto", "country": "CA", "lat": 43.6532, "lon": -79.3832, "tz": "America/Toronto"},
     {"name": "Singapore", "country": "SG", "lat": 1.3521, "lon": 103.8198, "tz": "Asia/Singapore"},
@@ -321,11 +325,172 @@ def generate_day(date, city):
     }
 
 
+# ── Eclipse Computation ──────────────────────────────────────────────────────
+
+# Eclipse type flag masks from pyswisseph
+LUNAR_ECLIPSE_TYPES = {
+    swe.ECL_TOTAL: "Total",
+    swe.ECL_PARTIAL: "Partial",
+    swe.ECL_PENUMBRAL: "Penumbral",
+}
+
+SOLAR_ECLIPSE_TYPES = {
+    swe.ECL_TOTAL: "Total",
+    swe.ECL_PARTIAL: "Partial",
+    swe.ECL_ANNULAR: "Annular",
+    swe.ECL_ANNULAR_TOTAL: "Annular",  # Hybrid
+}
+
+
+def jd_to_iso(jd, tz_name="UTC"):
+    """Convert Julian Day to ISO 8601 string in given timezone."""
+    from zoneinfo import ZoneInfo
+    y, m, d, h = swe.revjul(jd)
+    hours = int(h)
+    minutes = int((h - hours) * 60)
+    seconds = int(((h - hours) * 60 - minutes) * 60)
+    dt_utc = datetime(y, m, d, hours, minutes, seconds, tzinfo=timezone.utc)
+    dt_local = dt_utc.astimezone(ZoneInfo(tz_name))
+    return dt_local.isoformat()
+
+
+def classify_eclipse_type(ecl_flags, type_map):
+    """Determine eclipse type string from Swiss Ephemeris flags."""
+    for flag, name in type_map.items():
+        if ecl_flags & flag:
+            return name
+    return "Partial"  # fallback
+
+
+def compute_eclipses_for_city(city, start_jd, end_jd):
+    """
+    Compute all lunar and solar eclipses visible from a city within the JD range.
+    Uses swe.lun_eclipse_when_loc() and swe.sol_eclipse_when_loc().
+    Returns a list of eclipse dicts ready for JSON serialization.
+    """
+    geopos = (city["lon"], city["lat"], 0.0)  # (longitude, latitude, altitude)
+    tz_name = city["tz"]
+    eclipses = []
+
+    # ── Lunar eclipses ─────────────────────────────────────────────────────
+    search_jd = start_jd
+    while search_jd < end_jd:
+        try:
+            retflag, tret = swe.lun_eclipse_when_loc(search_jd, geopos)
+        except Exception:
+            break
+
+        if retflag == 0 or tret[0] == 0.0:
+            break
+
+        # tret indices for lunar eclipse at location:
+        # 0 = maximum, 1 = partial begin, 2 = partial end,
+        # 3 = total begin, 4 = total end, 5 = penumbral begin, 6 = penumbral end
+        max_jd = tret[0]
+
+        if max_jd > end_jd:
+            break
+
+        eclipse_type = classify_eclipse_type(retflag, LUNAR_ECLIPSE_TYPES)
+
+        # Convert JD to date string (using maximum time)
+        y, m, d, h = swe.revjul(max_jd)
+        date_str = f"{y:04d}-{m:02d}-{d:02d}"
+
+        # Check if moon is below horizon (partial begin == 0 means not visible)
+        moon_below = (tret[1] == 0.0 and tret[5] != 0.0)
+
+        eclipse = {
+            "body": "Lunar",
+            "type": eclipse_type,
+            "dateString": date_str,
+            "maxEclipseTime": jd_to_iso(max_jd, tz_name),
+            "magnitude": round(abs(retflag & 0xFFFF) / 1000.0, 4) if False else 0.0,
+            "moonBelowHorizon": moon_below,
+            "lunarContactTimes": {
+                "penumbralBegin": jd_to_iso(tret[5], tz_name) if tret[5] != 0 else None,
+                "partialBegin": jd_to_iso(tret[1], tz_name) if tret[1] != 0 else None,
+                "totalBegin": jd_to_iso(tret[3], tz_name) if tret[3] != 0 else None,
+                "maximum": jd_to_iso(max_jd, tz_name),
+                "totalEnd": jd_to_iso(tret[4], tz_name) if tret[4] != 0 else None,
+                "partialEnd": jd_to_iso(tret[2], tz_name) if tret[2] != 0 else None,
+                "penumbralEnd": jd_to_iso(tret[6], tz_name) if tret[6] != 0 else None,
+            },
+            "solarContactTimes": None,
+            "mythologyNote": "Rahu swallows Chandra — the shadow of the Earth envelops the Moon.",
+        }
+
+        # Compute magnitude using swe.lun_eclipse_how()
+        try:
+            attr_flag, attr = swe.lun_eclipse_how(max_jd, geopos)
+            eclipse["magnitude"] = round(attr[0], 4)  # attr[0] = umbral magnitude
+        except Exception:
+            pass
+
+        eclipses.append(eclipse)
+        search_jd = max_jd + 1.0  # Move past this eclipse
+
+    # ── Solar eclipses ─────────────────────────────────────────────────────
+    search_jd = start_jd
+    while search_jd < end_jd:
+        try:
+            retflag, tret, attr = swe.sol_eclipse_when_loc(search_jd, geopos)
+        except Exception:
+            break
+
+        if retflag == 0 or tret[0] == 0.0:
+            break
+
+        # tret indices for solar eclipse at location:
+        # 0 = maximum, 1 = first contact, 2 = second contact,
+        # 3 = third contact, 4 = fourth contact
+        max_jd = tret[0]
+
+        if max_jd > end_jd:
+            break
+
+        eclipse_type = classify_eclipse_type(retflag, SOLAR_ECLIPSE_TYPES)
+
+        y, m, d, h = swe.revjul(max_jd)
+        date_str = f"{y:04d}-{m:02d}-{d:02d}"
+
+        eclipse = {
+            "body": "Solar",
+            "type": eclipse_type,
+            "dateString": date_str,
+            "maxEclipseTime": jd_to_iso(max_jd, tz_name),
+            "magnitude": round(attr[0], 4) if attr[0] != 0 else 0.0,  # attr[0] = magnitude
+            "moonBelowHorizon": False,
+            "lunarContactTimes": None,
+            "solarContactTimes": {
+                "firstContact": jd_to_iso(tret[1], tz_name) if tret[1] != 0 else None,
+                "secondContact": jd_to_iso(tret[2], tz_name) if tret[2] != 0 else None,
+                "maximum": jd_to_iso(max_jd, tz_name),
+                "thirdContact": jd_to_iso(tret[3], tz_name) if tret[3] != 0 else None,
+                "fourthContact": jd_to_iso(tret[4], tz_name) if tret[4] != 0 else None,
+            },
+            "mythologyNote": "Rahu swallows Surya — the Moon's shadow crosses the face of the Sun.",
+        }
+
+        eclipses.append(eclipse)
+        search_jd = max_jd + 1.0
+
+    return eclipses
+
+
+# ── Main ─────────────────────────────────────────────────────────────────────
+
 def main():
     swe.set_ephe_path(None)  # Use built-in ephemeris
 
     start_date = datetime(2026, 3, 1)
     end_date = datetime(2026, 4, 30)
+
+    # Wider range for eclipse search (eclipses are rare, search full year)
+    eclipse_start = datetime(2026, 1, 1)
+    eclipse_end = datetime(2027, 1, 1)
+    eclipse_start_jd = datetime_to_jd(eclipse_start.replace(tzinfo=timezone.utc))
+    eclipse_end_jd = datetime_to_jd(eclipse_end.replace(tzinfo=timezone.utc))
 
     output_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Devi", "Data")
     os.makedirs(output_dir, exist_ok=True)
@@ -336,6 +501,7 @@ def main():
         city_key = city["name"].lower().replace(" ", "_")
         print(f"Generating {city['name']}...", end=" ", flush=True)
 
+        # Generate daily panchang data
         days = []
         current = start_date
         for _ in range(total_days):
@@ -347,7 +513,14 @@ def main():
         with open(output_path, "w") as f:
             json.dump(days, f, indent=2)
 
-        print(f"done ({len(days)} days)")
+        # Generate eclipse data
+        city_eclipses = compute_eclipses_for_city(city, eclipse_start_jd, eclipse_end_jd)
+        eclipse_path = os.path.join(output_dir, f"eclipses_{city_key}.json")
+        with open(eclipse_path, "w") as f:
+            json.dump(city_eclipses, f, indent=2)
+
+        eclipse_count = len(city_eclipses)
+        print(f"done ({len(days)} days, {eclipse_count} eclipses)")
 
     print(f"\nGenerated {len(CITIES)} city files in {output_dir}")
 

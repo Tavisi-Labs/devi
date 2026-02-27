@@ -377,15 +377,21 @@ struct OnboardingView: View {
             .scrollBounceBehavior(.basedOnSize)
 
             Button {
-                vm.saveOnboardingNotificationPreferences(
-                    sunrise: notifSunrise,
-                    sunset: notifSunset,
-                    rahuKalam: notifRahuKalam,
-                    abhijit: notifAbhijit,
-                    brahma: notifBrahma
-                )
-                vm.completeOnboarding()
-                vm.loadData()
+                Task {
+                    // Request notification permission before saving prefs
+                    let _ = await vm.notificationService.requestAuthorization()
+                    vm.saveOnboardingNotificationPreferences(
+                        sunrise: notifSunrise,
+                        sunset: notifSunset,
+                        rahuKalam: notifRahuKalam,
+                        abhijit: notifAbhijit,
+                        brahma: notifBrahma
+                    )
+                    vm.completeOnboarding()
+                    vm.loadData()
+                    await vm.checkNotificationAuthorization()
+                    await vm.rescheduleNotifications()
+                }
             } label: {
                 Text("Begin")
             }

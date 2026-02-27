@@ -317,6 +317,123 @@ struct NavratriPeriod {
     )
 }
 
+// MARK: - Eclipse Data
+
+enum EclipseBody: String, Codable {
+    case lunar = "Lunar"
+    case solar = "Solar"
+
+    var sanskritName: String {
+        switch self {
+        case .lunar: return "Chandra Grahan"
+        case .solar: return "Surya Grahan"
+        }
+    }
+
+    var devanagari: String {
+        switch self {
+        case .lunar: return "चन्द्र ग्रहण"
+        case .solar: return "सूर्य ग्रहण"
+        }
+    }
+}
+
+enum EclipseType: String, Codable {
+    case total = "Total"
+    case partial = "Partial"
+    case annular = "Annular"
+    case penumbral = "Penumbral"
+}
+
+struct LunarEclipseContactTimes: Codable {
+    let penumbralBegin: Date?
+    let partialBegin: Date?
+    let totalBegin: Date?
+    let maximum: Date
+    let totalEnd: Date?
+    let partialEnd: Date?
+    let penumbralEnd: Date?
+
+    /// All non-nil contact times in chronological order with labels
+    var timeline: [(label: String, time: Date)] {
+        var pairs: [(String, Date)] = []
+        if let t = penumbralBegin { pairs.append(("Penumbral Begins", t)) }
+        if let t = partialBegin { pairs.append(("Partial Begins", t)) }
+        if let t = totalBegin { pairs.append(("Total Begins", t)) }
+        pairs.append(("Maximum", maximum))
+        if let t = totalEnd { pairs.append(("Total Ends", t)) }
+        if let t = partialEnd { pairs.append(("Partial Ends", t)) }
+        if let t = penumbralEnd { pairs.append(("Penumbral Ends", t)) }
+        return pairs
+    }
+}
+
+struct SolarEclipseContactTimes: Codable {
+    let firstContact: Date?      // Partial begins
+    let secondContact: Date?     // Total/annular begins
+    let maximum: Date
+    let thirdContact: Date?      // Total/annular ends
+    let fourthContact: Date?     // Partial ends
+
+    var timeline: [(label: String, time: Date)] {
+        var pairs: [(String, Date)] = []
+        if let t = firstContact { pairs.append(("Partial Begins", t)) }
+        if let t = secondContact { pairs.append(("Totality Begins", t)) }
+        pairs.append(("Maximum", maximum))
+        if let t = thirdContact { pairs.append(("Totality Ends", t)) }
+        if let t = fourthContact { pairs.append(("Partial Ends", t)) }
+        return pairs
+    }
+}
+
+struct EclipseEvent: Identifiable, Codable {
+    var id: String { "\(body.rawValue)-\(dateString)" }
+
+    let body: EclipseBody
+    let type: EclipseType
+    let dateString: String                       // "2026-03-03" ISO format
+    let maxEclipseTime: Date
+    let magnitude: Double                        // 0.0 - 1.0+ (> 1.0 for total)
+    let lunarContactTimes: LunarEclipseContactTimes?
+    let solarContactTimes: SolarEclipseContactTimes?
+    let moonBelowHorizon: Bool                   // True if eclipse not visible (moon below horizon)
+    let mythologyNote: String?
+
+    var displayName: String {
+        "\(type.rawValue) \(body.rawValue) Eclipse"
+    }
+
+    /// Contact times timeline, regardless of body type
+    var contactTimeline: [(label: String, time: Date)] {
+        if let lunar = lunarContactTimes {
+            return lunar.timeline
+        } else if let solar = solarContactTimes {
+            return solar.timeline
+        }
+        return [("Maximum", maxEclipseTime)]
+    }
+
+    /// Days from a reference date to this eclipse
+    func daysFrom(_ dateString: String) -> Int {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let from = formatter.date(from: dateString),
+              let to = formatter.date(from: self.dateString) else { return 0 }
+        return Calendar.current.dateComponents([.day], from: from, to: to).day ?? 0
+    }
+
+    /// Human-readable proximity label
+    func proximityLabel(from dateString: String) -> String {
+        let days = daysFrom(dateString)
+        switch days {
+        case 0: return "TODAY"
+        case 1: return "TOMORROW"
+        case 2...30: return "IN \(days) DAYS"
+        default: return ""
+        }
+    }
+}
+
 // MARK: - Upcoming Event
 
 struct UpcomingEvent: Identifiable {
@@ -343,7 +460,7 @@ struct UserCity: Codable, Identifiable, Hashable {
     let longitude: Double
     let timezoneIdentifier: String
     
-    static let defaults: [UserCity] = [
+    static let popularCities: [UserCity] = [
         // US cities
         UserCity(name: "New York", country: "US", latitude: 40.7128, longitude: -74.0060, timezoneIdentifier: "America/New_York"),
         UserCity(name: "Los Angeles", country: "US", latitude: 34.0522, longitude: -118.2437, timezoneIdentifier: "America/Los_Angeles"),
@@ -359,6 +476,10 @@ struct UserCity: Codable, Identifiable, Hashable {
         UserCity(name: "Chennai", country: "IN", latitude: 13.0827, longitude: 80.2707, timezoneIdentifier: "Asia/Kolkata"),
         UserCity(name: "Hyderabad", country: "IN", latitude: 17.3850, longitude: 78.4867, timezoneIdentifier: "Asia/Kolkata"),
         UserCity(name: "Kolkata", country: "IN", latitude: 22.5726, longitude: 88.3639, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Kochi", country: "IN", latitude: 9.9312, longitude: 76.2673, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Thiruvananthapuram", country: "IN", latitude: 8.5241, longitude: 76.9366, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Kozhikode", country: "IN", latitude: 11.2588, longitude: 75.7804, timezoneIdentifier: "Asia/Kolkata"),
+        UserCity(name: "Thrissur", country: "IN", latitude: 10.5276, longitude: 76.2144, timezoneIdentifier: "Asia/Kolkata"),
         // UK
         UserCity(name: "London", country: "UK", latitude: 51.5074, longitude: -0.1278, timezoneIdentifier: "Europe/London"),
         // Canada
@@ -369,11 +490,11 @@ struct UserCity: Codable, Identifiable, Hashable {
     
     /// Find nearest city to a coordinate
     static func nearest(to location: CLLocation) -> UserCity {
-        defaults.min(by: { cityA, cityB in
+        popularCities.min(by: { cityA, cityB in
             let locA = CLLocation(latitude: cityA.latitude, longitude: cityA.longitude)
             let locB = CLLocation(latitude: cityB.latitude, longitude: cityB.longitude)
             return location.distance(from: locA) < location.distance(from: locB)
-        }) ?? defaults[0]
+        }) ?? popularCities[0]
     }
 }
 

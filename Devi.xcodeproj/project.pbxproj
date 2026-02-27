@@ -7,41 +7,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360B289972920360586AA1CC /* EclipseCard.swift */; };
 		033C35B8D8C67417071612C3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443E05B8B65D4E3900BC0BDE /* HomeView.swift */; };
 		07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */; };
 		0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406B7EE63A21C444D045C89E /* SunArcView.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
+		41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09C4017C2811FC941DD4451 /* StarFieldView.swift */; };
 		45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */; };
 		4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D21D4B060787531B830527 /* OnboardingView.swift */; };
+		5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */; };
 		53EB548AF45411CA45FFB15A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = 8770626AEDBE1DA0D475369D /* Solar */; };
+		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
-		C1A2B3D4E5F6071829304152 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */; };
-		D2B3C4E5F6071829304152A1 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6071829304152A1 /* StarFieldView.swift */; };
-		E3A4B5C6D7E8091A2B3C4D5E /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */; };
-		F4B5C6D7E8F9102A3B4C5D6E /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */; };
-		A5C6D7E8F9A0213B4C5D6E7F /* PanchangDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */; };
+		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
+		C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */; };
+		D3F4D6E623EDD5A5157196B6 /* ShareTextBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */; };
+		D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8671B2E2810F5DB127BCD949 /* CitySearchService.swift */; };
+		D694479C65408F156F68ED12 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		360B289972920360586AA1CC /* EclipseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseCard.swift; sourceTree = "<group>"; };
 		406B7EE63A21C444D045C89E /* SunArcView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunArcView.swift; sourceTree = "<group>"; };
+		42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTextBuilder.swift; sourceTree = "<group>"; };
 		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWindowsCard.swift; sourceTree = "<group>"; };
 		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
+		7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		8671B2E2810F5DB127BCD949 /* CitySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitySearchService.swift; sourceTree = "<group>"; };
+		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
 		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
-		B2C3D4E5F6071829304152A1 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
+		E09C4017C2811FC941DD4451 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
+		E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
+		E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
-		D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
-		E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,10 +78,11 @@
 		4914BAD1C99EF5D62BB857EB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				360B289972920360586AA1CC /* EclipseCard.swift */,
 				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
-				A1B2C3D4E5F6071829304152 /* OrnamentalDivider.swift */,
-				E5F6A7B8C9D0213B4C5D6E7F /* PanchangDetailSheet.swift */,
-				B2C3D4E5F6071829304152A1 /* StarFieldView.swift */,
+				0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */,
+				994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */,
+				E09C4017C2811FC941DD4451 /* StarFieldView.swift */,
 				406B7EE63A21C444D045C89E /* SunArcView.swift */,
 				5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */,
 			);
@@ -83,10 +92,13 @@
 		63D4C2FC48BFDEA82A2DC0A7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				8671B2E2810F5DB127BCD949 /* CitySearchService.swift */,
+				7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */,
 				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
-				C3D4E5F6A7B8091A2B3C4D5E /* PanchangElement.swift */,
-				D4E5F6A7B8C9102A3B4C5D6E /* PanchangDescriptions.swift */,
+				E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */,
+				E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */,
 				D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */,
+				42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -184,21 +196,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */,
 				B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */,
+				02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */,
 				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
 				45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */,
+				C19C27D51654472CE9003804 /* NotificationService.swift in Sources */,
 				4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */,
-				C1A2B3D4E5F6071829304152 /* OrnamentalDivider.swift in Sources */,
-				D2B3C4E5F6071829304152A1 /* StarFieldView.swift in Sources */,
+				D694479C65408F156F68ED12 /* OrnamentalDivider.swift in Sources */,
 				36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */,
+				564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */,
+				5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */,
+				C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */,
 				892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */,
 				90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */,
+				D3F4D6E623EDD5A5157196B6 /* ShareTextBuilder.swift in Sources */,
+				41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */,
 				0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */,
 				AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */,
 				07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */,
-				E3A4B5C6D7E8091A2B3C4D5E /* PanchangElement.swift in Sources */,
-				F4B5C6D7E8F9102A3B4C5D6E /* PanchangDescriptions.swift in Sources */,
-				A5C6D7E8F9A0213B4C5D6E7F /* PanchangDetailSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +303,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.deviapp.Devi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.Devi;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -310,7 +326,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.deviapp.Devi;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.Devi;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

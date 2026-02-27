@@ -10,6 +10,7 @@ enum PanchangElement: Identifiable {
     case karana(Karana)
     case vara(String)           // varaDeity string e.g. "Surya (Sun)"
     case timeWindow(TimeWindow)
+    case eclipse(EclipseEvent)
 
     var id: String {
         switch self {
@@ -19,6 +20,7 @@ enum PanchangElement: Identifiable {
         case .karana(let k): return "karana-\(k.name)"
         case .vara(let v): return "vara-\(v)"
         case .timeWindow(let tw): return "timeWindow-\(tw.type.rawValue)"
+        case .eclipse(let e): return "eclipse-\(e.id)"
         }
     }
 
@@ -30,6 +32,7 @@ enum PanchangElement: Identifiable {
         case .karana(let k): return k.name
         case .vara(let v): return v.components(separatedBy: " (").first ?? v
         case .timeWindow(let tw): return tw.type.rawValue
+        case .eclipse(let e): return e.displayName
         }
     }
 
@@ -41,6 +44,7 @@ enum PanchangElement: Identifiable {
         case .karana: return "KARANA"
         case .vara: return "VARA"
         case .timeWindow: return "TIME WINDOW"
+        case .eclipse: return "GRAHAN"
         }
     }
 }

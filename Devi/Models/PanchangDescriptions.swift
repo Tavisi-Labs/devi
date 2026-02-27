@@ -57,6 +57,14 @@ struct TimeWindowInfo {
     let description: String
 }
 
+struct EclipseInfo {
+    let description: String
+    let mythology: String
+    let spiritualSignificance: String
+    let dosAndDonts: (doItems: [String], dontItems: [String])
+    let mantras: [(devanagari: String, transliteration: String, purpose: String)]
+}
+
 // MARK: - PanchangDescriptions Namespace
 
 enum PanchangDescriptions {
@@ -999,4 +1007,58 @@ enum PanchangDescriptions {
     static func timeWindowInfo(for key: String) -> TimeWindowInfo? {
         return timeWindows[key]
     }
+
+    // MARK: - Eclipse (Grahan)
+
+    static let eclipseInfo = EclipseInfo(
+        description: "An eclipse (Grahan) is one of the most significant astronomical and spiritual events in the Hindu calendar. A lunar eclipse (Chandra Grahan) occurs when the Earth passes between the Sun and Moon, casting its shadow on the Moon. A solar eclipse (Surya Grahan) occurs when the Moon passes between the Earth and Sun, blocking its light. In Vedic tradition, eclipses are deeply sacred periods of intensified spiritual energy, when the normal flow of cosmic light is disrupted and the veil between worlds grows thin.",
+
+        mythology: "The origin of eclipses traces to the Samudra Manthan (Churning of the Cosmic Ocean). When the Devas and Asuras churned the ocean to obtain Amrit (the nectar of immortality), Lord Vishnu took the form of Mohini to distribute the nectar only to the Devas. The Asura Svarbhanu disguised himself among the Devas and received a sip. Surya (Sun) and Chandra (Moon) recognized him and alerted Vishnu, who severed Svarbhanu's head with the Sudarshana Chakra. Having tasted Amrit, both halves survived — the head became Rahu and the body became Ketu. In revenge, Rahu periodically swallows the Sun and Moon, causing eclipses. Because he has no body, the luminaries pass through him and emerge again.",
+
+        spiritualSignificance: "Eclipses are considered extraordinarily powerful periods for spiritual practice. The merit of mantra japa (chanting) performed during an eclipse is believed to be multiplied a thousandfold. Fasting during an eclipse purifies the body and mind. The Sutak period (inauspicious window before and during the eclipse) is observed by avoiding food preparation, eating, and beginning new activities. After the eclipse, a purifying bath and charity are recommended. Temples close their doors during the eclipse and reopen with fresh consecration afterward.",
+
+        dosAndDonts: (
+            doItems: [
+                "Chant mantras — especially Maha Mrityunjaya, Gayatri, or Rahu mantra",
+                "Meditate and perform japa (repetitive chanting)",
+                "Fast during the Sutak period (begins 9 hours before lunar, 12 hours before solar eclipse)",
+                "Take a purifying bath after the eclipse ends",
+                "Donate food, clothing, or money to the needy after the eclipse",
+                "Sprinkle Ganga jal (holy water) or tulsi leaves in stored food",
+                "Pregnant women should rest and chant protective mantras"
+            ],
+            dontItems: [
+                "Do not eat or cook during the Sutak period",
+                "Do not begin new ventures, travel, or sign contracts",
+                "Do not look directly at a solar eclipse without proper eye protection",
+                "Do not sleep during the eclipse — remain awake for spiritual practice",
+                "Do not use sharp objects (knives, needles) during the eclipse",
+                "Avoid intimate relations during the Sutak period",
+                "Do not keep leftover cooked food from before the eclipse"
+            ]
+        ),
+
+        mantras: [
+            (
+                devanagari: "ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यं भर्गो देवस्य धीमहि धियो यो नः प्रचोदयात्",
+                transliteration: "Om Bhur Bhuvah Svah Tat Savitur Varenyam Bhargo Devasya Dhimahi Dhiyo Yo Nah Prachodayat",
+                purpose: "Gayatri Mantra — supreme prayer for divine light and wisdom"
+            ),
+            (
+                devanagari: "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् उर्वारुकमिव बन्धनान् मृत्योर्मुक्षीय मामृतात्",
+                transliteration: "Om Tryambakam Yajamahe Sugandhim Pushti-Vardhanam Urvarukamiva Bandhanan Mrityor Mukshiya Maamritat",
+                purpose: "Maha Mrityunjaya Mantra — protection and liberation from death"
+            ),
+            (
+                devanagari: "ॐ रां राहवे नमः",
+                transliteration: "Om Raam Rahave Namah",
+                purpose: "Rahu Beej Mantra — pacifies Rahu's malefic influence during lunar eclipses"
+            ),
+            (
+                devanagari: "ॐ कें केतवे नमः",
+                transliteration: "Om Kem Ketave Namah",
+                purpose: "Ketu Beej Mantra — pacifies Ketu's influence during solar eclipses"
+            )
+        ]
+    )
 }
