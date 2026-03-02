@@ -12,6 +12,7 @@ struct SunArcView: View {
     let countdownText: String
     let countdownLabel: String
     let theme: DeviTheme
+    let timePeriod: TimePeriod
     let timezoneIdentifier: String
 
     // Animation state for the sun dot pulse
@@ -36,11 +37,11 @@ struct SunArcView: View {
                     SunArcShape()
                         .trim(from: 0, to: progress)
                         .stroke(
-                            theme.arcGradient,
+                            DeviTheme.arcGradient(for: timePeriod),
                             style: StrokeStyle(lineWidth: 3, lineCap: .round)
                         )
                         .frame(width: arcSize, height: arcSize / 2)
-                        .shadow(color: Color(hex: "f0c040").opacity(0.35), radius: 6, x: 0, y: 0)
+                        .shadow(color: DeviTheme.arcShadowColor(for: timePeriod).opacity(0.35), radius: 6, x: 0, y: 0)
                 }
 
                 // Sun/Moon dot
@@ -52,20 +53,21 @@ struct SunArcView: View {
                     isPulsing: isPulsing
                 )
 
-                // Center content: current time + countdown
+                // Center content: label → hero countdown → current time
                 VStack(spacing: 4) {
-                    Text(currentTime)
-                        .font(.system(size: 24, weight: .light, design: .rounded))
-                        .foregroundColor(theme.primaryText.opacity(0.8))
-
                     Text(countdownLabel)
                         .deviLabel(.section, theme: theme)
+                        .tracking(3.0)
 
                     Text(countdownText)
-                        .font(.system(size: 48, weight: .light, design: .rounded))
+                        .font(.system(size: 52, weight: .light, design: .rounded))
                         .foregroundColor(theme.primaryText)
                         .monospacedDigit()
                         .contentTransition(.numericText())
+
+                    Text(currentTime)
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(theme.secondaryText)
                 }
                 .offset(y: 30) // More breathing room from arc center
             }
@@ -92,7 +94,7 @@ struct SunArcView: View {
             .padding(.horizontal, 48)
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 5).repeatForever(autoreverses: true)) {
                 isPulsing = true
             }
         }
@@ -145,24 +147,34 @@ struct SunDot: View {
 
         ZStack {
             if isDaytime {
-                // Warm radial glow
+                // Faint halo layer
+                Circle()
+                    .fill(sunGold.opacity(0.06))
+                    .frame(width: 80, height: 80)
+                    .blur(radius: 12)
+
+                // Warm radial glow (3-stop)
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [sunGold.opacity(0.4), .clear],
+                            stops: [
+                                .init(color: sunGold.opacity(0.25), location: 0),
+                                .init(color: sunGold.opacity(0.08), location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ],
                             center: .center,
                             startRadius: 0,
-                            endRadius: 20
+                            endRadius: 28
                         )
                     )
-                    .frame(width: 40, height: 40)
-                    .scaleEffect(isPulsing ? 1.08 : 1.0)
+                    .frame(width: 56, height: 56)
+                    .scaleEffect(isPulsing ? 1.04 : 1.0)
 
                 // Outer ring
                 Circle()
                     .fill(sunGold.opacity(0.3))
                     .frame(width: 28, height: 28)
-                    .scaleEffect(isPulsing ? 1.04 : 1.0)
+                    .scaleEffect(isPulsing ? 1.02 : 1.0)
 
                 // Inner dot
                 Circle()
@@ -185,7 +197,7 @@ struct SunDot: View {
                         )
                     )
                     .frame(width: 36, height: 36)
-                    .scaleEffect(isPulsing ? 1.08 : 1.0)
+                    .scaleEffect(isPulsing ? 1.04 : 1.0)
 
                 // Moon icon
                 Image(systemName: "moon.fill")
@@ -211,9 +223,10 @@ struct SunDot: View {
             sunrise: Calendar.current.date(bySettingHour: 6, minute: 18, second: 0, of: Date())!,
             sunset: Calendar.current.date(bySettingHour: 18, minute: 42, second: 0, of: Date())!,
             currentTime: "6:42 PM",
-            countdownText: "10:33:00",
+            countdownText: "10.33.00",
             countdownLabel: "SUNSET IN",
             theme: DeviTheme.forPeriod(.evening),
+            timePeriod: .evening,
             timezoneIdentifier: "America/New_York"
         )
     }

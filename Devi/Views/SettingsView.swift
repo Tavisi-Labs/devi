@@ -8,7 +8,8 @@ struct SettingsView: View {
     @ObservedObject var vm: PanchangViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showCityPicker = false
-    
+    @State private var showPanchangEducation = false
+
     var body: some View {
         NavigationStack {
             List {
@@ -26,7 +27,9 @@ struct SettingsView: View {
                                 .font(.system(size: 12, weight: .semibold))
                                 .foregroundColor(.secondary.opacity(0.5))
                         }
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                     .foregroundColor(.primary)
                 } header: {
                     Text("Location")
@@ -53,8 +56,11 @@ struct SettingsView: View {
                                         .font(.system(size: 13))
                                         .foregroundColor(.secondary)
                                 }
+                                Spacer()
                             }
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -93,6 +99,26 @@ struct SettingsView: View {
                     Text("Event notifications are sent \(vm.notifMinutesBefore) minutes before. Daily summary arrives 30 minutes before sunrise.")
                 }
                 
+                // MARK: - Learn
+                Section {
+                    Button {
+                        showPanchangEducation = true
+                    } label: {
+                        HStack {
+                            Label("Learn about Panchang", systemImage: "book")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.secondary.opacity(0.5))
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.primary)
+                } header: {
+                    Text("Learn")
+                }
+
                 // MARK: - About
                 Section {
                     HStack {
@@ -101,9 +127,16 @@ struct SettingsView: View {
                         Text("1.0.0")
                             .foregroundColor(.secondary)
                     }
-                    
+
                     Link(destination: URL(string: "mailto:hello@deviapp.com")!) {
                         Label("Send Feedback", systemImage: "envelope")
+                    }
+
+                    Button {
+                        vm.resetOnboarding()
+                        dismiss()
+                    } label: {
+                        Label("Restart Onboarding", systemImage: "arrow.counterclockwise")
                     }
                 } header: {
                     Text("About")
@@ -126,6 +159,9 @@ struct SettingsView: View {
                     vm.selectCity(city)
                     showCityPicker = false
                 }
+            }
+            .sheet(isPresented: $showPanchangEducation) {
+                PanchangEducationSheet()
             }
         }
     }

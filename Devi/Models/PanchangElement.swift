@@ -7,7 +7,7 @@ enum PanchangElement: Identifiable {
     case tithi(Tithi)
     case nakshatra(Nakshatra)
     case yoga(Yoga)
-    case karana(Karana)
+    case karana([Karana])       // All karanas for the day (2-3 with transition times)
     case vara(String)           // varaDeity string e.g. "Surya (Sun)"
     case timeWindow(TimeWindow)
     case eclipse(EclipseEvent)
@@ -17,7 +17,7 @@ enum PanchangElement: Identifiable {
         case .tithi(let t): return "tithi-\(t.name)"
         case .nakshatra(let n): return "nakshatra-\(n.name)"
         case .yoga(let y): return "yoga-\(y.name)"
-        case .karana(let k): return "karana-\(k.name)"
+        case .karana(let ks): return "karana-\(ks.first?.name ?? "")"
         case .vara(let v): return "vara-\(v)"
         case .timeWindow(let tw): return "timeWindow-\(tw.type.rawValue)"
         case .eclipse(let e): return "eclipse-\(e.id)"
@@ -29,7 +29,7 @@ enum PanchangElement: Identifiable {
         case .tithi(let t): return t.name
         case .nakshatra(let n): return n.name
         case .yoga(let y): return y.name
-        case .karana(let k): return k.name
+        case .karana(let ks): return ks.first?.name ?? ""
         case .vara(let v): return v.components(separatedBy: " (").first ?? v
         case .timeWindow(let tw): return tw.type.rawValue
         case .eclipse(let e): return e.displayName

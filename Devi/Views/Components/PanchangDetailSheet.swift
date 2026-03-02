@@ -112,7 +112,8 @@ struct PanchangDetailSheet: View {
                 return info.meaning
             }
             return nil
-        case .karana(let k):
+        case .karana(let ks):
+            guard let k = ks.first else { return nil }
             if let info = PanchangDescriptions.karanaInfo(for: k.name) {
                 return info.type
             }
@@ -143,8 +144,31 @@ struct PanchangDetailSheet: View {
             timingBar(label: "Ends at", time: n.endTime)
         case .yoga(let y):
             timingBar(label: "Ends at", time: y.endTime)
-        case .karana(let k):
-            timingBar(label: "Ends at", time: k.endTime)
+        case .karana(let ks):
+            // Show all karana transitions for the day
+            VStack(alignment: .leading, spacing: 8) {
+                Text("TODAY'S KARANAS")
+                    .deviLabel(.caption, theme: theme)
+
+                VStack(spacing: 4) {
+                    ForEach(Array(ks.enumerated()), id: \.offset) { idx, k in
+                        HStack {
+                            Circle()
+                                .fill(idx == 0 ? theme.accentColor : theme.secondaryText.opacity(0.4))
+                                .frame(width: idx == 0 ? 8 : 5, height: idx == 0 ? 8 : 5)
+                            Text(k.name)
+                                .font(.system(size: 14, weight: idx == 0 ? .semibold : .regular, design: .serif))
+                                .foregroundColor(idx == 0 ? theme.primaryText : theme.secondaryText)
+                            Spacer()
+                            Text("until \(deviFormatTime(k.endTime, timezoneIdentifier: timezoneIdentifier))")
+                                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                .foregroundColor(theme.primaryText)
+                        }
+                    }
+                }
+                .padding(12)
+                .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+            }
         case .timeWindow(let tw):
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -222,7 +246,8 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.nakshatraInfo(for: n.name)?.description
         case .yoga(let y):
             return PanchangDescriptions.yogaInfo(for: y.number)?.description
-        case .karana(let k):
+        case .karana(let ks):
+            guard let k = ks.first else { return nil }
             return PanchangDescriptions.karanaInfo(for: k.name)?.description
         case .vara(let v):
             return PanchangDescriptions.varaInfo(for: varaWeekday(from: v))?.description
@@ -258,12 +283,16 @@ struct PanchangDetailSheet: View {
                 ("Quality", info.quality),
                 ("Number", "\(y.number) of 27")
             ]
-        case .karana(let k):
-            guard let info = PanchangDescriptions.karanaInfo(for: k.name) else { return [] }
-            return [
+        case .karana(let ks):
+            guard let k = ks.first, let info = PanchangDescriptions.karanaInfo(for: k.name) else { return [] }
+            var attrs: [(String, String)] = [
                 ("Type", info.type),
-                ("Suitability", info.suitability)
+                ("Suitability", info.suitability),
             ]
+            if ks.count > 1 {
+                attrs.append(("Transitions", "\(ks.count) karanas today"))
+            }
+            return attrs
         case .vara(let v):
             guard let info = PanchangDescriptions.varaInfo(for: varaWeekday(from: v)) else { return [] }
             return [

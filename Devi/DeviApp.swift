@@ -8,6 +8,13 @@ struct DeviApp: App {
     @StateObject private var vm = PanchangViewModel()
     @Environment(\.scenePhase) private var scenePhase
 
+    init() {
+        // Initialize Swiss Ephemeris singleton — sets Lahiri ayanamsa and ephemeris path.
+        // Must happen before any panchang computation. The singleton is lazy, so
+        // accessing .shared triggers init() which calls swe_set_sid_mode().
+        _ = VedicCalculator.shared
+    }
+
     var body: some Scene {
         WindowGroup {
             Group {

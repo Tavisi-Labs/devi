@@ -114,17 +114,46 @@ struct DeviTheme {
         )
     }
 
-    // Arc gradient for the sun timer
-    var arcGradient: LinearGradient {
-        LinearGradient(
-            colors: [
-                Color(hex: "d4a857"),   // Sunrise gold
-                Color(hex: "f0c040"),   // Noon bright
-                Color(hex: "b87333")    // Sunset copper
-            ],
-            startPoint: .leading,
-            endPoint: .trailing
-        )
+    // Arc gradient for the sun timer — adapts to time of day
+    static func arcGradient(for period: TimePeriod) -> LinearGradient {
+        switch period {
+        case .brahmaMuhurta:
+            return LinearGradient(
+                colors: [Color(hex: "6366f1"), Color(hex: "a855f7")],
+                startPoint: .leading, endPoint: .trailing
+            )
+        case .morning:
+            return LinearGradient(
+                colors: [Color(hex: "f59e0b"), Color(hex: "ef4444")],
+                startPoint: .leading, endPoint: .trailing
+            )
+        case .afternoon:
+            return LinearGradient(
+                colors: [Color(hex: "d4a857"), Color(hex: "f0c040")],
+                startPoint: .leading, endPoint: .trailing
+            )
+        case .evening:
+            return LinearGradient(
+                colors: [Color(hex: "ea580c"), Color(hex: "9a3412")],
+                startPoint: .leading, endPoint: .trailing
+            )
+        case .night:
+            return LinearGradient(
+                colors: [Color(hex: "94a3b8"), Color(hex: "64748b")],
+                startPoint: .leading, endPoint: .trailing
+            )
+        }
+    }
+
+    // Arc shadow color — matches the gradient start for visual coherence
+    static func arcShadowColor(for period: TimePeriod) -> Color {
+        switch period {
+        case .brahmaMuhurta: return Color(hex: "6366f1")
+        case .morning:       return Color(hex: "f59e0b")
+        case .afternoon:     return Color(hex: "f0c040")
+        case .evening:       return Color(hex: "ea580c")
+        case .night:         return Color(hex: "94a3b8")
+        }
     }
 }
 
@@ -153,10 +182,10 @@ struct DeviCardModifier: ViewModifier {
                 case .raised:
                     ZStack {
                         RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(.ultraThinMaterial.opacity(0.5))
+                            .fill(.ultraThinMaterial.opacity(0.25))
 
                         RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(theme.primaryText.opacity(0.06))
+                            .fill(theme.primaryText.opacity(0.03))
                     }
                 case .prominent:
                     ZStack {
@@ -184,7 +213,7 @@ struct DeviCardModifier: ViewModifier {
                         EmptyView()
                     case .raised:
                         RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .stroke(theme.primaryText.opacity(0.10), lineWidth: 1)
+                            .stroke(theme.primaryText.opacity(0.05), lineWidth: 0.5)
                     case .prominent:
                         RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
                             .stroke(theme.accentColor.opacity(0.15), lineWidth: 1)
@@ -195,13 +224,13 @@ struct DeviCardModifier: ViewModifier {
                 color: {
                     switch elevation {
                     case .flat: return .clear
-                    case .raised: return Color.black.opacity(0.15)
-                    case .prominent: return Color.black.opacity(0.20)
+                    case .raised: return Color.black.opacity(0.08)
+                    case .prominent: return Color.black.opacity(0.12)
                     }
                 }(),
-                radius: elevation == .prominent ? 12 : 8,
+                radius: elevation == .prominent ? 8 : 4,
                 x: 0,
-                y: elevation == .prominent ? 6 : 4
+                y: elevation == .prominent ? 3 : 2
             )
     }
 }

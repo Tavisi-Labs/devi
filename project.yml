@@ -16,6 +16,9 @@ packages:
   Solar:
     url: https://github.com/ceeK/Solar
     from: "3.0.0"
+  SwissEphemeris:
+    url: https://github.com/vsmithers1087/SwissEphemeris
+    from: "0.0.99"
 
 targets:
   Devi:
@@ -35,3 +38,4 @@ targets:
         INFOPLIST_KEY_UIUserInterfaceStyle: Dark
     dependencies:
       - package: Solar
+      - package: SwissEphemeris

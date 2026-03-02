@@ -150,16 +150,19 @@ struct SolarData: Codable {
 
 struct DailyPanchang: Codable, Identifiable {
     var id: String { dateString }
-    
+
     let dateString: String   // "2026-03-20" ISO format
     let tithi: Tithi
     let nakshatra: Nakshatra
     let yoga: Yoga
-    let karana: Karana
+    let karanas: [Karana]    // 2-3 karanas per day with transition times
     let solar: SolarData
     let timeWindows: [TimeWindow]
     let lunarMonth: String   // "Chaitra", "Vaishakha", etc.
     let festivals: [String]  // Any festivals on this day
+
+    /// Backwards-compatible accessor for the primary (sunrise) karana.
+    var karana: Karana { karanas.first! }
     
     /// The Hindu weekday lord
     var varaDeity: String {

@@ -22,7 +22,11 @@ enum ShareTextBuilder {
         // Core five elements
         lines.append("Tithi: \(panchang.tithi.name) (until \(formatTime(panchang.tithi.endTime, timezoneIdentifier: city.timezoneIdentifier)))")
         lines.append("Nakshatra: \(panchang.nakshatra.name) (until \(formatTime(panchang.nakshatra.endTime, timezoneIdentifier: city.timezoneIdentifier)))")
-        lines.append("Yoga: \(panchang.yoga.name) · Karana: \(panchang.karana.name)")
+        let karanaText = panchang.karanas.map { k in
+            "\(k.name) (until \(formatTime(k.endTime, timezoneIdentifier: city.timezoneIdentifier)))"
+        }.joined(separator: " → ")
+        lines.append("Yoga: \(panchang.yoga.name)")
+        lines.append("Karana: \(karanaText)")
         lines.append("Vara: \(panchang.varaDeity)")
         lines.append("")
 
@@ -143,11 +147,13 @@ enum ShareTextBuilder {
             if let quality = info?.quality { lines.append("Quality: \(quality)") }
             lines.append("Until \(formatTime(y.endTime, timezoneIdentifier: timezoneIdentifier))")
 
-        case .karana(let k):
-            let info = PanchangDescriptions.karanaInfo(for: k.name)
-            lines.append("Karana: \(k.name)")
-            if let type = info?.type { lines.append("Type: \(type)") }
-            lines.append("Until \(formatTime(k.endTime, timezoneIdentifier: timezoneIdentifier))")
+        case .karana(let ks):
+            lines.append("Karanas:")
+            for k in ks {
+                let info = PanchangDescriptions.karanaInfo(for: k.name)
+                let typeStr = info.map { " (\($0.type))" } ?? ""
+                lines.append("  \(k.name)\(typeStr) — until \(formatTime(k.endTime, timezoneIdentifier: timezoneIdentifier))")
+            }
 
         case .vara(let v):
             let weekday = varaWeekday(from: v)

@@ -21,7 +21,7 @@ struct HomeView: View {
                 .animation(.easeInOut(duration: 5), value: vm.timePeriod)
 
             ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 32) {
+                VStack(spacing: 40) {
 
                     // MARK: - Header (date + location + settings)
                     headerSection
@@ -40,9 +40,15 @@ struct HomeView: View {
                             countdownText: vm.countdownText,
                             countdownLabel: vm.countdownLabel,
                             theme: vm.theme,
+                            timePeriod: vm.timePeriod,
                             timezoneIdentifier: vm.currentCity.timezoneIdentifier
                         )
-                        .padding(.top, 4)
+                        .padding(.top, 12)
+                    }
+
+                    // MARK: - Three-fact info bar
+                    if let panchang = vm.todayPanchang {
+                        infoBar(panchang: panchang)
                     }
 
                     // MARK: - Fasting indicator (if applicable)
@@ -92,7 +98,7 @@ struct HomeView: View {
                     upcomingSection
 
                 }
-                .padding(.bottom, 60)
+                .padding(.bottom, 80)
                 .padding(.top, 8)
             }
         }
@@ -120,62 +126,64 @@ struct HomeView: View {
     // MARK: - Header
 
     private var headerSection: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                // Formatted date above city
-                Text(formattedDate)
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundColor(vm.theme.secondaryText)
-
-                HStack(spacing: 4) {
-                    Image(systemName: "location.fill")
-                        .font(.system(size: 10))
-                    Text(vm.currentCity.name)
-                        .font(.system(size: 13, weight: .medium))
+        VStack(spacing: 6) {
+            // Icon bar: share left, settings right
+            HStack {
+                if let panchang = vm.todayPanchang {
+                    ShareLink(item: ShareTextBuilder.dailySummary(
+                        panchang: panchang,
+                        city: vm.currentCity,
+                        navratriDay: vm.currentNavratriDay
+                    )) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(vm.theme.secondaryText)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                } else {
+                    Spacer().frame(width: 44, height: 44)
                 }
-                .foregroundColor(vm.theme.secondaryText)
-            }
 
-            Spacer()
+                Spacer()
 
-            if let panchang = vm.todayPanchang {
-                ShareLink(item: ShareTextBuilder.dailySummary(
-                    panchang: panchang,
-                    city: vm.currentCity,
-                    navratriDay: vm.currentNavratriDay
-                )) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 15, weight: .regular))
+                Button {
+                    showSettings = true
+                } label: {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 16, weight: .regular))
                         .foregroundColor(vm.theme.secondaryText)
-                        .frame(width: 36, height: 36)
-                        .background(vm.theme.primaryText.opacity(0.06))
-                        .clipShape(Circle())
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 16)
+
+            // Centered city name
+            Text(vm.currentCity.name)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(vm.theme.primaryText)
+
+            // Centered Vedic date + Gregorian date
+            if let panchang = vm.todayPanchang {
+                Text("\(panchang.lunarMonth) \u{00B7} \(panchang.tithi.paksha.rawValue) Paksha")
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundColor(vm.theme.secondaryText)
             }
 
-            Button {
-                showSettings = true
-            } label: {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundColor(vm.theme.secondaryText)
-                    .frame(width: 36, height: 36)
-                    .background(vm.theme.primaryText.opacity(0.06))
-                    .clipShape(Circle())
-            }
+            Text(formattedDate)
+                .font(.system(size: 12, weight: .regular))
+                .foregroundColor(vm.theme.secondaryText.opacity(0.7))
         }
-        .padding(.horizontal, 20)
     }
 
     // MARK: - Tithi Display (tappable)
 
     private var tithiSection: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 10) {
             if let panchang = vm.todayPanchang {
-                Text("\(panchang.lunarMonth), \(panchang.tithi.paksha.rawValue) Paksha")
-                    .font(.system(size: 15, weight: .regular, design: .serif))
-                    .foregroundColor(vm.theme.secondaryText)
-
                 Button {
                     selectedElement = .tithi(panchang.tithi)
                 } label: {
@@ -201,6 +209,59 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
         }
+    }
+
+    // MARK: - Three-Fact Info Bar
+
+    private func infoBar(panchang: DailyPanchang) -> some View {
+        HStack(spacing: 0) {
+            // Left: Tithi ends
+            VStack(spacing: 3) {
+                Text("TITHI ENDS")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(vm.theme.secondaryText)
+                    .tracking(0.5)
+                Text(formatTime(panchang.tithi.endTime))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(vm.theme.primaryText)
+            }
+            .frame(maxWidth: .infinity)
+
+            // Divider
+            Rectangle()
+                .fill(vm.theme.primaryText.opacity(0.10))
+                .frame(width: 0.5, height: 28)
+
+            // Center: Nakshatra
+            VStack(spacing: 3) {
+                Image(systemName: "star.fill")
+                    .font(.system(size: 8))
+                    .foregroundColor(vm.theme.secondaryText)
+                Text(panchang.nakshatra.name)
+                    .font(.system(size: 14, weight: .medium, design: .serif))
+                    .foregroundColor(vm.theme.primaryText)
+            }
+            .frame(maxWidth: .infinity)
+
+            // Divider
+            Rectangle()
+                .fill(vm.theme.primaryText.opacity(0.10))
+                .frame(width: 0.5, height: 28)
+
+            // Right: Sunset/Sunrise time
+            VStack(spacing: 3) {
+                Text(vm.isDaytime ? "SUNSET" : "SUNRISE")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(vm.theme.secondaryText)
+                    .tracking(0.5)
+                Text(formatTime(vm.isDaytime ? panchang.solar.sunset : panchang.solar.sunrise))
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(vm.theme.primaryText)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 32)
+        .padding(.vertical, 12)
     }
 
     // MARK: - Fasting Banner
@@ -237,8 +298,8 @@ struct HomeView: View {
                     }
                     Divider().background(vm.theme.primaryText.opacity(0.08))
 
-                    tappableDetailRow("Karana", value: panchang.karana.name, sacredValue: true) {
-                        selectedElement = .karana(panchang.karana)
+                    tappableDetailRow("Karana", value: karanaDisplayValue(panchang), sacredValue: true) {
+                        selectedElement = .karana(panchang.karanas)
                     }
                     Divider().background(vm.theme.primaryText.opacity(0.08))
 
@@ -342,6 +403,14 @@ struct HomeView: View {
         case .eclipse: return Color(hex: "7B8EC4")
         case .festival: return vm.theme.accentColor
         }
+    }
+
+    /// Format karana transitions: "Vanija → Vishti" or just "Bava" if only one
+    private func karanaDisplayValue(_ panchang: DailyPanchang) -> String {
+        if panchang.karanas.count <= 1 {
+            return panchang.karana.name
+        }
+        return panchang.karanas.map(\.name).joined(separator: " → ")
     }
 
     private func formatTime(_ date: Date) -> String {

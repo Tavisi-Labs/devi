@@ -19,7 +19,7 @@ class PanchangViewModel: ObservableObject {
     @Published var todayEclipse: EclipseEvent?
     @Published var imminentEclipse: EclipseEvent?    // Within 7 days
     @Published var upcomingEvents: [UpcomingEvent] = []
-    @Published var countdownText: String = "00:00:00"
+    @Published var countdownText: String = "0.00.00"
     @Published var countdownLabel: String = "SUNRISE IN"
     @Published var currentTimeText: String = "6:00 PM"
     private var tomorrowSunrise: Date?
@@ -67,7 +67,9 @@ class PanchangViewModel: ObservableObject {
 
     private let locationManager = LocationManager()
     private var timerCancellable: AnyCancellable?
-    private let dataStore = PanchangDataStore()
+    private let dataStore = PanchangDataStore() // Kept for eclipse data (separate concern)
+    private var panchangCache: [String: DailyPanchang] = [:]  // city+date → panchang
+    private var lastCacheCity: String = ""
 
     // MARK: - Computed
 
@@ -163,13 +165,13 @@ class PanchangViewModel: ObservableObject {
             label = "SUNRISE IN"
         } else {
             countdownLabel = "NEXT SUNRISE"
-            countdownText = "--:--:--"
+            countdownText = "--.--.--"
             return
         }
 
         let remaining = target.timeIntervalSince(now)
         guard remaining > 0 else {
-            countdownText = "00:00:00"
+            countdownText = "0.00.00"
             countdownLabel = label
             return
         }
@@ -178,7 +180,7 @@ class PanchangViewModel: ObservableObject {
         let minutes = (Int(remaining) % 3600) / 60
         let seconds = Int(remaining) % 60
 
-        countdownText = String(format: "%d:%02d:%02d", hours, minutes, seconds)
+        countdownText = String(format: "%d.%02d.%02d", hours, minutes, seconds)
         countdownLabel = label
     }
 
@@ -196,23 +198,29 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Data Loading
 
     func loadData() {
-        // Load panchang for today from bundled data
+        // Invalidate cache on city change
+        if lastCacheCity != currentCity.id {
+            panchangCache.removeAll()
+            lastCacheCity = currentCity.id
+        }
+
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let todayString = dateFormatter.string(from: Date())
 
-        todayPanchang = dataStore.panchang(for: todayString, city: currentCity)
+        // Compute today's panchang dynamically via Swiss Ephemeris
+        todayPanchang = cachedPanchang(for: Date(), dateString: todayString)
 
-        // Load tomorrow's sunrise for after-sunset countdown
+        // Compute tomorrow's sunrise for after-sunset countdown
         if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) {
             let tomorrowString = dateFormatter.string(from: tomorrow)
-            tomorrowSunrise = dataStore.panchang(for: tomorrowString, city: currentCity).solar.sunrise
+            tomorrowSunrise = cachedPanchang(for: tomorrow, dateString: tomorrowString).solar.sunrise
         }
 
         // Check Navratri
         checkNavratri(dateString: todayString)
 
-        // Load eclipse data
+        // Load eclipse data (still from mock data store)
         loadEclipseData(todayString: todayString)
 
         // Load upcoming events
@@ -223,6 +231,15 @@ class PanchangViewModel: ObservableObject {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
             theme = DeviTheme.forPeriod(timePeriod)
         }
+    }
+
+    /// Returns panchang from cache or computes it fresh via PanchangCalculator.
+    private func cachedPanchang(for date: Date, dateString: String) -> DailyPanchang {
+        let key = "\(currentCity.id)-\(dateString)"
+        if let cached = panchangCache[key] { return cached }
+        let result = PanchangCalculator.panchang(for: date, city: currentCity)
+        panchangCache[key] = result
+        return result
     }
 
     private func checkNavratri(dateString: String) {
@@ -326,6 +343,7 @@ class PanchangViewModel: ObservableObject {
         currentCity = city
         persistCity(city)
         loadData()
+        tick() // Immediately refresh time displays for new timezone
         scheduleNotificationReschedule()
     }
 
@@ -355,6 +373,11 @@ class PanchangViewModel: ObservableObject {
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
     }
 
+    func resetOnboarding() {
+        hasCompletedOnboarding = false
+        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+    }
+
     // MARK: - Notification Scheduling
 
     /// Debounced reschedule — cancels any pending reschedule and waits 500ms.
@@ -371,7 +394,12 @@ class PanchangViewModel: ObservableObject {
 
     /// Collects 7 days of panchang data + preferences and calls the notification service.
     func rescheduleNotifications() async {
-        let days = dataStore.panchangForDateRange(startDate: Date(), days: 7, city: currentCity)
+        // Compute 7 days of panchang dynamically
+        let calendar = Calendar.current
+        let days: [DailyPanchang] = (0..<7).compactMap { offset in
+            guard let date = calendar.date(byAdding: .day, value: offset, to: Date()) else { return nil }
+            return PanchangCalculator.panchang(for: date, city: currentCity)
+        }
 
         // Collect navratri data for each day
         var navratriDays: [String: NavratriDay] = [:]
@@ -530,77 +558,5 @@ class PanchangDataStore {
         return [lunarEclipse, solarEclipse]
     }
 
-    /// Returns panchang data for a range of days (feeds the notification scheduler).
-    func panchangForDateRange(startDate: Date, days: Int, city: UserCity) -> [DailyPanchang] {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let calendar = Calendar.current
-
-        return (0..<days).compactMap { offset in
-            guard let date = calendar.date(byAdding: .day, value: offset, to: startDate) else { return nil }
-            let dateString = formatter.string(from: date)
-            return panchang(for: dateString, city: city)
-        }
-    }
-
-    func panchang(for dateString: String, city: UserCity) -> DailyPanchang {
-        let calendar = Calendar.current
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let baseDate = formatter.date(from: dateString) ?? Date()
-        let dayStart = calendar.startOfDay(for: baseDate)
-
-        // Mock sunrise/sunset (replace with real bundled data)
-        let sunrise = calendar.date(bySettingHour: 6, minute: 18, second: 0, of: dayStart)!
-        let sunset = calendar.date(bySettingHour: 18, minute: 42, second: 0, of: dayStart)!
-
-        return DailyPanchang(
-            dateString: dateString,
-            tithi: Tithi(
-                number: 5,
-                name: "Panchami",
-                paksha: .shukla,
-                endTime: calendar.date(bySettingHour: 22, minute: 15, second: 0, of: dayStart)!
-            ),
-            nakshatra: Nakshatra(
-                number: 3,
-                name: "Krittika",
-                ruler: "Sun",
-                deity: "Agni",
-                endTime: calendar.date(bySettingHour: 14, minute: 30, second: 0, of: dayStart)!
-            ),
-            yoga: Yoga(
-                number: 22,
-                name: "Shubha",
-                endTime: calendar.date(bySettingHour: 16, minute: 45, second: 0, of: dayStart)!
-            ),
-            karana: Karana(
-                number: 9,
-                name: "Bava",
-                endTime: calendar.date(bySettingHour: 11, minute: 20, second: 0, of: dayStart)!
-            ),
-            solar: SolarData(
-                sunrise: sunrise,
-                sunset: sunset,
-                moonrise: calendar.date(bySettingHour: 22, minute: 42, second: 0, of: dayStart),
-                moonset: calendar.date(bySettingHour: 8, minute: 15, second: 0, of: dayStart)
-            ),
-            timeWindows: [
-                TimeWindow(type: .brahmaMuhurta,
-                          start: calendar.date(bySettingHour: 4, minute: 42, second: 0, of: dayStart)!,
-                          end: calendar.date(bySettingHour: 5, minute: 30, second: 0, of: dayStart)!),
-                TimeWindow(type: .abhijitMuhurta,
-                          start: calendar.date(bySettingHour: 11, minute: 42, second: 0, of: dayStart)!,
-                          end: calendar.date(bySettingHour: 12, minute: 30, second: 0, of: dayStart)!),
-                TimeWindow(type: .rahuKalam,
-                          start: calendar.date(bySettingHour: 13, minute: 30, second: 0, of: dayStart)!,
-                          end: calendar.date(bySettingHour: 15, minute: 0, second: 0, of: dayStart)!),
-                TimeWindow(type: .gulikaKalam,
-                          start: calendar.date(bySettingHour: 12, minute: 0, second: 0, of: dayStart)!,
-                          end: calendar.date(bySettingHour: 13, minute: 30, second: 0, of: dayStart)!),
-            ],
-            lunarMonth: "Phalguna",
-            festivals: []
-        )
-    }
+    // Mock panchang methods removed — PanchangCalculator now computes everything dynamically.
 }

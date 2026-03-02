@@ -13,27 +13,15 @@ struct OrnamentalDivider: View {
     }
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 10) {
             line
 
             if let label {
-                Text("\u{2726}")
-                    .font(.system(size: 12))
-                    .foregroundColor(theme.accentColor.opacity(0.8))
-
                 Text(label)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(theme.secondaryText)
                     .textCase(.uppercase)
-                    .tracking(1.5)
-
-                Text("\u{2726}")
-                    .font(.system(size: 12))
-                    .foregroundColor(theme.accentColor.opacity(0.8))
-            } else {
-                Text("\u{25C6}")
-                    .font(.system(size: 12))
-                    .foregroundColor(theme.accentColor.opacity(0.8))
+                    .tracking(2.0)
             }
 
             line
@@ -43,8 +31,8 @@ struct OrnamentalDivider: View {
 
     private var line: some View {
         Rectangle()
-            .fill(theme.primaryText.opacity(0.25))
-            .frame(height: 1.0)
+            .fill(theme.primaryText.opacity(0.10))
+            .frame(height: 0.5)
     }
 }
 

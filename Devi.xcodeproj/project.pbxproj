@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,13 +13,16 @@
 		0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406B7EE63A21C444D045C89E /* SunArcView.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
 		41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09C4017C2811FC941DD4451 /* StarFieldView.swift */; };
+		42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */; };
 		45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */; };
 		4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D21D4B060787531B830527 /* OnboardingView.swift */; };
 		5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */; };
 		53EB548AF45411CA45FFB15A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = 8770626AEDBE1DA0D475369D /* Solar */; };
+		561B3143C07D20B5677CE9B9 /* PanchangCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */; };
 		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
+		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
 		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
@@ -36,6 +39,7 @@
 		406B7EE63A21C444D045C89E /* SunArcView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunArcView.swift; sourceTree = "<group>"; };
 		42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTextBuilder.swift; sourceTree = "<group>"; };
 		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculator.swift; sourceTree = "<group>"; };
 		5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWindowsCard.swift; sourceTree = "<group>"; };
 		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
 		7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -43,13 +47,14 @@
 		8671B2E2810F5DB127BCD949 /* CitySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitySearchService.swift; sourceTree = "<group>"; };
 		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
-		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
 		E09C4017C2811FC941DD4451 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
 		E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +63,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				53EB548AF45411CA45FFB15A /* Solar in Frameworks */,
+				A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,11 +100,13 @@
 			children = (
 				8671B2E2810F5DB127BCD949 /* CitySearchService.swift */,
 				7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */,
+				4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */,
 				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
 				E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */,
 				E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */,
 				D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */,
 				42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */,
+				F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -155,6 +163,7 @@
 			name = Devi;
 			packageProductDependencies = (
 				8770626AEDBE1DA0D475369D /* Solar */,
+				DC9406F18B90AF0917117B76 /* SwissEphemeris */,
 			);
 			productName = Devi;
 			productReference = B5F37171BB5BCFC490113269 /* Devi.app */;
@@ -181,8 +190,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */,
+				E9F2E605191273FE3F9F2C9B /* XCRemoteSwiftPackageReference "SwissEphemeris" */,
 			);
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -204,6 +213,7 @@
 				C19C27D51654472CE9003804 /* NotificationService.swift in Sources */,
 				4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */,
 				D694479C65408F156F68ED12 /* OrnamentalDivider.swift in Sources */,
+				561B3143C07D20B5677CE9B9 /* PanchangCalculator.swift in Sources */,
 				36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */,
 				564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */,
 				5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */,
@@ -215,6 +225,7 @@
 				0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */,
 				AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */,
 				07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */,
+				42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,6 +303,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = KTK5RL3ZR3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -414,6 +426,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E9F2E605191273FE3F9F2C9B /* XCRemoteSwiftPackageReference "SwissEphemeris" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vsmithers1087/SwissEphemeris";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.99;
+			};
+		};
 		F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ceeK/Solar";
@@ -429,6 +449,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */;
 			productName = Solar;
+		};
+		DC9406F18B90AF0917117B76 /* SwissEphemeris */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E9F2E605191273FE3F9F2C9B /* XCRemoteSwiftPackageReference "SwissEphemeris" */;
+			productName = SwissEphemeris;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

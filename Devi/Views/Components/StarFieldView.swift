@@ -11,11 +11,11 @@ struct StarFieldView: View {
 
     private var fieldOpacity: Double {
         switch timePeriod {
-        case .night:          return 1.0
-        case .brahmaMuhurta:  return 0.8
-        case .evening:        return 0.5
-        case .morning:        return 0.15
-        case .afternoon:      return 0.08
+        case .night:          return 0.55
+        case .brahmaMuhurta:  return 0.4
+        case .evening:        return 0.3
+        case .morning:        return 0.1
+        case .afternoon:      return 0.04
         }
     }
 
@@ -33,7 +33,7 @@ struct StarFieldView: View {
         if fieldOpacity == 0 {
             Color.clear
         } else {
-            TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            TimelineView(.animation(minimumInterval: 1.0 / 15.0)) { timeline in
                 Canvas { context, size in
                     let time = timeline.date.timeIntervalSinceReferenceDate
                     let visibleCount = Int(Double(stars.count) * visibleFraction)
@@ -68,7 +68,7 @@ struct StarFieldView: View {
             .allowsHitTesting(false)
             .onAppear {
                 if stars.isEmpty {
-                    stars = (0..<200).map { _ in Star.random() }
+                    stars = (0..<80).map { _ in Star.random() }
                 }
             }
         }
@@ -99,11 +99,11 @@ private struct Star {
         return Star(
             normalizedX: Double.random(in: 0...1),
             normalizedY: Double.random(in: 0...1),
-            size: Double.random(in: 1...3),
-            baseBrightness: Double.random(in: 0.3...1.0),
-            twinkleSpeed: Double.random(in: 0.5...2.0),
+            size: Double.random(in: 0.5...1.8),
+            baseBrightness: Double.random(in: 0.15...0.6),
+            twinkleSpeed: Double.random(in: 0.2...0.8),
             twinklePhase: Double.random(in: 0...(.pi * 2)),
-            driftAmplitude: Double.random(in: 2...6),
+            driftAmplitude: Double.random(in: 0.5...2.0),
             driftPeriodX: Double.random(in: 30...60),
             driftPeriodY: Double.random(in: 30...60),
             phaseX: Double.random(in: 0...(.pi * 2)),
