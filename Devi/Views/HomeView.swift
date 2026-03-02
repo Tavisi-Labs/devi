@@ -36,6 +36,8 @@ struct HomeView: View {
                             isDaytime: vm.isDaytime,
                             sunrise: solar.sunrise,
                             sunset: solar.sunset,
+                            moonrise: solar.moonrise,
+                            moonset: solar.moonset,
                             currentTime: vm.currentTimeText,
                             countdownText: vm.countdownText,
                             countdownLabel: vm.countdownLabel,

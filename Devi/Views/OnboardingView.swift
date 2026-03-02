@@ -33,6 +33,28 @@ struct OnboardingView: View {
                 notificationPage.tag(1)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
+
+            if vm.isResolvingLocation {
+                Color.black.opacity(0.20)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .tint(onboardingTheme.accentColor)
+
+                    Text("Finding your location…")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(onboardingTheme.primaryText)
+                }
+                .padding(.horizontal, 22)
+                .padding(.vertical, 18)
+                .deviCard(theme: onboardingTheme, elevation: .raised, cornerRadius: 16)
+                .padding(.horizontal, 40)
+            }
+        }
+        .onChange(of: vm.isResolvingLocation) { _, isResolving in
+            guard !isResolving, currentPage == 0 else { return }
+            withAnimation { currentPage = 1 }
         }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: vm.currentCity) { city in
@@ -85,7 +107,6 @@ struct OnboardingView: View {
                     // Use My Location button
                     Button {
                         vm.requestLocation()
-                        withAnimation { currentPage = 1 }
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "location.fill")
@@ -95,6 +116,7 @@ struct OnboardingView: View {
                     }
                     .deviButton(.primary)
                     .padding(.horizontal, 32)
+                    .disabled(vm.isResolvingLocation)
 
                     // "or choose your city" separator
                     Text("or choose your city")
@@ -133,7 +155,9 @@ struct OnboardingView: View {
 
                     // Search other cities
                     Button {
-                        showCityPicker = true
+                        if !vm.isResolvingLocation {
+                            showCityPicker = true
+                        }
                     } label: {
                         Text("Search other cities")
                             .font(.system(size: 14, weight: .medium))

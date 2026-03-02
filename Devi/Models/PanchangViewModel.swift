@@ -24,6 +24,7 @@ class PanchangViewModel: ObservableObject {
     @Published var currentTimeText: String = "6:00 PM"
     private var tomorrowSunrise: Date?
     @Published var isLocationAuthorized: Bool = false
+    @Published var isResolvingLocation: Bool = false
     @Published var hasCompletedOnboarding: Bool = false
     @Published var notificationsAuthorized: Bool = false
 
@@ -66,6 +67,7 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Private
 
     private let locationManager = LocationManager()
+    private var locationResolutionTimeoutTask: Task<Void, Never>?
     private var timerCancellable: AnyCancellable?
     private let dataStore = PanchangDataStore() // Kept for eclipse data (separate concern)
     private var panchangCache: [String: DailyPanchang] = [:]  // city+date → panchang
@@ -294,12 +296,28 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Location
 
     func requestLocation() {
+        guard !isResolvingLocation else { return }
+        isResolvingLocation = true
+
+        locationResolutionTimeoutTask?.cancel()
+        locationResolutionTimeoutTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(10))
+            guard let self, !Task.isCancelled, self.isResolvingLocation else { return }
+            self.selectCity(UserCity.popularCities[0])
+        }
+
         locationManager.requestPermission { [weak self] authorized in
-            self?.isLocationAuthorized = authorized
-            if authorized {
-                self?.locationManager.getCurrentLocation { location in
+            Task { @MainActor in
+                guard let self else { return }
+                self.isLocationAuthorized = authorized
+                guard authorized else {
+                    self.finishLocationResolution()
+                    return
+                }
+
+                self.locationManager.getCurrentLocation { location in
                     Task { @MainActor in
-                        await self?.resolveLocationToCity(location)
+                        await self.resolveLocationToCity(location)
                     }
                 }
             }
@@ -309,6 +327,8 @@ class PanchangViewModel: ObservableObject {
     /// Reverse-geocode a GPS location to a real city name.
     /// Falls back to nearest popular city if geocoding fails (e.g. offline).
     private func resolveLocationToCity(_ location: CLLocation) async {
+        guard isResolvingLocation else { return }
+
         let geocoder = CLGeocoder()
         do {
             let placemarks = try await geocoder.reverseGeocodeLocation(location)
@@ -345,6 +365,13 @@ class PanchangViewModel: ObservableObject {
         loadData()
         tick() // Immediately refresh time displays for new timezone
         scheduleNotificationReschedule()
+        finishLocationResolution()
+    }
+
+    private func finishLocationResolution() {
+        isResolvingLocation = false
+        locationResolutionTimeoutTask?.cancel()
+        locationResolutionTimeoutTask = nil
     }
 
     private func persistCity(_ city: UserCity) {
@@ -375,7 +402,18 @@ class PanchangViewModel: ObservableObject {
 
     func resetOnboarding() {
         hasCompletedOnboarding = false
-        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+        let ud = UserDefaults.standard
+        ud.set(false, forKey: "hasCompletedOnboarding")
+        ud.removeObject(forKey: "city.name")
+        ud.removeObject(forKey: "city.country")
+        ud.removeObject(forKey: "city.latitude")
+        ud.removeObject(forKey: "city.longitude")
+        ud.removeObject(forKey: "city.timezoneIdentifier")
+
+        currentCity = UserCity.popularCities[0]
+        loadData()
+        tick()
+        finishLocationResolution()
     }
 
     // MARK: - Notification Scheduling
