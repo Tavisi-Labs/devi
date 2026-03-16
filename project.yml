@@ -29,12 +29,14 @@ targets:
     settings:
       base:
         GENERATE_INFOPLIST_FILE: true
+        PRODUCT_BUNDLE_IDENTIFIER: com.hareeshnagaraj.devi
         DEVELOPMENT_TEAM: KTK5RL3ZR3
         CODE_SIGN_STYLE: Automatic
         MARKETING_VERSION: "0.9.0"
         CURRENT_PROJECT_VERSION: "1"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UIRequiresFullScreen: true
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area."
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         INFOPLIST_KEY_UIUserInterfaceStyle: Dark
