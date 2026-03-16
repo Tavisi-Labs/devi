@@ -21,12 +21,14 @@
 		561B3143C07D20B5677CE9B9 /* PanchangCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */; };
 		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
+		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
 		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
 		C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */; };
+		D242439F6807E30BD55D80D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D40FE13768033F483BCEA6DC /* Assets.xcassets */; };
 		D3F4D6E623EDD5A5157196B6 /* ShareTextBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */; };
 		D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8671B2E2810F5DB127BCD949 /* CitySearchService.swift */; };
 		D694479C65408F156F68ED12 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */; };
@@ -49,11 +51,13 @@
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
 		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
+		D40FE13768033F483BCEA6DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
 		E09C4017C2811FC941DD4451 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
 		E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,7 +77,9 @@
 		24431773675F89C667CBFE20 /* Devi */ = {
 			isa = PBXGroup;
 			children = (
+				D40FE13768033F483BCEA6DC /* Assets.xcassets */,
 				9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */,
+				F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */,
 				63D4C2FC48BFDEA82A2DC0A7 /* Models */,
 				AFAA87FA2E7674A778B7F622 /* Utils */,
 				8481CF9F392B620436155731 /* Views */,
@@ -154,6 +160,7 @@
 			buildConfigurationList = C363D8B438CF27CAD3DFAA67 /* Build configuration list for PBXNativeTarget "Devi" */;
 			buildPhases = (
 				BA73B945ED4921F1409CAEB0 /* Sources */,
+				34F8211EC949268AA53277C6 /* Resources */,
 				5AA97A4A8B5305455BD0F778 /* Frameworks */,
 			);
 			buildRules = (
@@ -199,6 +206,18 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		34F8211EC949268AA53277C6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D242439F6807E30BD55D80D4 /* Assets.xcassets in Resources */,
+				8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BA73B945ED4921F1409CAEB0 /* Sources */ = {
@@ -314,7 +333,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.Devi;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -337,7 +356,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.Devi;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -371,24 +371,71 @@ enum PanchangCalculator {
 
     // MARK: - Festivals (Hardcoded for 2026)
 
+    // Full 2026 Hindu festival calendar — dates sourced from drikpanchang.com (Delhi IST).
+    // Fasting days (Ekadashi, Pradosh, Purnima, Amavasya) are computed dynamically from tithi
+    // and do NOT need entries here. Only named festivals and observances belong in this table.
     private static let festivalData: [String: [String]] = [
-        "2026-03-13": ["Maha Shivaratri"],
-        "2026-03-14": ["Amavasya"],
-        "2026-03-19": ["Chaitra Navratri Begins"],
+        // ── January ──
+        "2026-01-13": ["Lohri"],
+        "2026-01-14": ["Makar Sankranti", "Pongal"],
+        "2026-01-23": ["Vasant Panchami"],
+
+        // ── February ──
+        "2026-02-15": ["Maha Shivaratri"],
+
+        // ── March ──
+        "2026-03-03": ["Holika Dahan"],
+        "2026-03-04": ["Holi"],
+        "2026-03-19": ["Chaitra Navratri Begins", "Ugadi", "Gudi Padwa"],
         "2026-03-20": ["Chaitra Navratri Day 2"],
         "2026-03-21": ["Chaitra Navratri Day 3"],
         "2026-03-22": ["Chaitra Navratri Day 4"],
         "2026-03-23": ["Chaitra Navratri Day 5"],
         "2026-03-24": ["Chaitra Navratri Day 6"],
         "2026-03-25": ["Chaitra Navratri Day 7"],
-        "2026-03-26": ["Chaitra Navratri Day 8", "Durga Ashtami"],
-        "2026-03-27": ["Chaitra Navratri Day 9", "Ram Navami"],
-        "2026-03-28": ["Ekadashi"],
-        "2026-03-29": ["Hanuman Jayanti"],
-        "2026-04-01": ["Chaitra Purnima"],
-        "2026-04-12": ["Amavasya"],
-        "2026-04-13": ["Baisakhi"],
-        "2026-04-14": ["Tamil New Year"],
+        "2026-03-26": ["Chaitra Navratri Day 8", "Durga Ashtami", "Ram Navami"],
+        "2026-03-27": ["Chaitra Navratri Day 9"],
+
+        // ── April ──
+        "2026-04-02": ["Hanuman Jayanti", "Chaitra Purnima"],
+        "2026-04-14": ["Baisakhi", "Tamil New Year"],
+        "2026-04-19": ["Akshaya Tritiya"],
+
+        // ── May ──
+        "2026-05-01": ["Buddha Purnima"],
+
+        // ── July ──
+        "2026-07-29": ["Guru Purnima"],
+
+        // ── August ──
+        "2026-08-26": ["Onam"],
+        "2026-08-28": ["Raksha Bandhan"],
+
+        // ── September ──
+        "2026-09-04": ["Krishna Janmashtami"],
+        "2026-09-14": ["Ganesh Chaturthi"],
+
+        // ── October ──
+        "2026-10-11": ["Sharad Navratri Begins"],
+        "2026-10-12": ["Sharad Navratri Day 2"],
+        "2026-10-13": ["Sharad Navratri Day 3"],
+        "2026-10-14": ["Sharad Navratri Day 4"],
+        "2026-10-15": ["Sharad Navratri Day 5"],
+        "2026-10-16": ["Sharad Navratri Day 6"],
+        "2026-10-17": ["Sharad Navratri Day 7"],
+        "2026-10-18": ["Sharad Navratri Day 8", "Maha Ashtami"],
+        "2026-10-19": ["Sharad Navratri Day 9", "Maha Navami"],
+        "2026-10-20": ["Dussehra", "Vijayadashami"],
+        "2026-10-29": ["Karva Chauth"],
+
+        // ── November ──
+        "2026-11-06": ["Dhanteras"],
+        "2026-11-07": ["Naraka Chaturdashi", "Choti Diwali"],
+        "2026-11-08": ["Diwali", "Lakshmi Puja"],
+        "2026-11-10": ["Govardhan Puja"],
+        "2026-11-11": ["Bhai Dooj"],
+        "2026-11-15": ["Chhath Puja"],
+        "2026-11-24": ["Kartik Purnima", "Dev Diwali"],
     ]
 
     static func festivals(for dateString: String) -> [String] {

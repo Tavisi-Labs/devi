@@ -256,30 +256,52 @@ class PanchangViewModel: ObservableObject {
     }
 
     private func loadEclipseData(todayString: String) {
-        eclipseEvents = dataStore.eclipses(for: currentCity)
-
-        todayEclipse = eclipseEvents.first { $0.dateString == todayString }
-
-        imminentEclipse = eclipseEvents
-            .filter { eclipse in
-                let days = eclipse.daysFrom(todayString)
-                return days >= 0 && days <= 7
-            }
-            .sorted { $0.daysFrom(todayString) < $1.daysFrom(todayString) }
-            .first
+        // Eclipse data suppressed until real ephemeris-based calculations are implemented.
+        // Mock data from PanchangDataStore erodes trust — keep all eclipse UI code intact.
+        eclipseEvents = []
+        todayEclipse = nil
+        imminentEclipse = nil
     }
 
-    private func loadUpcomingEvents(from dateString: String) {
-        // Simplified — in real app, scan next 30 days of bundled data
-        var events = [
-            UpcomingEvent(name: "Ekadashi", dateString: "2026-03-25", daysAway: 6, type: .fasting),
-            UpcomingEvent(name: "Purnima", dateString: "2026-03-29", daysAway: 10, type: .fasting),
-            UpcomingEvent(name: "Ram Navami", dateString: "2026-03-27", daysAway: 8, type: .festival),
-        ]
+    private func loadUpcomingEvents(from todayString: String) {
+        let calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        guard let today = dateFormatter.date(from: todayString) else { return }
 
-        // Add eclipse events to upcoming
+        var events: [UpcomingEvent] = []
+        var seenNames: Set<String> = []  // Deduplicate across days
+
+        // Scan next 30 days for festivals and fasting days
+        for offset in 1...30 {
+            guard let date = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
+            let ds = dateFormatter.string(from: date)
+
+            // Festivals from the static festival data
+            let festivals = PanchangCalculator.festivals(for: ds)
+            for fest in festivals {
+                guard !seenNames.contains(fest) else { continue }
+                seenNames.insert(fest)
+                events.append(UpcomingEvent(
+                    name: fest, dateString: ds, daysAway: offset, type: .festival
+                ))
+            }
+
+            // Fasting days from tithi calculation
+            let panchang = cachedPanchang(for: date, dateString: ds)
+            if let fastType = panchang.tithi.fastingType {
+                let label = fastType
+                guard !seenNames.contains("\(label)-\(ds)") else { continue }
+                seenNames.insert("\(label)-\(ds)")
+                events.append(UpcomingEvent(
+                    name: label, dateString: ds, daysAway: offset, type: .fasting
+                ))
+            }
+        }
+
+        // Merge eclipse events (if any)
         for eclipse in eclipseEvents {
-            let days = eclipse.daysFrom(dateString)
+            let days = eclipse.daysFrom(todayString)
             if days > 0 && days <= 30 {
                 events.append(UpcomingEvent(
                     name: eclipse.displayName,
