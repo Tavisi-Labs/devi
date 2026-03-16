@@ -54,9 +54,15 @@ struct HomeView: View {
                     }
 
                     // MARK: - Fasting indicator (if applicable)
-                    if let fastType = vm.todayPanchang?.tithi.fastingType {
-                        fastingBanner(fastType)
-                            .deviEntrance()
+                    if let panchang = vm.todayPanchang, let fastType = panchang.tithi.fastingType {
+                        let enrichedName = enrichedFastingName(fastType, panchang: panchang)
+                        Button {
+                            selectedElement = .fastingDay(fastType)
+                        } label: {
+                            fastingBanner(enrichedName)
+                        }
+                        .buttonStyle(.plain)
+                        .deviEntrance()
                     }
 
                     // MARK: - Eclipse Card (imminent or today)
@@ -120,7 +126,8 @@ struct HomeView: View {
                 element: element,
                 theme: vm.theme,
                 timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                cityName: vm.currentCity.name
+                cityName: vm.currentCity.name,
+                panchangContext: vm.todayPanchang
             )
         }
     }
@@ -268,17 +275,21 @@ struct HomeView: View {
 
     // MARK: - Fasting Banner
 
-    private func fastingBanner(_ type: String) -> some View {
+    private func fastingBanner(_ displayName: String) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "flame.fill")
                 .font(.system(size: 14))
                 .foregroundColor(Color(hex: "c54b2a"))
 
-            Text("Today is \(type)")
+            Text("Today is \(displayName)")
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(vm.theme.primaryText)
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(vm.theme.secondaryText.opacity(0.4))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -374,23 +385,33 @@ struct HomeView: View {
 
             VStack(spacing: 0) {
                 ForEach(vm.upcomingEvents) { event in
-                    HStack {
-                        Circle()
-                            .fill(eventDotColor(event.type))
-                            .frame(width: 6, height: 6)
+                    Button {
+                        selectedElement = panchangElement(for: event)
+                    } label: {
+                        HStack {
+                            Circle()
+                                .fill(eventDotColor(event.type))
+                                .frame(width: 6, height: 6)
 
-                        Text(event.name)
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(vm.theme.primaryText)
+                            Text(event.name)
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(vm.theme.primaryText)
 
-                        Spacer()
+                            Spacer()
 
-                        Text("in \(event.daysAway) days")
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundColor(vm.theme.secondaryText)
+                            Text("in \(event.daysAway) days")
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundColor(vm.theme.secondaryText)
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(vm.theme.secondaryText.opacity(0.4))
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .contentShape(Rectangle())
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -398,6 +419,46 @@ struct HomeView: View {
     }
 
     // MARK: - Helpers
+
+    // MARK: - Event → PanchangElement Resolver
+
+    private func panchangElement(for event: UpcomingEvent) -> PanchangElement {
+        switch event.type {
+        case .festival:
+            if let navDay = navratriDay(from: event.name) {
+                return .navratriDay(navDay)
+            }
+            return .festival(event.name)
+        case .fasting:
+            return .fastingDay(event.name)
+        case .eclipse:
+            if let eclipse = vm.eclipseEvents.first(where: { $0.dateString == event.dateString }) {
+                return .eclipse(eclipse)
+            }
+            return .festival(event.name)
+        }
+    }
+
+    /// Parses Navratri event names into NavratriDay structs.
+    /// "Chaitra Navratri Begins" → Day 1, "Chaitra Navratri Day 3" → Day 3, etc.
+    private func navratriDay(from eventName: String) -> NavratriDay? {
+        let days = NavratriDay.chaitraNavratri2026  // Same goddess data for both periods
+
+        if eventName.contains("Navratri Begins") {
+            return days.first
+        }
+
+        // Match "Chaitra Navratri Day N" or "Sharad Navratri Day N"
+        if eventName.contains("Navratri Day") {
+            let components = eventName.components(separatedBy: " ")
+            if let lastComponent = components.last, let dayNum = Int(lastComponent),
+               dayNum >= 1, dayNum <= 9 {
+                return days[dayNum - 1]
+            }
+        }
+
+        return nil
+    }
 
     private func eventDotColor(_ type: UpcomingEvent.EventType) -> Color {
         switch type {
@@ -413,6 +474,30 @@ struct HomeView: View {
             return panchang.karana.name
         }
         return panchang.karanas.map(\.name).joined(separator: " → ")
+    }
+
+    /// Computes a weekday-specific Pradosh name or named Ekadashi variant.
+    /// "Pradosh Vrat" + Monday → "Soma Pradosh Vrat"
+    /// "Ekadashi" + Chaitra + Shukla → "Kamada Ekadashi"
+    /// "Purnima" / "Amavasya" → unchanged (no named variants)
+    private func enrichedFastingName(_ baseType: String, panchang: DailyPanchang) -> String {
+        switch baseType {
+        case "Pradosh Vrat":
+            if let info = PanchangDescriptions.pradoshTypeInfo(for: panchang.varaDeity) {
+                return info.typeName
+            }
+            return baseType
+        case "Ekadashi":
+            if let ekadashi = PanchangDescriptions.ekadashiName(
+                lunarMonth: panchang.lunarMonth,
+                paksha: panchang.tithi.paksha
+            ) {
+                return "\(ekadashi.name) Ekadashi"
+            }
+            return baseType
+        default:
+            return baseType
+        }
     }
 
     private func formatTime(_ date: Date) -> String {

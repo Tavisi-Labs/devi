@@ -48,10 +48,10 @@ enum ShareTextBuilder {
             }
         }
 
-        // Fasting day
+        // Fasting day (with enriched name)
         if let fastType = panchang.tithi.fastingType {
             lines.append("")
-            lines.append("🔥 Today is \(fastType)")
+            lines.append("🔥 Today is \(enrichedFastingName(fastType, panchang: panchang))")
         }
 
         // Navratri
@@ -184,6 +184,50 @@ enum ShareTextBuilder {
             for contact in e.contactTimeline {
                 lines.append("\(contact.label): \(formatTime(contact.time, timezoneIdentifier: timezoneIdentifier))")
             }
+
+        case .festival(let name):
+            let info = PanchangDescriptions.festivalInfo(for: name)
+            lines.append(name)
+            if let meaning = info?.meaning { lines.append(meaning) }
+            lines.append("")
+            if let significance = info?.significance { lines.append(significance) }
+            if let observances = info?.observances {
+                lines.append("")
+                lines.append(contentsOf: observances.prefix(3).map { "• \($0)" })
+            }
+
+        case .fastingDay(let name):
+            let info = PanchangDescriptions.fastingDayInfo(for: name)
+            lines.append("🔥 \(name)")
+            if let meaning = info?.meaning { lines.append(meaning) }
+            // Pradosh type enrichment (context-independent — uses today's weekday)
+            if name == "Pradosh Vrat" {
+                let weekday = Calendar.current.component(.weekday, from: Date())
+                let deityNames = ["", "Surya", "Chandra", "Mangala", "Budha", "Guru", "Shukra", "Shani"]
+                if weekday >= 1, weekday <= 7,
+                   let pradosh = PanchangDescriptions.pradoshTypes[deityNames[weekday]] {
+                    lines.append("Type: \(pradosh.typeName)")
+                }
+            }
+            lines.append("")
+            if let whyFast = info?.whyFast {
+                let firstSentence = whyFast.components(separatedBy: ". ").first ?? whyFast
+                lines.append(firstSentence + ".")
+            }
+            if let howTo = info?.howToObserve {
+                lines.append("")
+                lines.append(contentsOf: howTo.prefix(3).map { "• \($0)" })
+            }
+
+        case .navratriDay(let day):
+            lines.append("🪷 Navratri Day \(day.dayNumber) — \(day.goddessName)")
+            lines.append("\"\(day.goddessEpithet)\"")
+            lines.append("")
+            lines.append("Wear: \(day.colorName)")
+            lines.append("Offering: \(day.offering)")
+            lines.append("")
+            lines.append(day.mantra)
+            lines.append(day.mantraTranslit)
         }
 
         lines.append(footer)
@@ -243,6 +287,27 @@ enum ShareTextBuilder {
         case .rahuKalam: return "rahuKalam"
         case .gulikaKalam: return "gulikaKalam"
         case .yamaganda: return "yamaganda"
+        }
+    }
+
+    /// Enriched fasting name: weekday-specific Pradosh or named Ekadashi.
+    private static func enrichedFastingName(_ baseType: String, panchang: DailyPanchang) -> String {
+        switch baseType {
+        case "Pradosh Vrat":
+            if let info = PanchangDescriptions.pradoshTypeInfo(for: panchang.varaDeity) {
+                return info.typeName
+            }
+            return baseType
+        case "Ekadashi":
+            if let ekadashi = PanchangDescriptions.ekadashiName(
+                lunarMonth: panchang.lunarMonth,
+                paksha: panchang.tithi.paksha
+            ) {
+                return "\(ekadashi.name) Ekadashi"
+            }
+            return baseType
+        default:
+            return baseType
         }
     }
 

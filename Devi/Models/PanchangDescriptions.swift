@@ -65,6 +65,32 @@ struct EclipseInfo {
     let mantras: [(devanagari: String, transliteration: String, purpose: String)]
 }
 
+struct FestivalInfo {
+    let name: String
+    let meaning: String
+    let description: String
+    let significance: String
+    let observances: [String]
+    let associatedDeity: String
+}
+
+struct FastingDayInfo {
+    let name: String
+    let meaning: String
+    let description: String
+    let whyFast: String
+    let howToObserve: [String]
+    let associatedDeity: String
+    let mantra: (devanagari: String, transliteration: String)?
+}
+
+struct PradoshTypeInfo {
+    let typeName: String       // "Soma Pradosh Vrat"
+    let weekday: String        // "Monday"
+    let significance: String   // "Very auspicious — Shiva's own day"
+    let deity: String          // "Shiva / Chandra"
+}
+
 // MARK: - PanchangDescriptions Namespace
 
 enum PanchangDescriptions {
@@ -1061,4 +1087,702 @@ enum PanchangDescriptions {
             )
         ]
     )
+
+    // MARK: - Festivals (Utsav)
+
+    static let festivals: [String: FestivalInfo] = [
+        "Lohri": FestivalInfo(
+            name: "Lohri",
+            meaning: "Bonfire Festival — derived from 'loh' (warmth/light)",
+            description: "Lohri is a Punjabi winter harvest festival celebrated on the eve of Makar Sankranti. Bonfires are lit to mark the end of the coldest month, Paush. Revelers throw sesame seeds, peanuts, and popcorn into the fire while singing folk songs praising Dulla Bhatti, a Punjabi folk hero.",
+            significance: "Lohri marks the astronomical transition when days begin to lengthen. It celebrates fertility, the harvest of sugarcane, and the warmth of community during winter's peak.",
+            observances: [
+                "Light a communal bonfire at dusk",
+                "Offer sesame seeds (til), jaggery (gur), and peanuts to the fire",
+                "Sing traditional Lohri folk songs",
+                "Share rewri and gajak sweets with neighbors",
+                "Celebrate newlyweds and newborns in the family"
+            ],
+            associatedDeity: "Agni (Fire God)"
+        ),
+        "Makar Sankranti": FestivalInfo(
+            name: "Makar Sankranti",
+            meaning: "The Sun's entry (Sankranti) into Capricorn (Makara)",
+            description: "Makar Sankranti is a solar festival marking the Sun's northward journey (Uttarayan). Unlike most Hindu festivals based on the lunar calendar, this one follows the solar calendar and falls on January 14 or 15 each year. It is celebrated across India under different regional names.",
+            significance: "Uttarayan is considered the gateway period for spiritual liberation. Bhishma Pitamah in the Mahabharata chose to die during Uttarayan. The day symbolizes light conquering darkness and the harvest of winter crops.",
+            observances: [
+                "Take a holy bath at dawn, especially in sacred rivers",
+                "Offer til-gur (sesame-jaggery) sweets to family and friends",
+                "Fly kites — a tradition especially popular in Gujarat and Rajasthan",
+                "Donate warm clothes, food, and sesame to the needy",
+                "Prepare traditional dishes like khichdi, pongal, or til laddu"
+            ],
+            associatedDeity: "Surya (Sun God)"
+        ),
+        "Pongal": FestivalInfo(
+            name: "Pongal",
+            meaning: "Boiling over — from the Tamil for overflowing rice",
+            description: "Pongal is a four-day Tamil harvest thanksgiving festival. The centerpiece is cooking freshly harvested rice with milk in a clay pot until it boils over — the overflowing symbolizes abundance. The festival spans Bhogi Pongal, Thai Pongal, Mattu Pongal, and Kaanum Pongal.",
+            significance: "Pongal thanks the Sun God, farm cattle, and nature for a bountiful harvest. It marks the beginning of the Tamil month Thai and the Sun's northward journey. It is one of the most important festivals in Tamil culture.",
+            observances: [
+                "Cook Pongal rice in a new clay pot until it overflows",
+                "Decorate the entrance with kolam (rice flour patterns)",
+                "Worship cattle on Mattu Pongal with garlands and paint",
+                "Offer sugarcane, turmeric, and the first harvest to Surya",
+                "Gather with family for feasting and thanksgiving"
+            ],
+            associatedDeity: "Surya (Sun God) / Indra"
+        ),
+        "Vasant Panchami": FestivalInfo(
+            name: "Vasant Panchami",
+            meaning: "Fifth day (Panchami) of Spring (Vasant)",
+            description: "Vasant Panchami heralds the arrival of spring and is dedicated to Goddess Saraswati, the embodiment of knowledge, music, and arts. People wear yellow to symbolize the mustard fields in bloom. Children are often introduced to writing on this day in a ceremony called Akshar Abhyas.",
+            significance: "This day marks the seasonal shift when nature begins its renewal. Saraswati is worshipped as the source of all knowledge and creative inspiration. It is considered the most auspicious day to begin formal education.",
+            observances: [
+                "Worship Goddess Saraswati with books, instruments, and flowers",
+                "Wear yellow clothes and offer yellow flowers and sweets",
+                "Begin children's education (Akshar Abhyas / Vidyarambham)",
+                "Place books, pens, and musical instruments before the deity",
+                "Prepare and distribute yellow rice and saffron sweets"
+            ],
+            associatedDeity: "Saraswati (Goddess of Knowledge)"
+        ),
+        "Maha Shivaratri": FestivalInfo(
+            name: "Maha Shivaratri",
+            meaning: "The Great Night of Shiva",
+            description: "Maha Shivaratri is the most sacred night dedicated to Lord Shiva, observed on the 14th day of the dark fortnight in Phalguna/Magha month. Devotees observe strict fasting, all-night vigils (jagran), and continuous chanting of Om Namah Shivaya. Shiva Lingas are bathed with milk, water, and bel leaves.",
+            significance: "Multiple legends explain Shivaratri — the night Shiva performed the Tandava (cosmic dance), the night of Shiva-Parvati's marriage, and the night Shiva drank the Halahala poison to save the universe. It is believed that sincere worship on this night grants liberation.",
+            observances: [
+                "Fast for the full day and night (nirjal or phalahar)",
+                "Stay awake all night chanting Om Namah Shivaya",
+                "Perform Abhishek of Shiva Linga with milk, honey, and water",
+                "Offer bel leaves, dhatura flowers, and cannabis leaves to Shiva",
+                "Visit Shiva temples during each of the four prahar (night quarters)"
+            ],
+            associatedDeity: "Shiva (The Transformer)"
+        ),
+        "Holika Dahan": FestivalInfo(
+            name: "Holika Dahan",
+            meaning: "Burning of Holika — the demoness",
+            description: "Holika Dahan is the bonfire ritual on the eve of Holi, commemorating the triumph of devotee Prahlad over the demoness Holika. According to legend, Holika had a boon of fire immunity and tried to burn Prahlad on Hiranyakashipu's orders, but divine grace protected Prahlad and consumed Holika instead.",
+            significance: "The bonfire symbolizes the victory of good over evil and the burning away of negativity. Devotees circumambulate the fire, offering coconut, grains, and prayers. It reminds that true devotion provides divine protection against all harm.",
+            observances: [
+                "Build and light a communal bonfire at the auspicious muhurta",
+                "Circumambulate the fire (parikrama) praying for protection",
+                "Offer coconut, roasted grains, and new harvest to the fire",
+                "Sing devotional songs praising Vishnu and Prahlad",
+                "Apply the sacred ash from the bonfire on the forehead"
+            ],
+            associatedDeity: "Vishnu (as protector of Prahlad)"
+        ),
+        "Holi": FestivalInfo(
+            name: "Holi",
+            meaning: "Festival of Colors — named after Holika",
+            description: "Holi is the vibrant spring festival of colors celebrated across India. People smear each other with gulal (colored powder) and spray colored water, dissolving social barriers in joyous celebration. The festival also celebrates Krishna's playful dalliance with Radha and the gopis of Vrindavan.",
+            significance: "Holi celebrates the arrival of spring, the triumph of good over evil (Holika story), and the divine love of Radha-Krishna. It is one of the most inclusive Hindu festivals — caste, age, and status dissolve in the colors.",
+            observances: [
+                "Play with organic gulal (colored powders) and colored water",
+                "Drink thandai and share gujiya sweets",
+                "Sing Holi folk songs (Faag) and play dhol",
+                "Visit family, friends, and neighbors to apply colors",
+                "Apply oil on skin before playing to protect from harsh colors"
+            ],
+            associatedDeity: "Krishna / Radha"
+        ),
+        "Ugadi": FestivalInfo(
+            name: "Ugadi",
+            meaning: "Beginning of a new age — from 'yuga' (age) + 'adi' (beginning)",
+            description: "Ugadi marks the Telugu and Kannada New Year, falling on the first day of Chaitra month. A special dish called Ugadi Pachadi is prepared with six tastes (sweet, sour, salty, bitter, pungent, astringent) symbolizing the varied experiences life brings in the new year.",
+            significance: "Ugadi celebrates the day Brahma began creation. The six-taste pachadi teaches acceptance of all experiences — joy and sorrow, gain and loss. It is one of the most important festivals in South Indian Hindu tradition.",
+            observances: [
+                "Clean and decorate the home with fresh mango leaf toranas",
+                "Prepare Ugadi Pachadi with six tastes (neem, jaggery, tamarind, salt, chili, raw mango)",
+                "Listen to the Panchanga Shravanam (almanac reading for the new year)",
+                "Wear new clothes and visit the temple",
+                "Share festive meals with family and neighbors"
+            ],
+            associatedDeity: "Brahma (The Creator)"
+        ),
+        "Gudi Padwa": FestivalInfo(
+            name: "Gudi Padwa",
+            meaning: "Gudi (flag/banner) + Padwa (Pratipada, first day)",
+            description: "Gudi Padwa is the Marathi New Year, celebrated on the same day as Ugadi. A 'Gudi' — a bright cloth tied to a stick topped with a copper/silver kalash and neem-mango garland — is hoisted outside homes. It symbolizes victory, prosperity, and the raising of Brahma's flag of creation.",
+            significance: "The Gudi represents the flag of dharma and is believed to ward off evil. Legend connects it to the victory flag raised by Rama upon returning to Ayodhya. It marks the start of the Hindu new year in the Deccan region.",
+            observances: [
+                "Hoist the Gudi flag at the entrance of the home",
+                "Prepare shrikhand-puri as the festive meal",
+                "Eat neem leaves mixed with jaggery for health",
+                "Decorate doorways with mango leaf torans and rangoli",
+                "Wear new clothes and exchange good wishes"
+            ],
+            associatedDeity: "Brahma / Rama"
+        ),
+        "Durga Ashtami": FestivalInfo(
+            name: "Durga Ashtami",
+            meaning: "The Eighth Day of Durga — peak of Navratri worship",
+            description: "Durga Ashtami (Maha Ashtami) is the eighth and most intense day of Navratri, when the fierce aspect of Durga is worshipped. Kanya Puja is performed — nine young girls representing the nine forms of Durga are honored with washing their feet, feeding them, and offering gifts.",
+            significance: "Ashtami is when Durga's energy is at its peak. The Sandhi Puja, performed at the junction of Ashtami and Navami, is considered the most powerful moment of the entire Navratri. Weapons are worshipped (Astra Puja) in many traditions.",
+            observances: [
+                "Perform Kanya Puja — worship nine young girls as Nava Durga",
+                "Observe Sandhi Puja at the Ashtami-Navami junction",
+                "Offer havan (fire ritual) to Durga",
+                "Fast and perform intensive Devi worship",
+                "Worship weapons and tools (Astra Puja / Ayudha Puja)"
+            ],
+            associatedDeity: "Durga (Mahagauri / Kalaratri)"
+        ),
+        "Ram Navami": FestivalInfo(
+            name: "Ram Navami",
+            meaning: "The Ninth-day birth of Lord Rama",
+            description: "Ram Navami celebrates the birth of Lord Rama, the seventh avatar of Vishnu and the ideal king (Maryada Purushottam). Born on the ninth day of Chaitra Shukla Paksha, Rama embodies dharma, honor, and selfless duty. Temples enact his birth scene at the exact midday muhurta.",
+            significance: "Rama's life is the template of righteous living — duty to family, justice for all, and compassion even toward enemies. Ram Navami falls during Chaitra Navratri, linking the worship of divine feminine power with the birth of dharma's protector.",
+            observances: [
+                "Fast and read the Ramayana or Ram Charit Manas",
+                "Visit Rama temples for darshan at the noon birth muhurta",
+                "Perform abhishek of Rama idol with panchamrit",
+                "Chant 'Sri Ram Jai Ram Jai Jai Ram' throughout the day",
+                "Distribute panakam (jaggery-ginger drink) and neer mor as prasad"
+            ],
+            associatedDeity: "Rama (seventh avatar of Vishnu)"
+        ),
+        "Hanuman Jayanti": FestivalInfo(
+            name: "Hanuman Jayanti",
+            meaning: "Birthday of Hanuman — the devotee supreme",
+            description: "Hanuman Jayanti celebrates the birth of Lord Hanuman, son of Vayu (Wind God) and the greatest devotee of Lord Rama. Born on Chaitra Purnima, Hanuman is worshipped for strength, courage, devotion, and celibacy. Temples recite the Hanuman Chalisa and Sundar Kand all day.",
+            significance: "Hanuman represents perfect bhakti (devotion) — selfless service to the divine. He is the patron deity of wrestlers, warriors, and anyone seeking courage. His story teaches that true strength comes from surrender to dharma.",
+            observances: [
+                "Recite the Hanuman Chalisa 11 or 108 times",
+                "Apply sindoor (vermilion) to Hanuman idols",
+                "Read Sundar Kand from the Ramayana",
+                "Offer jasmine oil, sindoor, and laddus to Hanuman",
+                "Visit Hanuman temples for special morning and evening aarti"
+            ],
+            associatedDeity: "Hanuman (son of Vayu)"
+        ),
+        "Chaitra Purnima": FestivalInfo(
+            name: "Chaitra Purnima",
+            meaning: "Full Moon of Chaitra — first Purnima of the Hindu new year",
+            description: "Chaitra Purnima is the full moon that closes the auspicious month of Chaitra. It coincides with Hanuman Jayanti in most years. This Purnima holds special significance as the first full moon after the Hindu new year begins on Chaitra Shukla Pratipada.",
+            significance: "Chaitra Purnima carries the accumulated spiritual merit of the sacred Chaitra month. Bathing in holy rivers on this day is considered highly purifying. It marks the completion of the Chaitra Navratri cycle.",
+            observances: [
+                "Take a sacred bath in a river or at home before sunrise",
+                "Perform Satyanarayan Puja",
+                "Observe Purnima fast (phalahar) until moonrise",
+                "Donate food, clothes, and money to the needy",
+                "Light a ghee lamp and offer white flowers to Chandra"
+            ],
+            associatedDeity: "Chandra (Moon) / Vishnu"
+        ),
+        "Baisakhi": FestivalInfo(
+            name: "Baisakhi",
+            meaning: "Named after the month Vaishakh — the harvest month",
+            description: "Baisakhi is the Punjabi and North Indian harvest festival marking the solar new year. Historically, it commemorates the founding of the Khalsa by Guru Gobind Singh in 1699. For Hindus, it celebrates the abundant Rabi harvest and the Sun's entry into Mesha (Aries).",
+            significance: "Baisakhi unites harvest thanksgiving with cultural renewal. Farmers celebrate the fruits of months of labor. The festival also marks a major turning point in Sikh history with the creation of the Khalsa Panth.",
+            observances: [
+                "Thank the earth and divine for a bountiful Rabi harvest",
+                "Perform Bhangra and Gidda folk dances",
+                "Prepare festive meals with new harvest grains",
+                "Visit gurdwaras and temples for special prayers",
+                "Participate in community fairs and Nagar Kirtan processions"
+            ],
+            associatedDeity: "Surya (Sun God)"
+        ),
+        "Tamil New Year": FestivalInfo(
+            name: "Tamil New Year",
+            meaning: "Puthandu — 'new year' in Tamil",
+            description: "Tamil New Year (Puthandu) is celebrated on the first day of the Tamil month Chithirai, coinciding with the solar new year. Homes are decorated with kolam, and a special tray (Kanni) with fruits, flowers, gold jewelry, and a mirror is the first sight upon waking.",
+            significance: "Puthandu represents fresh beginnings aligned with the solar cycle. The tradition of viewing the Kanni tray first thing ensures the new year begins with auspicious sights — gold for wealth, flowers for beauty, and fruits for abundance.",
+            observances: [
+                "Prepare the Kanni tray with auspicious items as the first sight of the day",
+                "Draw elaborate kolam patterns at the entrance",
+                "Cook Maanga Pachadi with all six tastes",
+                "Wear new clothes and visit temples",
+                "Share festive meals with extended family"
+            ],
+            associatedDeity: "Surya (Sun God) / Chitragupta"
+        ),
+        "Akshaya Tritiya": FestivalInfo(
+            name: "Akshaya Tritiya",
+            meaning: "Imperishable Third — 'akshaya' means never diminishing",
+            description: "Akshaya Tritiya is one of the most auspicious days in the Hindu calendar, when any good deed, donation, or investment is believed to yield imperishable merit. It falls on the third day of Vaishakha Shukla Paksha. Legend says this is the day Treta Yuga began and Veda Vyasa started composing the Mahabharata.",
+            significance: "The word 'Akshaya' means that which never diminishes. Any positive action on this day multiplies infinitely. Kubera, the god of wealth, is believed to have received his riches on this day. It is considered so auspicious that no muhurta calculation is needed.",
+            observances: [
+                "Purchase gold or start new investments",
+                "Perform charitable donations — food, clothes, or money",
+                "Begin new business ventures or sign important contracts",
+                "Worship Vishnu and Lakshmi together",
+                "Offer water to ancestors (Pitru Tarpanam)"
+            ],
+            associatedDeity: "Vishnu / Lakshmi / Kubera"
+        ),
+        "Buddha Purnima": FestivalInfo(
+            name: "Buddha Purnima",
+            meaning: "Full Moon of the Awakened One",
+            description: "Buddha Purnima (Vesak) commemorates the birth, enlightenment, and Mahaparinirvana of Gautama Buddha, all of which occurred on Vaishakha Purnima. In Hindu tradition, Buddha is revered as the ninth avatar of Vishnu who taught compassion and non-violence.",
+            significance: "This triple-blessed Purnima celebrates the greatest teacher of compassion. Hindu tradition honors Buddha as an avatar who reminded humanity of ahimsa (non-violence) and the middle path between asceticism and indulgence.",
+            observances: [
+                "Visit Buddhist temples and stupas for prayers",
+                "Practice meditation and observe the five precepts",
+                "Donate to monks, monasteries, and the needy",
+                "Release caged birds and animals as acts of compassion",
+                "Read from the Dhammapada or Jataka tales"
+            ],
+            associatedDeity: "Buddha (ninth avatar of Vishnu)"
+        ),
+        "Guru Purnima": FestivalInfo(
+            name: "Guru Purnima",
+            meaning: "Full Moon of the Guru — honoring spiritual teachers",
+            description: "Guru Purnima, on Ashadha Purnima, honors Veda Vyasa (born on this day), who compiled the Vedas and authored the Mahabharata. The day is dedicated to all gurus — spiritual teachers who dispel the darkness of ignorance. Students honor their teachers with offerings and gratitude.",
+            significance: "In Vedic tradition, the guru is equated with the divine trinity — Guru Brahma, Guru Vishnu, Guru Devo Maheshwara. This day acknowledges that knowledge is the greatest gift, and the one who transmits it deserves supreme reverence.",
+            observances: [
+                "Visit and honor your spiritual teacher with offerings",
+                "Recite the Guru Stotram or Guru Gita",
+                "Perform Vyasa Puja in honor of Veda Vyasa",
+                "Begin or deepen a spiritual practice (sadhana)",
+                "Donate to educational causes and institutions"
+            ],
+            associatedDeity: "Veda Vyasa / Brihaspati"
+        ),
+        "Onam": FestivalInfo(
+            name: "Onam",
+            meaning: "Named after the nakshatra Shravana (Thiruvonam in Malayalam)",
+            description: "Onam is Kerala's harvest festival celebrating the annual return of the legendary King Mahabali. According to myth, Vishnu as Vamana sent the generous Mahabali to the netherworld but granted him permission to visit his people once a year. Onam marks that visit with elaborate feasts and festivities.",
+            significance: "Onam celebrates Mahabali's golden age of equality and prosperity. Despite being pushed down by a divine avatar, Mahabali's love for his people is so great that he returns annually. The festival embodies Kerala's ideals of hospitality, equality, and abundance.",
+            observances: [
+                "Prepare the Onam Sadhya — a grand vegetarian feast on banana leaves",
+                "Create Pookalam (flower carpet) at the entrance for ten days",
+                "Watch or participate in Vallamkali (snake boat races)",
+                "Perform Pulikali (tiger dance) and Kathakali performances",
+                "Wear traditional Kasavu (cream and gold) attire"
+            ],
+            associatedDeity: "Vishnu (as Vamana) / King Mahabali"
+        ),
+        "Raksha Bandhan": FestivalInfo(
+            name: "Raksha Bandhan",
+            meaning: "Bond of Protection — raksha (protection) + bandhan (bond)",
+            description: "Raksha Bandhan is the festival of the sacred bond between siblings. Sisters tie a protective thread (rakhi) on their brothers' wrists, praying for their well-being. Brothers vow to protect their sisters. The tradition extends beyond blood siblings to any protective relationship.",
+            significance: "The festival has roots in multiple legends — Draupadi tying cloth on Krishna's wrist, Indrani tying a thread on Indra before battle. It celebrates the protective bonds of love that transcend physical strength and material gifts.",
+            observances: [
+                "Sisters tie rakhi on brothers' wrists with prayers and tilak",
+                "Brothers give gifts and pledge protection",
+                "Prepare festive sweets like barfi and laddu",
+                "Perform aarti and apply kumkum tilak before tying rakhi",
+                "Share a festive family meal together"
+            ],
+            associatedDeity: "Krishna / Lakshmi / Indra"
+        ),
+        "Krishna Janmashtami": FestivalInfo(
+            name: "Krishna Janmashtami",
+            meaning: "The Eighth-day birth of Krishna",
+            description: "Janmashtami celebrates the birth of Lord Krishna at midnight on Bhadrapada Krishna Ashtami. Krishna was born in a prison in Mathura to Devaki and Vasudeva, then carried across the Yamuna to safety in Gokul. Temples enact the birth scene at the exact midnight hour with great devotion.",
+            significance: "Krishna is the complete avatar (Purna Avatar) of Vishnu, embodying love, wisdom, and divine play. His life teachings in the Bhagavad Gita remain humanity's greatest guide to righteous action. Janmashtami celebrates the descent of the divine into the human realm.",
+            observances: [
+                "Fast until midnight (the birth hour)",
+                "Decorate a cradle (jhula) for baby Krishna",
+                "Sing bhajans and perform aarti at the midnight birth moment",
+                "Break the fast with panchamrit and festive prasad",
+                "Organize Dahi Handi (pot-breaking) events"
+            ],
+            associatedDeity: "Krishna (eighth avatar of Vishnu)"
+        ),
+        "Ganesh Chaturthi": FestivalInfo(
+            name: "Ganesh Chaturthi",
+            meaning: "Fourth day of Ganesh — celebrating the elephant-headed god",
+            description: "Ganesh Chaturthi marks the birth of Lord Ganesh on Bhadrapada Shukla Chaturthi. Clay idols of Ganesh are installed in homes and public pandals with great ceremony. For 1.5, 5, 7, or 10 days the community worships with modak offerings, after which the idol is immersed in water (Visarjan).",
+            significance: "Ganesh is the remover of obstacles and the lord of beginnings. No Hindu ritual begins without first invoking Ganesh. The festival was revived by Lokmanya Tilak as a vehicle for community gathering during the independence movement.",
+            observances: [
+                "Install a clay Ganesh idol with Prana Pratishtha ceremony",
+                "Offer 21 modaks (Ganesh's favorite sweet) and durva grass",
+                "Recite Ganesh Atharvashirsha and Ganapati Stotra",
+                "Perform daily aarti for the duration of the festival",
+                "Immerse the idol with 'Ganpati Bappa Morya' chanting (Visarjan)"
+            ],
+            associatedDeity: "Ganesh (son of Shiva and Parvati)"
+        ),
+        "Maha Ashtami": FestivalInfo(
+            name: "Maha Ashtami",
+            meaning: "The Great Eighth — climax of Sharad Navratri",
+            description: "Maha Ashtami during Sharad Navratri is the most intense day of Devi worship. Massive pujas, fire rituals, and Kanya Puja are performed. In Bengal, this is the day of Kumari Puja and the dramatic Sandhi Puja at the Ashtami-Navami junction — considered the moment Chamunda slays the demons Chanda and Munda.",
+            significance: "Ashtami is when the Goddess's shakti reaches its zenith. The Sandhi Puja (spanning the last 24 minutes of Ashtami and first 24 minutes of Navami) is the most spiritually charged moment of the entire Navratri. 108 lotus lamps are lit during this interval.",
+            observances: [
+                "Perform elaborate Durga Puja with havan",
+                "Conduct Kanya Puja — worship nine young girls as Nava Durga",
+                "Observe Sandhi Puja at the Ashtami-Navami junction",
+                "Fast and offer kheer, puri, and halwa to the Goddess",
+                "Perform Ayudha Puja (worship of tools and instruments)"
+            ],
+            associatedDeity: "Durga (as Chamunda / Mahagauri)"
+        ),
+        "Maha Navami": FestivalInfo(
+            name: "Maha Navami",
+            meaning: "The Great Ninth — Navratri's penultimate day",
+            description: "Maha Navami is the ninth and final day of Navratri worship before Vijayadashami. Goddess Siddhidatri — bestower of all supernatural powers — is venerated. In many traditions, Saraswati Puja is performed and the Navami Havan concludes the nine nights of worship.",
+            significance: "Navami completes the nine-night worship cycle. All nine forms of Durga have been invoked, and their combined shakti is now fully awakened. The Navami Havan seals the spiritual energy accumulated over nine days of fasting and worship.",
+            observances: [
+                "Perform the Navami Havan (concluding fire ritual)",
+                "Worship Goddess Siddhidatri for spiritual attainment",
+                "Complete the final Kanya Puja with full honors",
+                "Prepare for Vijayadashami celebrations the next day",
+                "Offer the final Navratri prasad and distribute to devotees"
+            ],
+            associatedDeity: "Siddhidatri / Durga"
+        ),
+        "Dussehra": FestivalInfo(
+            name: "Dussehra",
+            meaning: "Defeat of the Ten-Headed — dasha (ten) + hara (defeat)",
+            description: "Dussehra celebrates Rama's victory over the ten-headed Ravana on the tenth day after Navratri. Massive effigies of Ravana, Kumbhakarna, and Meghnad are burned in public grounds across North India. In South India and Bengal, it marks Durga's triumph over Mahishasura.",
+            significance: "Dussehra symbolizes the triumph of dharma over adharma, knowledge over ignorance, and good over evil. The burning of Ravana's effigy reminds that unchecked ego (represented by ten heads of power and knowledge) leads to destruction.",
+            observances: [
+                "Attend the burning of Ravana, Kumbhakarna, and Meghnad effigies",
+                "Perform Shami Puja and exchange Shami (Apta) leaves as gold",
+                "Begin new ventures — Vijayadashami is auspicious for all starts",
+                "Worship weapons, vehicles, and tools (Shastra Puja)",
+                "Seek blessings from elders and distribute sweets"
+            ],
+            associatedDeity: "Rama / Durga"
+        ),
+        "Vijayadashami": FestivalInfo(
+            name: "Vijayadashami",
+            meaning: "Victorious Tenth Day — the day of triumph",
+            description: "Vijayadashami is the tenth day of Navratri, celebrated as the day of final victory. In South India, children begin formal education (Vidyarambham) by writing their first letters in rice. In Bengal, Durga idols are immersed in water during an emotional Sindur Khela ceremony.",
+            significance: "This day is one of the most auspicious muhurats of the year. Anything begun on Vijayadashami is believed to succeed. The ancients considered it the ideal day for launching campaigns, beginning studies, and starting enterprises.",
+            observances: [
+                "Begin children's education — Vidyarambham ceremony",
+                "Start new ventures and business enterprises",
+                "Perform Durga Visarjan (immersion) with Sindur Khela in Bengal",
+                "Cross boundaries and begin journeys (Seema Ullanghan)",
+                "Exchange Shami leaves symbolizing gold and prosperity"
+            ],
+            associatedDeity: "Durga / Saraswati / Rama"
+        ),
+        "Karva Chauth": FestivalInfo(
+            name: "Karva Chauth",
+            meaning: "Earthen pot (Karva) + Fourth day (Chauth)",
+            description: "Karva Chauth is a one-day fast observed by married women for the longevity and well-being of their husbands. The nirjal (waterless) fast begins before sunrise and ends after sighting the moon through a sieve, then seeing the husband's face. The ritual involves decorating hands with mehndi and exchanging karvas.",
+            significance: "Karva Chauth embodies the deep spiritual bond of Hindu marriage. The fasting wife channels her tapas (austerity) into a prayer for her husband's long life. The legend of Queen Veervati, whose perfect fast brought her husband back from death, is narrated during the ritual.",
+            observances: [
+                "Begin nirjal fast before sunrise after eating sargi (pre-dawn meal)",
+                "Apply mehndi (henna) on hands and dress in bridal finery",
+                "Listen to the Karva Chauth katha (story of Queen Veervati)",
+                "Break the fast after moonrise by viewing the moon through a sieve",
+                "Husband offers the first sip of water and a gift"
+            ],
+            associatedDeity: "Shiva-Parvati / Chandra (Moon)"
+        ),
+        "Dhanteras": FestivalInfo(
+            name: "Dhanteras",
+            meaning: "Wealth (Dhan) + Thirteenth day (Teras)",
+            description: "Dhanteras marks the beginning of the five-day Diwali festival on Krishna Trayodashi of Kartik month. It celebrates the emergence of Dhanvantari — the physician of the gods — from the Samudra Manthan, carrying the pot of Amrit and Ayurvedic knowledge. Purchasing gold and silver on this day is considered highly auspicious.",
+            significance: "Dhanteras combines health (Dhanvantari) and wealth (Lakshmi) worship. It marks the beginning of Diwali preparations. Yama, the god of death, is also worshipped on this evening — a lit diya outside the home is said to keep untimely death at bay.",
+            observances: [
+                "Purchase gold, silver, or new utensils",
+                "Light a diya outside the main entrance for Yama",
+                "Clean and decorate the home for Diwali preparations",
+                "Worship Dhanvantari for good health",
+                "Draw rangoli and prepare for Lakshmi's arrival"
+            ],
+            associatedDeity: "Dhanvantari / Lakshmi / Yama"
+        ),
+        "Naraka Chaturdashi": FestivalInfo(
+            name: "Naraka Chaturdashi",
+            meaning: "Fourteenth day of demon Naraka's defeat",
+            description: "Naraka Chaturdashi (Choti Diwali) celebrates Krishna's victory over the demon Narakasura, who had imprisoned 16,100 women. Krishna, aided by Satyabhama, slew Narakasura at dawn. The freed women were given dignity and protection. The early-morning oil bath ritual symbolizes purification from Naraka's evil.",
+            significance: "The festival celebrates liberation from tyranny and the restoration of honor. The pre-dawn oil bath with ubtan (turmeric paste) is believed to equal the merit of bathing in the Ganga. It is the second day of the Diwali festival.",
+            observances: [
+                "Wake before dawn for an abhyanga snan (oil bath) with ubtan",
+                "Crush a bitter berry (karela) underfoot symbolizing Narakasura's head",
+                "Light diyas and firecrackers at dawn to celebrate victory",
+                "Prepare and share festive sweets",
+                "Worship Krishna and Satyabhama"
+            ],
+            associatedDeity: "Krishna / Satyabhama"
+        ),
+        "Choti Diwali": FestivalInfo(
+            name: "Choti Diwali",
+            meaning: "Little Diwali — the eve of the main festival",
+            description: "Choti Diwali falls on Naraka Chaturdashi, the day before Diwali. It marks the beginning of large-scale lamp lighting. Homes are illuminated with diyas and candles, and rangoli patterns adorn doorsteps. In many regions, this is when the first firecrackers of Diwali are burst.",
+            significance: "Choti Diwali bridges the household preparation of Dhanteras with the grand Lakshmi Puja of Diwali. The lighting of lamps on this evening is said to guide departed ancestors and invite positive energy into the home.",
+            observances: [
+                "Light rows of diyas around the home and entrance",
+                "Create elaborate rangoli patterns at the doorstep",
+                "Perform the pre-dawn oil bath ritual",
+                "Share sweets and snacks with neighbors",
+                "Begin decorating the puja area for tomorrow's Lakshmi Puja"
+            ],
+            associatedDeity: "Krishna / Lakshmi"
+        ),
+        "Diwali": FestivalInfo(
+            name: "Diwali",
+            meaning: "Row of Lights — from 'deepavali' (row of lamps)",
+            description: "Diwali is the festival of lights, celebrated on Kartik Amavasya. It commemorates Rama's return to Ayodhya after 14 years of exile and his victory over Ravana. The darkest night of the year is illuminated with millions of diyas, symbolizing the triumph of inner light over spiritual darkness. Lakshmi Puja is the central ritual.",
+            significance: "Diwali is the most widely celebrated Hindu festival, symbolizing the victory of light over darkness, knowledge over ignorance, and hope over despair. It falls on Amavasya — when humans light the earth as the moon cannot, demonstrating that human spirit can overcome cosmic darkness.",
+            observances: [
+                "Perform Lakshmi-Ganesh Puja at the pradosh kaal (evening)",
+                "Light diyas in every corner of the home, especially dark areas",
+                "Draw rangoli and decorate with flowers and lights",
+                "Exchange gifts and sweets with family and friends",
+                "Open new account books (Chopda Puja) for businesses"
+            ],
+            associatedDeity: "Lakshmi / Ganesh / Rama"
+        ),
+        "Lakshmi Puja": FestivalInfo(
+            name: "Lakshmi Puja",
+            meaning: "Worship of the Goddess of Wealth and Fortune",
+            description: "Lakshmi Puja on Diwali night is the most important ritual of the festival. Performed during the Pradosh Kaal and Sthir Lagna (fixed sign rising), it invites Goddess Lakshmi into the home. The puja includes worship of Ganesh (for removing obstacles to prosperity), Lakshmi, and Saraswati together.",
+            significance: "Lakshmi is believed to roam the earth on Diwali night, blessing homes that are clean, illuminated, and filled with devotion. The puja during Sthir (fixed) Lagna ensures that wealth remains stable and does not leave the household.",
+            observances: [
+                "Clean the entire house thoroughly before the puja",
+                "Set up Lakshmi-Ganesh-Saraswati idols or images on the puja platform",
+                "Offer lotus flowers, kumkum, rice, and gold coins",
+                "Light a pure ghee diya that burns through the night",
+                "Keep the main door open during puja to welcome Lakshmi"
+            ],
+            associatedDeity: "Lakshmi / Ganesh / Saraswati"
+        ),
+        "Govardhan Puja": FestivalInfo(
+            name: "Govardhan Puja",
+            meaning: "Worship of Govardhan Hill — Krishna's mountain",
+            description: "Govardhan Puja (Annakut) celebrates Krishna lifting the Govardhan Hill on his little finger to shelter the people of Vrindavan from Indra's devastating rainstorm. Devotees prepare a mountain of food offerings (Annakut — 'mountain of grain') and offer it to Krishna.",
+            significance: "The festival teaches that true worship is in serving and protecting people, not empty rituals to appease gods out of fear. Krishna redirected worship from Indra to Govardhan (nature and community), establishing dharma rooted in compassion.",
+            observances: [
+                "Prepare an Annakut — a mountain of 56 or 108 food dishes",
+                "Create a small Govardhan hill from cow dung and flowers",
+                "Circumambulate the hill offering prayers",
+                "Feed cattle and apply tilak on cows (Go Puja)",
+                "Share the Annakut prasad with the entire community"
+            ],
+            associatedDeity: "Krishna"
+        ),
+        "Bhai Dooj": FestivalInfo(
+            name: "Bhai Dooj",
+            meaning: "Brother's Second Day — from bhai (brother) + dooj (dwitiya)",
+            description: "Bhai Dooj celebrates the bond between brothers and sisters, falling on Kartik Shukla Dwitiya. The legend says Yama (god of death) visited his sister Yamuna on this day, and she applied tilak on his forehead and prayed for his well-being. Yama declared that any brother who receives tilak on this day will be protected.",
+            significance: "Unlike Raksha Bandhan where sisters seek protection, Bhai Dooj has sisters blessing their brothers with tilak and prayers for long life. The Yama-Yamuna legend establishes this as a day when death itself honors the sibling bond.",
+            observances: [
+                "Sisters apply tilak on brothers' foreheads and perform aarti",
+                "Brothers give gifts to sisters",
+                "Prepare special sweets and a festive meal",
+                "Sisters pray to Yama for their brothers' longevity",
+                "Families gather for the final celebration of the Diwali season"
+            ],
+            associatedDeity: "Yama / Yamuna"
+        ),
+        "Chhath Puja": FestivalInfo(
+            name: "Chhath Puja",
+            meaning: "Sixth-day worship — dedicated to the Sun and Chhathi Maiya",
+            description: "Chhath is an ancient Vedic festival dedicated to Surya and Chhathi Maiya (Usha, the goddess of dawn). Observed mainly in Bihar, Jharkhand, and Eastern UP, devotees stand waist-deep in water offering arghya to the setting and rising sun over two days. The 36-hour nirjal fast is one of the most rigorous in Hinduism.",
+            significance: "Chhath is one of the few festivals where the setting sun is worshipped alongside the rising sun — honoring both endings and beginnings. The discipline of the 36-hour waterless fast, standing in cold water, demonstrates extraordinary devotion to the life-giving Sun.",
+            observances: [
+                "Observe 36-hour nirjal (waterless) fast",
+                "Prepare thekua and other traditional offerings without onion-garlic",
+                "Offer arghya to the setting sun on day one, standing in water",
+                "Offer arghya to the rising sun on day two, completing the fast",
+                "Maintain strict cleanliness — the entire home and ghat are purified"
+            ],
+            associatedDeity: "Surya / Chhathi Maiya (Usha)"
+        ),
+        "Kartik Purnima": FestivalInfo(
+            name: "Kartik Purnima",
+            meaning: "Full Moon of Kartik — the holiest Purnima",
+            description: "Kartik Purnima is considered the most sacred full moon of the year. It is also known as Tripuri Purnima (celebrating Shiva's destruction of Tripura) and Dev Diwali (when the gods celebrate Diwali in Kashi). The ghats of Varanasi are lit with millions of diyas on this night.",
+            significance: "Kartik Purnima carries triple significance — Shiva's cosmic victory, the divine celebration of light, and the culmination of the holy Kartik month. Bathing in the Ganga on this day is believed to grant the merit of a thousand Ashwamedha yagnas.",
+            observances: [
+                "Take a sacred bath in the Ganga or any holy river at dawn",
+                "Light diyas and set them afloat on rivers (Dev Diwali)",
+                "Perform Satyanarayan Puja",
+                "Observe Kartik Purnima fast",
+                "Visit Varanasi or a riverside ghat for the Dev Diwali spectacle"
+            ],
+            associatedDeity: "Shiva / Vishnu / Kartikeya"
+        ),
+        "Dev Diwali": FestivalInfo(
+            name: "Dev Diwali",
+            meaning: "Diwali of the Gods",
+            description: "Dev Diwali is celebrated on Kartik Purnima, fifteen days after Diwali. Legend says the gods descend to the ghats of Varanasi to celebrate their own festival of lights. The steps of Dashashwamedh Ghat are illuminated with over a million diyas, creating one of the most spectacular sights in Hinduism.",
+            significance: "If Diwali is humanity's festival of lights, Dev Diwali is the gods' celebration. It marks the completion of the Kartik month — the holiest month for lamp lighting and river worship. Varanasi becomes the meeting point of heaven and earth.",
+            observances: [
+                "Light diyas along river ghats and rooftops",
+                "Watch or participate in the Ganga Aarti at Varanasi",
+                "Float lit diyas on rivers as offerings",
+                "Perform puja to the river goddess (Ganga)",
+                "Observe the Kartik Purnima fast and donate to the needy"
+            ],
+            associatedDeity: "All Devas / Ganga / Shiva"
+        ),
+    ]
+
+    // MARK: - Fasting Days (Vrata)
+
+    static let fastingDays: [String: FastingDayInfo] = [
+        "Ekadashi": FastingDayInfo(
+            name: "Ekadashi",
+            meaning: "The Eleventh — most sacred fasting day for Vishnu devotees",
+            description: "Ekadashi falls on the 11th tithi of both the waxing (Shukla) and waning (Krishna) fortnights — 24 times a year. Each Ekadashi has a unique name (Nirjala, Devshayani, Prabodhini, etc.) and specific spiritual merit. The Padma Purana declares that observing Ekadashi is equivalent to performing all other vratas combined.",
+            whyFast: "Fasting on Ekadashi purifies the body and mind, drawing one closer to Vishnu. The Bhagavata Purana states that the sin personified (Papa Purusha) takes refuge in grains on Ekadashi — so devotees avoid all grains and beans. The fast develops self-discipline, detachment, and devotion.",
+            howToObserve: [
+                "Avoid all grains (rice, wheat), beans, and lentils for the full day",
+                "Eat only fruits, milk, nuts, and root vegetables (phalahar), or observe nirjal (waterless) fast",
+                "Chant Vishnu Sahasranama or Om Namo Narayanaya",
+                "Stay awake through the night in meditation or kirtan (jagran)",
+                "Break the fast (parana) the next morning during the prescribed Dwadashi window"
+            ],
+            associatedDeity: "Vishnu (The Preserver)",
+            mantra: (
+                devanagari: "ॐ नमो भगवते वासुदेवाय",
+                transliteration: "Om Namo Bhagavate Vasudevaya"
+            )
+        ),
+        "Pradosh Vrat": FastingDayInfo(
+            name: "Pradosh Vrat",
+            meaning: "Twilight Vow — fasting on the 13th tithi for Shiva",
+            description: "Pradosh Vrat is observed on every Trayodashi (13th tithi) during the Pradosh Kaal — the 2.5-hour twilight window after sunset. There are 24 Pradosh days per year, and special significance attaches to Shani Pradosh (Saturday) and Soma Pradosh (Monday). The Skanda Purana extols this vrata as the fastest path to Shiva's grace.",
+            whyFast: "The Pradosh Kaal is when Shiva and Parvati are in their most blissful state atop Mount Kailash, dancing the Sandhya Tandava. Worshipping during this window is like catching the divine couple at their most generous moment. Shiva grants boons readily during Pradosh.",
+            howToObserve: [
+                "Fast from sunrise until after the Pradosh Kaal puja",
+                "Perform Shiva Abhishek during the Pradosh Kaal (twilight) window",
+                "Offer bel leaves, milk, and dhatura flowers to the Shiva Linga",
+                "Chant Om Namah Shivaya 108 times during the puja",
+                "Break the fast after completing the evening worship"
+            ],
+            associatedDeity: "Shiva / Parvati",
+            mantra: (
+                devanagari: "ॐ नमः शिवाय",
+                transliteration: "Om Namah Shivaya"
+            )
+        ),
+        "Purnima": FastingDayInfo(
+            name: "Purnima",
+            meaning: "Full Moon Fast — the moon at its complete brilliance",
+            description: "Purnima Vrat is observed on every full moon, when lunar energy is at its peak. Each month's Purnima carries unique significance — Guru Purnima (July), Sharad Purnima (October), Kartik Purnima (November). The full moon amplifies both positive and negative tendencies, making it ideal for spiritual discipline.",
+            whyFast: "Fasting on Purnima harnesses the peak lunar energy for spiritual growth. The full moon governs the mind (manas) in Vedic thought — fasting calms the mind's amplified fluctuations. Satyanarayan Puja performed on Purnima is believed to fulfill wishes and bring prosperity.",
+            howToObserve: [
+                "Observe a single-meal fast or fruits-only (phalahar) fast",
+                "Perform Satyanarayan Puja in the evening",
+                "Donate white items — rice, milk, sugar, white clothes",
+                "Offer arghya (water) to the full moon after it rises",
+                "Chant the Chandra (Moon) mantra or Vishnu mantras"
+            ],
+            associatedDeity: "Chandra (Moon) / Vishnu / Satyanarayan",
+            mantra: (
+                devanagari: "ॐ श्रीं सों सोमाय नमः",
+                transliteration: "Om Shreem Som Somaya Namah"
+            )
+        ),
+        "Amavasya": FastingDayInfo(
+            name: "Amavasya",
+            meaning: "New Moon — the night of ancestral connection",
+            description: "Amavasya Vrat is observed on the new moon, when the moon is invisible and the night is darkest. This tithi is sacred to the Pitrus (ancestors). Tarpanam (water offerings) and Shraddha (remembrance rituals) are most powerful on Amavasya. Somavati Amavasya (Monday) and Mauni Amavasya are especially significant.",
+            whyFast: "Fasting on Amavasya honors the ancestors and creates a channel for their blessings to flow into the family. The dark moon represents the unseen realm of the departed. Fasting, combined with Tarpanam, is believed to liberate ancestors from karmic bonds and bring peace to the family lineage.",
+            howToObserve: [
+                "Perform Pitru Tarpanam — offer water mixed with sesame to ancestors",
+                "Observe a full-day fast or single-meal fast",
+                "Avoid starting new ventures or making major decisions",
+                "Light a sesame oil diya in the south direction for the Pitrus",
+                "Donate food, clothes, or money in the name of departed ancestors"
+            ],
+            associatedDeity: "Pitru Devatas (Ancestral Deities) / Yama",
+            mantra: nil
+        ),
+    ]
+
+    // MARK: - Festival + Fasting Lookup Helpers
+
+    /// Returns FestivalInfo for the given festival name (exact match).
+    static func festivalInfo(for name: String) -> FestivalInfo? {
+        return festivals[name]
+    }
+
+    /// Returns FastingDayInfo for the given fasting type (e.g., "Ekadashi", "Pradosh Vrat").
+    static func fastingDayInfo(for name: String) -> FastingDayInfo? {
+        return fastingDays[name]
+    }
+
+    // MARK: - Pradosh Weekday Types
+
+    /// 7 weekday-specific Pradosh types. Keyed by deity first name (e.g., "Chandra" from "Chandra (Moon)").
+    static let pradoshTypes: [String: PradoshTypeInfo] = [
+        "Surya": PradoshTypeInfo(
+            typeName: "Bhanu Pradosh Vrat",
+            weekday: "Sunday",
+            significance: "Bestows health, vitality, and fame. The Sun's energy amplifies Shiva's blessings for leadership and recognition.",
+            deity: "Shiva / Surya"
+        ),
+        "Chandra": PradoshTypeInfo(
+            typeName: "Soma Pradosh Vrat",
+            weekday: "Monday",
+            significance: "Most auspicious — Monday is Shiva's own day. Soma Pradosh fulfills desires, grants peace of mind, and deepens devotion to Shiva-Parvati.",
+            deity: "Shiva / Chandra"
+        ),
+        "Mangala": PradoshTypeInfo(
+            typeName: "Bhauma Pradosh Vrat",
+            weekday: "Tuesday",
+            significance: "Removes debts, diseases, and enemies. Mars energy combined with Shiva's grace grants courage and victory over adversity.",
+            deity: "Shiva / Mangala"
+        ),
+        "Budha": PradoshTypeInfo(
+            typeName: "Saumya Pradosh Vrat",
+            weekday: "Wednesday",
+            significance: "Enhances intellect, learning, and communication. Mercury's influence with Shiva's blessing supports education and business success.",
+            deity: "Shiva / Budha"
+        ),
+        "Guru": PradoshTypeInfo(
+            typeName: "Guruvara Pradosh Vrat",
+            weekday: "Thursday",
+            significance: "Brings wisdom, spiritual growth, and the blessings of the guru lineage. Jupiter amplifies Shiva's role as Adi Guru.",
+            deity: "Shiva / Guru"
+        ),
+        "Shukra": PradoshTypeInfo(
+            typeName: "Bhrigu Pradosh Vrat",
+            weekday: "Friday",
+            significance: "Grants marital harmony, wealth, and artistic fulfillment. Venus energy with Shiva-Parvati's grace blesses relationships.",
+            deity: "Shiva / Shukra"
+        ),
+        "Shani": PradoshTypeInfo(
+            typeName: "Shani Pradosh Vrat",
+            weekday: "Saturday",
+            significance: "Extremely powerful — removes the malefic effects of Shani (Saturn). Frees one from karmic debts, delays, and suffering. Second most revered after Soma Pradosh.",
+            deity: "Shiva / Shani"
+        ),
+    ]
+
+    /// Lookup Pradosh type by vara deity string (e.g., "Chandra (Moon)" → PradoshTypeInfo for Soma Pradosh).
+    static func pradoshTypeInfo(for varaDeity: String) -> PradoshTypeInfo? {
+        let deityName = varaDeity.components(separatedBy: " (").first ?? varaDeity
+        return pradoshTypes[deityName]
+    }
+
+    // MARK: - Ekadashi Named Variants (24 per year)
+
+    /// Keyed by "\(lunarMonth)-\(paksha)" e.g. "Chaitra-Shukla" → ("Kamada", "Fulfiller of Desires")
+    static let ekadashiNames: [String: (name: String, meaning: String)] = [
+        "Chaitra-Shukla":       ("Kamada",        "Fulfiller of Desires"),
+        "Chaitra-Krishna":      ("Varuthini",     "Granter of Boons"),
+        "Vaishakha-Shukla":     ("Mohini",        "The Enchanting"),
+        "Vaishakha-Krishna":    ("Apara",         "The Matchless"),
+        "Jyeshtha-Shukla":      ("Nirjala",       "The Waterless — most austere"),
+        "Jyeshtha-Krishna":     ("Yogini",        "Union with the Divine"),
+        "Ashadha-Shukla":       ("Devshayani",    "Vishnu's Cosmic Sleep Begins"),
+        "Ashadha-Krishna":      ("Kamika",        "Destroyer of Sins"),
+        "Shravana-Shukla":      ("Putrada",       "Bestower of Sons"),
+        "Shravana-Krishna":     ("Aja",           "The Unborn"),
+        "Bhadrapada-Shukla":    ("Parsva",        "The Auspicious Turn"),
+        "Bhadrapada-Krishna":   ("Indira",        "The Radiant"),
+        "Ashwina-Shukla":       ("Papankusha",    "Destroyer of Sin's Hook"),
+        "Ashwina-Krishna":      ("Rama",          "The Delightful"),
+        "Kartika-Shukla":       ("Prabodhini",    "The Awakening — Vishnu Rises"),
+        "Kartika-Krishna":      ("Utpanna",       "The Originator"),
+        "Margashirsha-Shukla":  ("Mokshada",      "Granter of Liberation"),
+        "Margashirsha-Krishna": ("Saphala",       "The Fruitful"),
+        "Pausha-Shukla":        ("Putrada",       "Bestower of Progeny"),
+        "Pausha-Krishna":       ("Shattila",      "The Six Sesame Offerings"),
+        "Magha-Shukla":         ("Jaya",          "The Victorious"),
+        "Magha-Krishna":        ("Vijaya",        "The Triumphant"),
+        "Phalguna-Shukla":      ("Amalaki",       "The Sacred Gooseberry"),
+        "Phalguna-Krishna":     ("Papamochani",   "Liberator from Sin"),
+    ]
+
+    /// Lookup Ekadashi name by lunar month and paksha.
+    static func ekadashiName(lunarMonth: String, paksha: Paksha) -> (name: String, meaning: String)? {
+        return ekadashiNames["\(lunarMonth)-\(paksha.rawValue)"]
+    }
 }

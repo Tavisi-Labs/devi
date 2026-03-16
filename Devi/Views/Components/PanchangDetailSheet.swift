@@ -8,6 +8,7 @@ struct PanchangDetailSheet: View {
     let theme: DeviTheme
     let timezoneIdentifier: String
     let cityName: String
+    var panchangContext: DailyPanchang?  // Optional — used for fasting day enrichment
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -84,6 +85,18 @@ struct PanchangDetailSheet: View {
                 if case .eclipse = element {
                     mantrasSection
                 }
+
+                // Navratri mantra section
+                if case .navratriDay(let day) = element {
+                    navratriMantraSection(day: day)
+                }
+
+                // Fasting day mantra section
+                if case .fastingDay(let name) = element,
+                   let info = PanchangDescriptions.fastingDayInfo(for: name),
+                   let mantra = info.mantra {
+                    fastingMantraSection(mantra: mantra, deity: info.associatedDeity)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 32)
@@ -130,6 +143,24 @@ struct PanchangDetailSheet: View {
             return nil
         case .eclipse(let e):
             return "\(e.body.devanagari) — \(e.type.rawValue)"
+        case .festival(let name):
+            return PanchangDescriptions.festivalInfo(for: name)?.meaning
+        case .fastingDay(let name):
+            // Show enriched subtitle for Ekadashi with specific name
+            if name == "Ekadashi", let ctx = panchangContext,
+               let ekadashi = PanchangDescriptions.ekadashiName(
+                   lunarMonth: ctx.lunarMonth, paksha: ctx.tithi.paksha
+               ) {
+                return "\(ekadashi.name) — \(ekadashi.meaning)"
+            }
+            // Show enriched subtitle for Pradosh with weekday type
+            if name == "Pradosh Vrat", let ctx = panchangContext,
+               let pradosh = PanchangDescriptions.pradoshTypeInfo(for: ctx.varaDeity) {
+                return "\(pradosh.typeName) — \(pradosh.weekday)"
+            }
+            return PanchangDescriptions.fastingDayInfo(for: name)?.meaning
+        case .navratriDay(let day):
+            return day.goddessEpithet
         }
     }
 
@@ -216,6 +247,36 @@ struct PanchangDetailSheet: View {
                 .padding(12)
                 .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
             }
+        case .fastingDay(let name):
+            if name == "Pradosh Vrat", let sunset = panchangContext?.solar.sunset {
+                let pradoshEnd = sunset.addingTimeInterval(150 * 60)  // sunset + 2h30m
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("PRADOSH KAAL")
+                        .deviLabel(.caption, theme: theme)
+
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("START")
+                                .deviLabel(.caption, theme: theme)
+                            Text(deviFormatTime(sunset, timezoneIdentifier: timezoneIdentifier))
+                                .deviLabel(.body, theme: theme)
+                        }
+                        Rectangle()
+                            .fill(theme.primaryText.opacity(0.15))
+                            .frame(height: 1)
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("END")
+                                .deviLabel(.caption, theme: theme)
+                            Text(deviFormatTime(pradoshEnd, timezoneIdentifier: timezoneIdentifier))
+                                .deviLabel(.body, theme: theme)
+                        }
+                    }
+                    .padding(12)
+                    .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+                }
+            } else {
+                EmptyView()
+            }
         default:
             EmptyView()
         }
@@ -255,6 +316,12 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.timeWindowInfo(for: timeWindowKey(tw.type))?.description
         case .eclipse:
             return PanchangDescriptions.eclipseInfo.description
+        case .festival(let name):
+            return PanchangDescriptions.festivalInfo(for: name)?.description
+        case .fastingDay(let name):
+            return PanchangDescriptions.fastingDayInfo(for: name)?.description
+        case .navratriDay(let day):
+            return "Day \(day.dayNumber) of Navratri is dedicated to Goddess \(day.goddessName) — \(day.goddessEpithet). Wear \(day.colorName) and offer \(day.offering) to receive her blessings."
         }
     }
 
@@ -316,6 +383,39 @@ struct PanchangDetailSheet: View {
                 attrs.append(("Visibility", "Moon below horizon — partial visibility only"))
             }
             return attrs
+        case .festival(let name):
+            guard let info = PanchangDescriptions.festivalInfo(for: name) else { return [] }
+            return [
+                ("Associated Deity", info.associatedDeity),
+                ("Significance", info.significance)
+            ]
+        case .fastingDay(let name):
+            guard let info = PanchangDescriptions.fastingDayInfo(for: name) else { return [] }
+            var attrs: [(String, String)] = [
+                ("Associated Deity", info.associatedDeity),
+            ]
+            // Add weekday-specific Pradosh type
+            if name == "Pradosh Vrat", let ctx = panchangContext,
+               let pradosh = PanchangDescriptions.pradoshTypeInfo(for: ctx.varaDeity) {
+                attrs.append(("Type", pradosh.typeName))
+                attrs.append(("Significance", pradosh.significance))
+            }
+            // Add named Ekadashi variant
+            if name == "Ekadashi", let ctx = panchangContext,
+               let ekadashi = PanchangDescriptions.ekadashiName(
+                   lunarMonth: ctx.lunarMonth, paksha: ctx.tithi.paksha
+               ) {
+                attrs.append(("This Ekadashi", "\(ekadashi.name) — \(ekadashi.meaning)"))
+            }
+            attrs.append(("Why Fast", info.whyFast))
+            return attrs
+        case .navratriDay(let day):
+            return [
+                ("Day", "\(day.dayNumber) of 9"),
+                ("Goddess", day.goddessName),
+                ("Color", day.colorName),
+                ("Offering", day.offering)
+            ]
         }
     }
 
@@ -351,6 +451,18 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.varaInfo(for: varaWeekday(from: v))?.auspiciousActivities ?? []
         case .eclipse:
             return PanchangDescriptions.eclipseInfo.dosAndDonts.doItems
+        case .festival(let name):
+            return PanchangDescriptions.festivalInfo(for: name)?.observances ?? []
+        case .fastingDay(let name):
+            return PanchangDescriptions.fastingDayInfo(for: name)?.howToObserve ?? []
+        case .navratriDay(let day):
+            return [
+                "Worship Goddess \(day.goddessName)",
+                "Wear \(day.colorName) clothing",
+                "Offer \(day.offering) to the Goddess",
+                "Chant the daily Navratri mantra",
+                "Observe the Navratri fast (phalahar)"
+            ]
         default:
             return []
         }
@@ -502,6 +614,72 @@ struct PanchangDetailSheet: View {
         .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
     }
 
+    // MARK: - Navratri Mantra
+
+    private func navratriMantraSection(day: NavratriDay) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "waveform")
+                    .font(.system(size: 12))
+                    .foregroundColor(theme.accentColor)
+                Text("Mantra for \(day.goddessName)")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(theme.primaryText)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(day.mantra)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundColor(theme.primaryText.opacity(0.9))
+                    .lineSpacing(4)
+
+                Text(day.mantraTranslit)
+                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .foregroundColor(theme.secondaryText)
+                    .italic()
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+    }
+
+    // MARK: - Fasting Day Mantra
+
+    private func fastingMantraSection(mantra: (devanagari: String, transliteration: String), deity: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 6) {
+                Image(systemName: "waveform")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color(hex: "c54b2a"))
+                Text("Mantra for \(deity)")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(theme.primaryText)
+            }
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(mantra.devanagari)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundColor(theme.primaryText.opacity(0.9))
+                    .lineSpacing(4)
+
+                Text(mantra.transliteration)
+                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .foregroundColor(theme.secondaryText)
+                    .italic()
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+    }
+
     // MARK: - Helpers
 
     /// Extracts weekday name from vara string like "Surya (Sun)"
@@ -545,7 +723,8 @@ struct PanchangDetailSheet: View {
                 )),
                 theme: DeviTheme.forPeriod(.brahmaMuhurta),
                 timezoneIdentifier: "America/New_York",
-                cityName: "New York"
+                cityName: "New York",
+                panchangContext: nil
             )
         }
 }

@@ -11,6 +11,9 @@ enum PanchangElement: Identifiable {
     case vara(String)           // varaDeity string e.g. "Surya (Sun)"
     case timeWindow(TimeWindow)
     case eclipse(EclipseEvent)
+    case festival(String)           // Festival name → FestivalInfo lookup
+    case fastingDay(String)         // "Ekadashi", "Amavasya", etc. → FastingDayInfo lookup
+    case navratriDay(NavratriDay)   // Rich goddess/mantra data
 
     var id: String {
         switch self {
@@ -21,6 +24,9 @@ enum PanchangElement: Identifiable {
         case .vara(let v): return "vara-\(v)"
         case .timeWindow(let tw): return "timeWindow-\(tw.type.rawValue)"
         case .eclipse(let e): return "eclipse-\(e.id)"
+        case .festival(let name): return "festival-\(name)"
+        case .fastingDay(let name): return "fasting-\(name)"
+        case .navratriDay(let day): return "navratri-\(day.dayNumber)"
         }
     }
 
@@ -33,6 +39,9 @@ enum PanchangElement: Identifiable {
         case .vara(let v): return v.components(separatedBy: " (").first ?? v
         case .timeWindow(let tw): return tw.type.rawValue
         case .eclipse(let e): return e.displayName
+        case .festival(let name): return name
+        case .fastingDay(let name): return name
+        case .navratriDay(let day): return day.goddessName
         }
     }
 
@@ -45,6 +54,9 @@ enum PanchangElement: Identifiable {
         case .vara: return "VARA"
         case .timeWindow: return "TIME WINDOW"
         case .eclipse: return "GRAHAN"
+        case .festival: return "UTSAV"
+        case .fastingDay: return "VRATA"
+        case .navratriDay: return "NAVRATRI"
         }
     }
 }
