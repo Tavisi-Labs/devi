@@ -278,6 +278,122 @@ enum PanchangCalculator {
         return windows
     }
 
+    // MARK: - Hora (Planetary Hours)
+
+    // Planet names in Chaldean sequence order (index 0-6)
+    private static let horaPlanetNames = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"]
+    private static let horaPlanetSanskrit = ["Surya", "Chandra", "Mangala", "Budha", "Guru", "Shukra", "Shani"]
+
+    // Corrected Sanskrit names aligned with Chaldean order: Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars
+    private static let horaSanskritByChaldean = ["Surya", "Shukra", "Budha", "Chandra", "Shani", "Guru", "Mangala"]
+
+    // First daytime hora planet index (in Chaldean sequence) by weekday (1=Sun ... 7=Sat)
+    // Sunday=Sun(0), Monday=Moon(3), Tuesday=Mars(6), Wednesday=Mercury(2),
+    // Thursday=Jupiter(5), Friday=Venus(1), Saturday=Saturn(4)
+    private static let horaStartIndex = [0, 0, 3, 6, 2, 5, 1, 4]
+
+    /// Compute 24 hora periods (12 day + 12 night) for the given sunrise/sunset/nextSunrise.
+    static func computeHoras(sunriseJD: Double, sunsetJD: Double, nextSunriseJD: Double, weekday: Int) -> [Hora] {
+        let calc = VedicCalculator.shared
+        let dayDuration = (sunsetJD - sunriseJD) / 12.0
+        let nightDuration = (nextSunriseJD - sunsetJD) / 12.0
+        let startIdx = horaStartIndex[weekday]
+
+        var horas: [Hora] = []
+
+        for i in 0..<24 {
+            let isDaytime = i < 12
+            let planetIdx = (startIdx + i) % 7
+            let segStart: Double
+            let segEnd: Double
+
+            if isDaytime {
+                segStart = sunriseJD + Double(i) * dayDuration
+                segEnd = segStart + dayDuration
+            } else {
+                let nightIdx = i - 12
+                segStart = sunsetJD + Double(nightIdx) * nightDuration
+                segEnd = segStart + nightDuration
+            }
+
+            horas.append(Hora(
+                planetName: horaPlanetNames[planetIdx],
+                planetSanskrit: horaSanskritByChaldean[planetIdx],
+                startTime: calc.date(from: segStart),
+                endTime: calc.date(from: segEnd),
+                isDaytime: isDaytime,
+                sequenceIndex: i
+            ))
+        }
+
+        return horas
+    }
+
+    // MARK: - Choghadiya
+
+    // 7 named choghadiya types in rotation order
+    private static let choghadiyaNames = ["Udveg", "Chal", "Labh", "Amrit", "Kaal", "Shubh", "Rog"]
+
+    private static let choghadiyaQualities: [ChoghadiyaQuality] = [
+        .inauspicious,  // Udveg
+        .neutral,       // Chal
+        .auspicious,    // Labh
+        .auspicious,    // Amrit
+        .inauspicious,  // Kaal
+        .auspicious,    // Shubh
+        .inauspicious   // Rog
+    ]
+
+    // Day start index by weekday (1=Sun ... 7=Sat)
+    private static let choghadiyaDayStart   = [0, 0, 3, 6, 2, 5, 1, 4]
+    // Night start index by weekday (1=Sun ... 7=Sat)
+    private static let choghadiyaNightStart = [0, 5, 1, 4, 0, 3, 6, 2]
+
+    /// Compute 16 choghadiya periods (8 day + 8 night).
+    static func computeChoghadiyas(sunriseJD: Double, sunsetJD: Double, nextSunriseJD: Double, weekday: Int) -> [Choghadiya] {
+        let calc = VedicCalculator.shared
+        let dayDuration = (sunsetJD - sunriseJD) / 8.0
+        let nightDuration = (nextSunriseJD - sunsetJD) / 8.0
+        let dayStart = choghadiyaDayStart[weekday]
+        let nightStart = choghadiyaNightStart[weekday]
+
+        var choghadiyas: [Choghadiya] = []
+
+        // 8 daytime choghadiyas
+        for i in 0..<8 {
+            let typeIdx = (dayStart + i) % 7
+            let segStart = sunriseJD + Double(i) * dayDuration
+            let segEnd = segStart + dayDuration
+
+            choghadiyas.append(Choghadiya(
+                name: choghadiyaNames[typeIdx],
+                quality: choghadiyaQualities[typeIdx],
+                startTime: calc.date(from: segStart),
+                endTime: calc.date(from: segEnd),
+                isDaytime: true,
+                sequenceIndex: i
+            ))
+        }
+
+        // 8 nighttime choghadiyas
+        for i in 0..<8 {
+            let typeIdx = (nightStart + i) % 7
+            let segStart = sunsetJD + Double(i) * nightDuration
+            let segEnd = segStart + nightDuration
+
+            choghadiyas.append(Choghadiya(
+                name: choghadiyaNames[typeIdx],
+                quality: choghadiyaQualities[typeIdx],
+                startTime: calc.date(from: segStart),
+                endTime: calc.date(from: segEnd),
+                isDaytime: false,
+                sequenceIndex: 8 + i
+            ))
+        }
+
+        return choghadiyas
+    }
+
     // MARK: - Full Day Computation
 
     /// Compute complete panchang for a date and city.
@@ -324,6 +440,10 @@ enum PanchangCalculator {
         let weekday = cal.component(.weekday, from: date) // 1=Sun ... 7=Sat
         let timeWindows = computeTimeWindows(sunriseJD: sunriseJD, sunsetJD: sunsetJD, weekday: weekday)
 
+        // Hora and Choghadiya (reuse sunrise/sunset/nextSunrise and weekday)
+        let horas = computeHoras(sunriseJD: sunriseJD, sunsetJD: sunsetJD, nextSunriseJD: nextSunriseJD, weekday: weekday)
+        let choghadiyas = computeChoghadiyas(sunriseJD: sunriseJD, sunsetJD: sunsetJD, nextSunriseJD: nextSunriseJD, weekday: weekday)
+
         // Lunar month
         let lunarMonth = computeLunarMonth(at: refJD)
 
@@ -364,6 +484,8 @@ enum PanchangCalculator {
                 moonset: moonsetJD.map { calc.date(from: $0) }
             ),
             timeWindows: timeWindows,
+            horas: horas,
+            choghadiyas: choghadiyas,
             lunarMonth: lunarMonth,
             festivals: festivals
         )

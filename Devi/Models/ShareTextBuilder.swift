@@ -228,6 +228,36 @@ enum ShareTextBuilder {
             lines.append("")
             lines.append(day.mantra)
             lines.append(day.mantraTranslit)
+
+        case .hora(let h):
+            let info = PanchangDescriptions.horaInfo(for: h.planetName)
+            lines.append("Hora: \(h.planetSanskrit) (\(h.planetName))")
+            if let quality = info?.quality { lines.append("Quality: \(quality)") }
+            lines.append("\(formatTime(h.startTime, timezoneIdentifier: timezoneIdentifier)) – \(formatTime(h.endTime, timezoneIdentifier: timezoneIdentifier))")
+            if let activities = info?.auspiciousActivities {
+                lines.append("")
+                lines.append(contentsOf: activities.prefix(3).map { "• \($0)" })
+            }
+
+        case .choghadiya(let c):
+            let info = PanchangDescriptions.choghadiyaInfo(for: c.name)
+            lines.append("Choghadiya: \(c.name) (\(c.quality.rawValue))")
+            if let meaning = info?.meaning { lines.append("\"\(meaning)\"") }
+            lines.append("\(formatTime(c.startTime, timezoneIdentifier: timezoneIdentifier)) – \(formatTime(c.endTime, timezoneIdentifier: timezoneIdentifier))")
+            if let activities = info?.auspiciousActivities, !activities.isEmpty {
+                lines.append("")
+                lines.append(contentsOf: activities.prefix(3).map { "• \($0)" })
+            }
+
+        case .mantra(let m):
+            lines.append("Today's Mantra — \(m.deity)")
+            lines.append("")
+            lines.append(m.devanagari)
+            lines.append(m.transliteration)
+            lines.append("")
+            lines.append(m.meaning)
+            lines.append("")
+            lines.append("Chant \(m.repetitions) times · \(m.bestTimeToChant)")
         }
 
         lines.append(footer)

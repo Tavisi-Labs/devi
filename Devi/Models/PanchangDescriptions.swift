@@ -91,6 +91,25 @@ struct PradoshTypeInfo {
     let deity: String          // "Shiva / Chandra"
 }
 
+struct HoraInfo {
+    let planetName: String
+    let planetSanskrit: String
+    let deity: String
+    let quality: String          // "Most Auspicious", "Benefic", "Malefic"
+    let nature: String           // "Benefic" or "Malefic"
+    let auspiciousActivities: [String]
+    let avoidActivities: [String]
+    let description: String
+}
+
+struct ChoghadiyaTypeInfo {
+    let name: String
+    let meaning: String
+    let quality: ChoghadiyaQuality
+    let description: String
+    let auspiciousActivities: [String]
+}
+
 // MARK: - PanchangDescriptions Namespace
 
 enum PanchangDescriptions {
@@ -1784,5 +1803,222 @@ enum PanchangDescriptions {
     /// Lookup Ekadashi name by lunar month and paksha.
     static func ekadashiName(lunarMonth: String, paksha: Paksha) -> (name: String, meaning: String)? {
         return ekadashiNames["\(lunarMonth)-\(paksha.rawValue)"]
+    }
+
+    // MARK: - Hora Info (7 Planets)
+
+    static let horaInfos: [String: HoraInfo] = [
+        "Sun": HoraInfo(
+            planetName: "Sun",
+            planetSanskrit: "Surya",
+            deity: "Surya Deva",
+            quality: "Authoritative",
+            nature: "Malefic",
+            auspiciousActivities: ["Government work", "Meeting authority figures", "Leadership tasks", "Courage-based acts", "Medical consultations"],
+            avoidActivities: ["Starting new partnerships", "Lending money", "Travel for pleasure"],
+            description: "Sun hora is ruled by Surya Deva, the soul of the universe. This hora carries strong, authoritative energy suited for activities requiring power, visibility, and leadership. Government dealings, official meetings, and health matters are well-supported. As a natural malefic, this hora can be harsh for delicate or cooperative ventures."
+        ),
+        "Moon": HoraInfo(
+            planetName: "Moon",
+            planetSanskrit: "Chandra",
+            deity: "Chandra Deva",
+            quality: "Nurturing",
+            nature: "Benefic",
+            auspiciousActivities: ["Travel and journeys", "Creative pursuits", "Family matters", "Agriculture", "Dealing with public"],
+            avoidActivities: ["Legal disputes", "Surgery", "Confrontations"],
+            description: "Moon hora is ruled by Chandra, lord of the mind and emotions. This hora supports activities connected to nurturing, creativity, and public interaction. Travel begun during Moon hora tends to be pleasant. The lunar energy favors intuition, artistic expression, and matters of the heart."
+        ),
+        "Mars": HoraInfo(
+            planetName: "Mars",
+            planetSanskrit: "Mangala",
+            deity: "Mangala Deva",
+            quality: "Aggressive",
+            nature: "Malefic",
+            auspiciousActivities: ["Legal matters", "Physical activities", "Competition", "Property dealings", "Surgery"],
+            avoidActivities: ["Marriage ceremonies", "Starting peaceful ventures", "Lending money", "Travel"],
+            description: "Mars hora is ruled by Mangala, the commander of the celestial army. This hora carries fierce, competitive energy ideal for activities requiring courage, physical strength, and assertiveness. Legal battles, property disputes, and athletic competitions are favored. Avoid peaceful or cooperative activities during this aggressive period."
+        ),
+        "Mercury": HoraInfo(
+            planetName: "Mercury",
+            planetSanskrit: "Budha",
+            deity: "Budha Deva",
+            quality: "Intellectual",
+            nature: "Benefic",
+            auspiciousActivities: ["Business transactions", "Communication", "Education", "Writing", "Accounting", "Short travel"],
+            avoidActivities: ["Long-term commitments", "Agriculture"],
+            description: "Mercury hora is ruled by Budha, the prince among planets and lord of intellect. This hora excels for all activities involving the mind — business negotiations, writing, learning, and communication. Trade, commerce, and financial calculations are especially favored. Mercury's quick, adaptable energy supports multitasking and intellectual endeavors."
+        ),
+        "Jupiter": HoraInfo(
+            planetName: "Jupiter",
+            planetSanskrit: "Guru",
+            deity: "Brihaspati",
+            quality: "Most Auspicious",
+            nature: "Benefic",
+            auspiciousActivities: ["Spiritual practices", "Education", "Marriage", "Charity", "Starting new ventures", "Meeting teachers"],
+            avoidActivities: [],
+            description: "Jupiter hora is ruled by Brihaspati, the guru of the devas and the most benefic planet. This is considered the most auspicious hora for virtually all positive activities. Spiritual practices, education, marriage ceremonies, charitable acts, and beginning new ventures all receive Jupiter's abundant blessings. There are no activities to avoid during this supremely favorable period."
+        ),
+        "Venus": HoraInfo(
+            planetName: "Venus",
+            planetSanskrit: "Shukra",
+            deity: "Shukracharya",
+            quality: "Pleasurable",
+            nature: "Benefic",
+            auspiciousActivities: ["Art and music", "Luxury purchases", "Romance", "Entertainment", "Fashion", "Beauty treatments"],
+            avoidActivities: ["Austerities", "Medical procedures"],
+            description: "Venus hora is ruled by Shukracharya, the guru of the asuras and lord of beauty and pleasure. This hora is ideal for all activities connected to aesthetics, luxury, romance, and sensory enjoyment. Purchasing jewelry, art, vehicles, or fine clothing is especially favored. Entertainment, music performances, and social gatherings thrive under Venus's graceful influence."
+        ),
+        "Saturn": HoraInfo(
+            planetName: "Saturn",
+            planetSanskrit: "Shani",
+            deity: "Shani Deva",
+            quality: "Disciplined",
+            nature: "Malefic",
+            auspiciousActivities: ["Discipline and penance", "Labor and manual work", "Charity to the poor", "Cleaning and organizing", "Meditation"],
+            avoidActivities: ["Starting new ventures", "Travel", "Marriage", "Celebrations", "Important purchases"],
+            description: "Saturn hora is ruled by Shani Deva, the lord of karma, discipline, and time. This hora carries heavy, restrictive energy that slows down new beginnings but supports work requiring patience, endurance, and service. Labor, charity, spiritual discipline, and organizational tasks are favored. Avoid starting anything new or celebratory during this sobering period."
+        ),
+    ]
+
+    static func horaInfo(for planetName: String) -> HoraInfo? {
+        horaInfos[planetName]
+    }
+
+    // MARK: - Choghadiya Info (7 Types)
+
+    static let choghadiyaInfos: [String: ChoghadiyaTypeInfo] = [
+        "Amrit": ChoghadiyaTypeInfo(
+            name: "Amrit",
+            meaning: "Nectar",
+            quality: .auspicious,
+            description: "Amrit Choghadiya is the most auspicious period, named after the divine nectar of immortality (Amrita) that emerged from the Samudra Manthan. All activities begun during this period are believed to bear sweet, lasting fruit. It is considered the best choghadiya for any important undertaking.",
+            auspiciousActivities: ["All auspicious activities", "Marriage ceremonies", "Starting new ventures", "Spiritual practices", "Important meetings", "Medical treatments"]
+        ),
+        "Shubh": ChoghadiyaTypeInfo(
+            name: "Shubh",
+            meaning: "Auspicious",
+            quality: .auspicious,
+            description: "Shubh Choghadiya carries positive, auspicious energy that supports success and prosperity. It is particularly favorable for business activities, ceremonies, and social functions. The energy is harmonious and supportive of cooperative endeavors.",
+            auspiciousActivities: ["Business deals", "Ceremonies and functions", "Meeting important people", "Financial transactions", "Starting education"]
+        ),
+        "Labh": ChoghadiyaTypeInfo(
+            name: "Labh",
+            meaning: "Profit",
+            quality: .auspicious,
+            description: "Labh Choghadiya is especially favorable for financial and commercial activities, as its name literally means 'profit' or 'gain.' This period is ideal for trade, investments, and any activity where material gain is desired. Business transactions initiated during Labh tend to be profitable.",
+            auspiciousActivities: ["Financial transactions", "Trade and commerce", "Investments", "Property dealings", "Salary negotiations"]
+        ),
+        "Chal": ChoghadiyaTypeInfo(
+            name: "Chal",
+            meaning: "Movement",
+            quality: .neutral,
+            description: "Chal Choghadiya carries neutral, mobile energy. Its name means 'movement' or 'change,' making it particularly suitable for travel and journeys. While not as powerfully positive as Amrit or Shubh, it is not inauspicious either. It supports activities involving motion and transition.",
+            auspiciousActivities: ["Travel and journeys", "Moving house", "Commuting", "Delivery and shipping"]
+        ),
+        "Udveg": ChoghadiyaTypeInfo(
+            name: "Udveg",
+            meaning: "Anxiety",
+            quality: .inauspicious,
+            description: "Udveg Choghadiya is ruled by the Sun and carries anxious, restless energy. Its name means 'anxiety' or 'agitation.' General activities should be avoided during this period. However, it is considered acceptable for government-related work and dealings with authority figures, as the Sun rules these domains.",
+            auspiciousActivities: ["Government work only"]
+        ),
+        "Kaal": ChoghadiyaTypeInfo(
+            name: "Kaal",
+            meaning: "Death / Time",
+            quality: .inauspicious,
+            description: "Kaal Choghadiya is ruled by Saturn and is considered highly inauspicious. Its name invokes Kaal (Time/Death), the cosmic force of destruction and dissolution. All new activities should be avoided during this period. Only ongoing, unavoidable work should continue. It is a time for patience and inner reflection.",
+            auspiciousActivities: []
+        ),
+        "Rog": ChoghadiyaTypeInfo(
+            name: "Rog",
+            meaning: "Disease",
+            quality: .inauspicious,
+            description: "Rog Choghadiya is ruled by Mars and carries disease-like, afflicting energy. Its name literally means 'disease.' All new ventures and important activities should be avoided during this period. However, the martial energy can be channeled into dealing with enemies or competitive situations if absolutely necessary.",
+            auspiciousActivities: []
+        ),
+    ]
+
+    static func choghadiyaInfo(for name: String) -> ChoghadiyaTypeInfo? {
+        choghadiyaInfos[name]
+    }
+
+    // MARK: - Daily Mantras (7 Weekdays)
+
+    /// Weekday mantras keyed by Calendar.component(.weekday) (1=Sun ... 7=Sat)
+    static let dailyMantras: [Int: DailyMantra] = [
+        1: DailyMantra(
+            deity: "Surya",
+            devanagari: "ॐ सूर्याय नमः",
+            transliteration: "Om Suryaya Namah",
+            meaning: "I bow to the Sun God, the source of all light and energy",
+            significance: "Sunday is ruled by Surya (Sun), the Atmakaraka — significator of the soul. Chanting this mantra invokes vitality, authority, confidence, and spiritual illumination. It is especially powerful when chanted facing the rising sun.",
+            bestTimeToChant: "Sunrise (during Surya Namaskar)",
+            repetitions: 7,
+            weekday: 1
+        ),
+        2: DailyMantra(
+            deity: "Shiva",
+            devanagari: "ॐ नमः शिवाय",
+            transliteration: "Om Namah Shivaya",
+            meaning: "I bow to Lord Shiva, the auspicious one, the transformer",
+            significance: "Monday is Somvar, ruled by Chandra (Moon) and sacred to Lord Shiva. This Panchakshari mantra is one of the most powerful in Hinduism. It purifies the mind, removes fear, and bestows peace. Monday fasting with this mantra is observed for marital harmony and mental peace.",
+            bestTimeToChant: "Brahma Muhurta or during Shiva Puja",
+            repetitions: 108,
+            weekday: 2
+        ),
+        3: DailyMantra(
+            deity: "Hanuman",
+            devanagari: "ॐ हनुमते नमः",
+            transliteration: "Om Hanumate Namah",
+            meaning: "I bow to Lord Hanuman, the embodiment of devotion and strength",
+            significance: "Tuesday is Mangalvar, ruled by Mars (Mangala) and sacred to Lord Hanuman. Chanting this mantra bestows courage, physical strength, and protection from enemies and negative energies. It is especially effective for overcoming fear and obstacles.",
+            bestTimeToChant: "Morning, after oil application",
+            repetitions: 11,
+            weekday: 3
+        ),
+        4: DailyMantra(
+            deity: "Budha",
+            devanagari: "ॐ बुधाय नमः",
+            transliteration: "Om Budhaya Namah",
+            meaning: "I bow to Mercury, lord of intellect and communication",
+            significance: "Wednesday is Budhvar, ruled by Budha (Mercury), the planet of intellect. This mantra sharpens the mind, improves communication skills, and aids in business and education. Students and professionals particularly benefit from this mantra for clarity of thought.",
+            bestTimeToChant: "Morning, before study or work",
+            repetitions: 9,
+            weekday: 4
+        ),
+        5: DailyMantra(
+            deity: "Brihaspati",
+            devanagari: "ॐ गुरवे नमः",
+            transliteration: "Om Gurave Namah",
+            meaning: "I bow to Jupiter, the divine teacher and bestower of wisdom",
+            significance: "Thursday is Guruvar, ruled by Guru (Jupiter), the most benefic planet. This mantra invokes divine wisdom, spiritual growth, and the blessings of teachers. It is the most auspicious day for learning, teaching, and all spiritual practices. Wearing yellow and visiting temples amplifies its effect.",
+            bestTimeToChant: "Morning, facing northeast",
+            repetitions: 19,
+            weekday: 5
+        ),
+        6: DailyMantra(
+            deity: "Lakshmi",
+            devanagari: "ॐ महालक्ष्म्यै नमः",
+            transliteration: "Om Mahalakshmyai Namah",
+            meaning: "I bow to Goddess Mahalakshmi, bestower of wealth and prosperity",
+            significance: "Friday is Shukravar, ruled by Shukra (Venus), the planet of beauty and prosperity. This mantra invokes Goddess Lakshmi for material abundance, beauty, and harmonious relationships. Wearing white, offering flowers, and keeping the home clean amplifies Friday's auspicious Venusian energy.",
+            bestTimeToChant: "Evening, during Lakshmi Puja",
+            repetitions: 108,
+            weekday: 6
+        ),
+        7: DailyMantra(
+            deity: "Shani",
+            devanagari: "ॐ शनैश्चराय नमः",
+            transliteration: "Om Shanaishcharaya Namah",
+            meaning: "I bow to Saturn, the slow-moving lord of karma and discipline",
+            significance: "Saturday is Shanivar, ruled by Shani (Saturn), the planet of karma and justice. This mantra pacifies Saturn's harsh influence and bestows patience, discipline, and spiritual maturity. Feeding crows, donating black sesame, and lighting a sesame oil lamp are traditional Saturday observances.",
+            bestTimeToChant: "Evening, at a Shani temple or before a lamp",
+            repetitions: 23,
+            weekday: 7
+        ),
+    ]
+
+    static func dailyMantra(for weekday: Int) -> DailyMantra? {
+        dailyMantras[weekday]
     }
 }

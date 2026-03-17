@@ -161,6 +161,18 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.fastingDayInfo(for: name)?.meaning
         case .navratriDay(let day):
             return day.goddessEpithet
+        case .hora(let h):
+            if let info = PanchangDescriptions.horaInfo(for: h.planetName) {
+                return "\(info.deity) — \(info.nature)"
+            }
+            return "\(h.planetSanskrit) (\(h.planetName))"
+        case .choghadiya(let c):
+            if let info = PanchangDescriptions.choghadiyaInfo(for: c.name) {
+                return "\"\(info.meaning)\" — \(c.quality.rawValue)"
+            }
+            return c.quality.rawValue
+        case .mantra(let m):
+            return "\(m.deity) — \(weekdayName(for: m.weekday))"
         }
     }
 
@@ -277,6 +289,61 @@ struct PanchangDetailSheet: View {
             } else {
                 EmptyView()
             }
+        case .hora(let h):
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("START")
+                        .deviLabel(.caption, theme: theme)
+                    Text(deviFormatTime(h.startTime, timezoneIdentifier: timezoneIdentifier))
+                        .deviLabel(.body, theme: theme)
+                }
+                Rectangle()
+                    .fill(theme.primaryText.opacity(0.15))
+                    .frame(height: 1)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("END")
+                        .deviLabel(.caption, theme: theme)
+                    Text(deviFormatTime(h.endTime, timezoneIdentifier: timezoneIdentifier))
+                        .deviLabel(.body, theme: theme)
+                }
+            }
+            .padding(12)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+        case .choghadiya(let c):
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("START")
+                        .deviLabel(.caption, theme: theme)
+                    Text(deviFormatTime(c.startTime, timezoneIdentifier: timezoneIdentifier))
+                        .deviLabel(.body, theme: theme)
+                }
+                Rectangle()
+                    .fill(theme.primaryText.opacity(0.15))
+                    .frame(height: 1)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("END")
+                        .deviLabel(.caption, theme: theme)
+                    Text(deviFormatTime(c.endTime, timezoneIdentifier: timezoneIdentifier))
+                        .deviLabel(.body, theme: theme)
+                }
+            }
+            .padding(12)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
+        case .mantra(let m):
+            VStack(spacing: 12) {
+                Text(m.devanagari)
+                    .font(.system(size: 22, weight: .regular))
+                    .foregroundColor(theme.primaryText)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+
+                Text(m.transliteration)
+                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .foregroundColor(theme.secondaryText)
+                    .italic()
+            }
+            .padding(16)
+            .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
         default:
             EmptyView()
         }
@@ -322,6 +389,12 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.fastingDayInfo(for: name)?.description
         case .navratriDay(let day):
             return "Day \(day.dayNumber) of Navratri is dedicated to Goddess \(day.goddessName) — \(day.goddessEpithet). Wear \(day.colorName) and offer \(day.offering) to receive her blessings."
+        case .hora(let h):
+            return PanchangDescriptions.horaInfo(for: h.planetName)?.description
+        case .choghadiya(let c):
+            return PanchangDescriptions.choghadiyaInfo(for: c.name)?.description
+        case .mantra(let m):
+            return m.significance
         }
     }
 
@@ -416,6 +489,28 @@ struct PanchangDetailSheet: View {
                 ("Color", day.colorName),
                 ("Offering", day.offering)
             ]
+        case .hora(let h):
+            guard let info = PanchangDescriptions.horaInfo(for: h.planetName) else { return [] }
+            return [
+                ("Planet", "\(info.planetSanskrit) (\(info.planetName))"),
+                ("Nature", info.nature),
+                ("Quality", info.quality),
+                ("Period", h.isDaytime ? "Daytime" : "Nighttime")
+            ]
+        case .choghadiya(let c):
+            guard let info = PanchangDescriptions.choghadiyaInfo(for: c.name) else { return [] }
+            return [
+                ("Meaning", info.meaning),
+                ("Quality", c.quality.rawValue),
+                ("Period", c.isDaytime ? "Daytime" : "Nighttime")
+            ]
+        case .mantra(let m):
+            return [
+                ("Deity", m.deity),
+                ("Best Time", m.bestTimeToChant),
+                ("Repetitions", "\(m.repetitions) times"),
+                ("Day", weekdayName(for: m.weekday))
+            ]
         }
     }
 
@@ -463,6 +558,12 @@ struct PanchangDetailSheet: View {
                 "Chant the daily Navratri mantra",
                 "Observe the Navratri fast (phalahar)"
             ]
+        case .hora(let h):
+            return PanchangDescriptions.horaInfo(for: h.planetName)?.auspiciousActivities ?? []
+        case .choghadiya(let c):
+            return PanchangDescriptions.choghadiyaInfo(for: c.name)?.auspiciousActivities ?? []
+        case .mantra:
+            return []
         default:
             return []
         }
@@ -474,6 +575,13 @@ struct PanchangDetailSheet: View {
             return ["Starting new ventures", "Important decisions", "Travel"]
         case .eclipse:
             return PanchangDescriptions.eclipseInfo.dosAndDonts.dontItems
+        case .hora(let h):
+            return PanchangDescriptions.horaInfo(for: h.planetName)?.avoidActivities ?? []
+        case .choghadiya(let c):
+            if c.quality == .inauspicious {
+                return ["Starting new ventures", "Important decisions", "Travel", "Ceremonies"]
+            }
+            return []
         default:
             return []
         }
@@ -694,6 +802,20 @@ struct PanchangDetailSheet: View {
         case "Shukra": return "Friday"
         case "Shani": return "Saturday"
         default: return deityName
+        }
+    }
+
+    /// Converts Calendar weekday (1-7) to name
+    private func weekdayName(for weekday: Int) -> String {
+        switch weekday {
+        case 1: return "Sunday"
+        case 2: return "Monday"
+        case 3: return "Tuesday"
+        case 4: return "Wednesday"
+        case 5: return "Thursday"
+        case 6: return "Friday"
+        case 7: return "Saturday"
+        default: return ""
         }
     }
 

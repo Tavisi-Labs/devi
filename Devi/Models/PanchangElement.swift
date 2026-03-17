@@ -14,6 +14,9 @@ enum PanchangElement: Identifiable {
     case festival(String)           // Festival name → FestivalInfo lookup
     case fastingDay(String)         // "Ekadashi", "Amavasya", etc. → FastingDayInfo lookup
     case navratriDay(NavratriDay)   // Rich goddess/mantra data
+    case hora(Hora)                  // Planetary hour detail
+    case choghadiya(Choghadiya)      // Choghadiya period detail
+    case mantra(DailyMantra)         // Daily weekday mantra detail
 
     var id: String {
         switch self {
@@ -27,6 +30,9 @@ enum PanchangElement: Identifiable {
         case .festival(let name): return "festival-\(name)"
         case .fastingDay(let name): return "fasting-\(name)"
         case .navratriDay(let day): return "navratri-\(day.dayNumber)"
+        case .hora(let h): return "hora-\(h.sequenceIndex)"
+        case .choghadiya(let c): return "choghadiya-\(c.sequenceIndex)"
+        case .mantra(let m): return "mantra-\(m.weekday)"
         }
     }
 
@@ -42,6 +48,9 @@ enum PanchangElement: Identifiable {
         case .festival(let name): return name
         case .fastingDay(let name): return name
         case .navratriDay(let day): return day.goddessName
+        case .hora(let h): return h.planetName
+        case .choghadiya(let c): return c.name
+        case .mantra(let m): return m.deity
         }
     }
 
@@ -57,6 +66,9 @@ enum PanchangElement: Identifiable {
         case .festival: return "UTSAV"
         case .fastingDay: return "VRATA"
         case .navratriDay: return "NAVRATRI"
+        case .hora: return "HORA"
+        case .choghadiya: return "CHOGHADIYA"
+        case .mantra: return "MANTRA"
         }
     }
 }

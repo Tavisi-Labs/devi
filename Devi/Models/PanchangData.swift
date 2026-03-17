@@ -101,6 +101,63 @@ struct TimeWindow: Codable, Identifiable {
     }
 }
 
+// MARK: - Hora (Planetary Hour)
+
+struct Hora: Codable, Identifiable {
+    var id: String { "\(sequenceIndex)-\(planetName)" }
+
+    let planetName: String       // "Sun", "Moon", "Mars", etc.
+    let planetSanskrit: String   // "Surya", "Chandra", "Mangala", etc.
+    let startTime: Date
+    let endTime: Date
+    let isDaytime: Bool
+    let sequenceIndex: Int       // 0-23 (0-11 day, 12-23 night)
+
+    var isActive: Bool {
+        let now = Date()
+        return now >= startTime && now < endTime
+    }
+}
+
+// MARK: - Choghadiya (Auspicious Time Period)
+
+enum ChoghadiyaQuality: String, Codable {
+    case auspicious = "Auspicious"
+    case inauspicious = "Inauspicious"
+    case neutral = "Neutral"
+}
+
+struct Choghadiya: Codable, Identifiable {
+    var id: String { "\(sequenceIndex)-\(name)" }
+
+    let name: String             // "Amrit", "Shubh", "Labh", etc.
+    let quality: ChoghadiyaQuality
+    let startTime: Date
+    let endTime: Date
+    let isDaytime: Bool
+    let sequenceIndex: Int       // 0-15 (0-7 day, 8-15 night)
+
+    var isActive: Bool {
+        let now = Date()
+        return now >= startTime && now < endTime
+    }
+}
+
+// MARK: - Daily Mantra (Weekday-Based)
+
+struct DailyMantra: Codable, Identifiable {
+    var id: String { deity }
+
+    let deity: String            // "Surya", "Shiva", etc.
+    let devanagari: String       // "ॐ सूर्याय नमः"
+    let transliteration: String  // "Om Suryaya Namah"
+    let meaning: String
+    let significance: String
+    let bestTimeToChant: String
+    let repetitions: Int
+    let weekday: Int             // Calendar weekday 1=Sun ... 7=Sat
+}
+
 // MARK: - Solar Data
 
 struct SolarData: Codable {
@@ -158,6 +215,8 @@ struct DailyPanchang: Codable, Identifiable {
     let karanas: [Karana]    // 2-3 karanas per day with transition times
     let solar: SolarData
     let timeWindows: [TimeWindow]
+    let horas: [Hora]            // 24 entries: 12 day + 12 night
+    let choghadiyas: [Choghadiya] // 16 entries: 8 day + 8 night
     let lunarMonth: String   // "Chaitra", "Vaishakha", etc.
     let festivals: [String]  // Any festivals on this day
 

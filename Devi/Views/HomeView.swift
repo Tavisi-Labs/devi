@@ -53,6 +53,9 @@ struct HomeView: View {
                         infoBar(panchang: panchang)
                     }
 
+                    // MARK: - Today's Details
+                    todayDetails
+
                     // MARK: - Fasting indicator (if applicable)
                     if let panchang = vm.todayPanchang, let fastType = panchang.tithi.fastingType {
                         let enrichedName = enrichedFastingName(fastType, panchang: panchang)
@@ -93,14 +96,37 @@ struct HomeView: View {
                         .padding(.horizontal)
                     }
 
+                    // MARK: - Hora Card (planetary hours)
+                    if let panchang = vm.todayPanchang {
+                        HoraCard(
+                            horas: panchang.horas,
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                            onTapHora: { hora in
+                                selectedElement = .hora(hora)
+                            }
+                        )
+                        .padding(.horizontal)
+                    }
+
+                    // MARK: - Choghadiya Card (auspicious periods)
+                    if let panchang = vm.todayPanchang {
+                        ChoghadiyaCard(
+                            choghadiyas: panchang.choghadiyas,
+                            theme: vm.theme,
+                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                            onTapChoghadiya: { chog in
+                                selectedElement = .choghadiya(chog)
+                            }
+                        )
+                        .padding(.horizontal)
+                    }
+
                     // MARK: - Navratri Card (conditional)
                     if let navDay = vm.currentNavratriDay {
                         NavratriCard(day: navDay, theme: vm.theme)
                             .padding(.horizontal)
                     }
-
-                    // MARK: - Today's Details
-                    todayDetails
 
                     // MARK: - Upcoming
                     upcomingSection
@@ -303,6 +329,16 @@ struct HomeView: View {
     private var todayDetails: some View {
         VStack(alignment: .leading, spacing: 16) {
             OrnamentalDivider("TODAY", theme: vm.theme)
+
+            // Mantra card — lives under the TODAY heading
+            if let mantra = PanchangDescriptions.dailyMantra(
+                for: Calendar.current.component(.weekday, from: Date())
+            ) {
+                MantraCard(mantra: mantra, theme: vm.theme) {
+                    selectedElement = .mantra(mantra)
+                }
+                .padding(.horizontal)
+            }
 
             if let panchang = vm.todayPanchang {
                 VStack(spacing: 0) {

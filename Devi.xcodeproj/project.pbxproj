@@ -11,6 +11,7 @@
 		033C35B8D8C67417071612C3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443E05B8B65D4E3900BC0BDE /* HomeView.swift */; };
 		07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */; };
 		0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406B7EE63A21C444D045C89E /* SunArcView.swift */; };
+		1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3628C62ABE084D82A65819 /* HoraCard.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
 		41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09C4017C2811FC941DD4451 /* StarFieldView.swift */; };
 		42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */; };
@@ -20,12 +21,14 @@
 		53EB548AF45411CA45FFB15A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = 8770626AEDBE1DA0D475369D /* Solar */; };
 		561B3143C07D20B5677CE9B9 /* PanchangCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */; };
 		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
+		56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */; };
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
+		B982EA76D203C242C49853BC /* MantraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81FA1582C6CC8D435E75D30 /* MantraCard.swift */; };
 		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
 		C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */; };
 		D242439F6807E30BD55D80D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D40FE13768033F483BCEA6DC /* Assets.xcassets */; };
@@ -36,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
+		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		360B289972920360586AA1CC /* EclipseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseCard.swift; sourceTree = "<group>"; };
 		406B7EE63A21C444D045C89E /* SunArcView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunArcView.swift; sourceTree = "<group>"; };
@@ -50,8 +54,10 @@
 		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
 		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoghadiyaCard.swift; sourceTree = "<group>"; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
 		D40FE13768033F483BCEA6DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D81FA1582C6CC8D435E75D30 /* MantraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraCard.swift; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
 		E09C4017C2811FC941DD4451 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
@@ -90,7 +96,10 @@
 		4914BAD1C99EF5D62BB857EB /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */,
 				360B289972920360586AA1CC /* EclipseCard.swift */,
+				2B3628C62ABE084D82A65819 /* HoraCard.swift */,
+				D81FA1582C6CC8D435E75D30 /* MantraCard.swift */,
 				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
 				0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */,
 				994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */,
@@ -231,10 +240,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */,
 				D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */,
 				B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */,
 				02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */,
 				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
+				1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */,
+				B982EA76D203C242C49853BC /* MantraCard.swift in Sources */,
 				45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */,
 				C19C27D51654472CE9003804 /* NotificationService.swift in Sources */,
 				4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */,
