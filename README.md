@@ -1,75 +1,56 @@
 # Devi
 
-A Hindu Panchang (almanac) app for iOS, built with SwiftUI. Devi provides daily Vedic calendar information — tithi, nakshatra, yoga, karana, auspicious/inauspicious time windows, and more — localized to your city.
+A Hindu Panchang app for iOS. No ads, no subscriptions, no clutter — just accurate Vedic calendar information, beautifully presented.
 
-## Features
+## What It Does
 
-- **Daily Panchang** — Tithi (lunar day), Nakshatra (lunar mansion), Yoga, Karana, and Vara (weekday deity)
-- **Sun Arc Visualization** — Live sunrise/sunset progress with countdown timer
-- **Time Windows** — Brahma Muhurta, Abhijit Muhurta, Rahu Kalam, Gulika Kalam, and Yamaganda with color-coded auspicious/inauspicious indicators
-- **Fasting Day Alerts** — Automatic detection of Ekadashi, Pradosh Vrat, Purnima, and Amavasya
-- **Navratri Tracking** — Day-by-day goddess info, mantras (Devanagari + transliteration), colors, and offerings for Chaitra and Sharad Navratri
-- **Multi-City Support** — Pre-configured cities across the US, India, UK, Canada, and Singapore
-- **Dark Theme** — Adaptive gradient backgrounds that shift with the time of day
+Devi gives you the full Hindu panchang for today, calculated for your city using the Swiss Ephemeris with Lahiri ayanamsa. Open the app and you immediately see:
 
-## Requirements
+- **Tithi & Nakshatra** — today's lunar day and star, with tap-through details on ruling deities, significance, and auspicious activities
+- **Sun Arc** — a live visual tracker showing sun position, countdown to sunrise/sunset, and current time
+- **Today's Mantra** — a weekday-specific Sanskrit mantra in Devanagari with transliteration, meaning, and chanting guidance
+- **Yoga & Karana** — the full set of daily Vedic elements with educational descriptions
+- **Hora** — planetary hours showing which planet rules the current hour and what activities it favors
+- **Choghadiya** — auspicious/inauspicious time periods for the day and night, color-coded by quality
+- **Time Windows** — Rahu Kaal, Yamagandam, Gulika Kaal, Brahma Muhurta, Abhijit Muhurta
+- **Fasting Days** — automatic detection of Ekadashi, Pradosh Vrat, Purnima, Amavasya with named variants (Soma Pradosh, Kamada Ekadashi, etc.)
+- **Eclipse Alerts** — upcoming solar and lunar eclipses with visibility info and do's/don'ts
+- **Navratri Tracker** — day-by-day goddess info, colors, mantras, and offerings during Chaitra and Sharad Navratri
+- **Upcoming Events** — festivals, fasting days, and eclipses on the horizon
 
-- iOS 17.0+
-- Xcode 16.0+
-- Swift 5.0
+Every element is tappable. Tap any tithi, nakshatra, hora, or time window to get a rich detail sheet with Vedic context — not a paragraph from Wikipedia, but real descriptions rooted in scripture and tradition.
+
+## Design
+
+Dark theme only. The background gradient shifts through five periods — Brahma Muhurta, morning, midday, evening, night — so the app feels different every time you open it. Sacred terms are rendered in serif. The accent palette is gold and saffron. Stars animate softly behind everything.
+
+The goal is an app that feels like it belongs on a temple wall, not in a startup pitch deck.
+
+## Privacy
+
+All panchang calculations happen on your device. No server, no API calls, no analytics, no tracking. Your location data stays on your phone.
 
 ## Setup
 
-This project uses [XcodeGen](https://github.com/yonaskolb/XcodeGen) to generate the Xcode project from `project.yml`.
+Requires iOS 17.0+, Xcode 16+, and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
 
 ```bash
-# Install XcodeGen (if needed)
-brew install xcodegen
-
-# Generate the Xcode project
+brew install xcodegen   # if needed
 xcodegen generate
-
-# Open in Xcode
 open Devi.xcodeproj
 ```
 
-## Panchang Data Generation
-
-The `scripts/` directory contains a Python script that generates panchang JSON data using the Swiss Ephemeris (Lahiri ayanamsa) for sidereal calculations.
+### Panchang Data Scripts
 
 ```bash
 cd scripts
-python3 -m venv ../.venv
 source ../.venv/bin/activate
 pip install -r requirements.txt
 python3 generate_panchang.py
 ```
 
-## Project Structure
-
-```
-Devi/
-├── DeviApp.swift              # App entry point (onboarding → home routing)
-├── Models/
-│   ├── PanchangData.swift     # Core data models (Tithi, Nakshatra, Yoga, etc.)
-│   └── PanchangViewModel.swift# Main view model
-├── Views/
-│   ├── HomeView.swift         # Primary single-screen UI
-│   ├── OnboardingView.swift   # First-launch city selection
-│   ├── SettingsView.swift     # User preferences
-│   └── Components/
-│       ├── SunArcView.swift   # Sunrise/sunset arc visualization
-│       ├── TimeWindowsCard.swift
-│       └── NavratriCard.swift
-└── Utils/
-    └── Theme.swift            # Adaptive color/gradient system
-scripts/
-├── generate_panchang.py       # Swiss Ephemeris data generator
-└── requirements.txt           # pyswisseph
-project.yml                    # XcodeGen project definition
-```
-
 ## Dependencies
 
 - [Solar](https://github.com/ceeK/Solar) — Sunrise/sunset calculations
-- [pyswisseph](https://pypi.org/project/pyswisseph/) — Swiss Ephemeris bindings for panchang data generation
+- [SwissEphemeris](https://github.com/vsmithers1087/SwissEphemeris) — Vedic astronomical calculations (Lahiri ayanamsa)
+- [pyswisseph](https://pypi.org/project/pyswisseph/) — Ephemeris bindings for the data generation scripts
