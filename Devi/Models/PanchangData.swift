@@ -490,7 +490,13 @@ struct EclipseEvent: Identifiable, Codable {
         switch days {
         case 0: return "TODAY"
         case 1: return "TOMORROW"
-        case 2...30: return "IN \(days) DAYS"
+        case 2...30:
+            let parser = DateFormatter()
+            parser.dateFormat = "yyyy-MM-dd"
+            guard let date = parser.date(from: self.dateString) else { return "" }
+            let display = DateFormatter()
+            display.dateFormat = "MMM d"
+            return display.string(from: date).uppercased()
         default: return ""
         }
     }
@@ -504,11 +510,23 @@ struct UpcomingEvent: Identifiable {
     let dateString: String
     let daysAway: Int
     let type: EventType
-    
+
     enum EventType {
         case festival
         case fasting
         case eclipse
+    }
+
+    /// Converts dateString ("yyyy-MM-dd") → display label.
+    /// Returns "Tomorrow" for daysAway == 1, otherwise "MMM d" (e.g., "Mar 20").
+    var formattedDate: String {
+        if daysAway == 1 { return "Tomorrow" }
+        let parser = DateFormatter()
+        parser.dateFormat = "yyyy-MM-dd"
+        guard let date = parser.date(from: dateString) else { return dateString }
+        let display = DateFormatter()
+        display.dateFormat = "MMM d"
+        return display.string(from: date)
     }
 }
 

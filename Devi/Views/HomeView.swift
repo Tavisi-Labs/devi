@@ -435,7 +435,7 @@ struct HomeView: View {
 
                             Spacer()
 
-                            Text("in \(event.daysAway) days")
+                            Text(event.formattedDate)
                                 .font(.system(size: 13, weight: .regular))
                                 .foregroundColor(vm.theme.secondaryText)
 

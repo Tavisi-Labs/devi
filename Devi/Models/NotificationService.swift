@@ -296,7 +296,20 @@ final class NotificationService: Sendable {
 
     private static func eclipseAdvanceContent(eclipse: EclipseEvent, daysAway: Int) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
-        let timeLabel = daysAway == 1 ? "Tomorrow" : "In \(daysAway) days"
+        let timeLabel: String
+        if daysAway == 1 {
+            timeLabel = "Tomorrow"
+        } else {
+            let parser = DateFormatter()
+            parser.dateFormat = "yyyy-MM-dd"
+            if let date = parser.date(from: eclipse.dateString) {
+                let display = DateFormatter()
+                display.dateFormat = "MMMM d"
+                timeLabel = display.string(from: date)
+            } else {
+                timeLabel = eclipse.dateString
+            }
+        }
         content.title = "\(eclipse.body.sanskritName) — \(timeLabel)"
         content.body = "\(eclipse.displayName) on \(eclipse.dateString). Prepare for spiritual observances."
         content.sound = .default
