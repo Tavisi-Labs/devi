@@ -3,6 +3,65 @@
 
 import SwiftUI
 
+// MARK: - Font Scale System
+
+/// User-adjustable font scale. Default is `.standard` (1.15x) — 15% bigger than the original
+/// "Compact" sizes. Propagated via SwiftUI Environment so all views inherit automatically.
+enum DeviFontScale: String, CaseIterable {
+    case compact    = "Compact"       // 1.0x  (original sizes, for small screens)
+    case standard   = "Default"       // 1.15x (new default — 15% bigger)
+    case large      = "Large"         // 1.30x
+    case extraLarge = "Extra Large"   // 1.45x
+
+    var multiplier: CGFloat {
+        switch self {
+        case .compact:    return 1.0
+        case .standard:   return 1.15
+        case .large:      return 1.30
+        case .extraLarge: return 1.45
+        }
+    }
+
+    /// Hero/countdown text caps at 1.15x to avoid blowing out the layout
+    var heroMultiplier: CGFloat {
+        min(multiplier, 1.15)
+    }
+}
+
+// MARK: - Environment Key
+
+private struct DeviFontScaleKey: EnvironmentKey {
+    static let defaultValue: DeviFontScale = .standard
+}
+
+extension EnvironmentValues {
+    var deviFontScale: DeviFontScale {
+        get { self[DeviFontScaleKey.self] }
+        set { self[DeviFontScaleKey.self] = newValue }
+    }
+}
+
+// MARK: - Scaled Font Modifier
+
+/// Drop-in replacement for `.font(.system(size:weight:design:))` that reads
+/// the environment font scale automatically.
+struct ScaledFontModifier: ViewModifier {
+    @Environment(\.deviFontScale) private var scale
+    let size: CGFloat
+    let weight: Font.Weight
+    let design: Font.Design
+
+    func body(content: Content) -> some View {
+        content.font(.system(size: size * scale.multiplier, weight: weight, design: design))
+    }
+}
+
+extension View {
+    func scaledFont(size: CGFloat, weight: Font.Weight = .regular, design: Font.Design = .default) -> some View {
+        modifier(ScaledFontModifier(size: size, weight: weight, design: design))
+    }
+}
+
 // MARK: - Time Period
 
 enum TimePeriod {
@@ -338,6 +397,7 @@ extension Color {
 struct ThemedLabel: ViewModifier {
     let style: LabelStyle
     let theme: DeviTheme
+    @Environment(\.deviFontScale) private var scale
 
     enum LabelStyle {
         case hero        // 48pt countdown
@@ -351,41 +411,44 @@ struct ThemedLabel: ViewModifier {
     }
 
     func body(content: Content) -> some View {
+        let m = scale.multiplier
+        let hm = scale.heroMultiplier
+
         switch style {
         case .hero:
             content
-                .font(.system(size: 48, weight: .light, design: .rounded))
+                .font(.system(size: 48 * hm, weight: .light, design: .rounded))
                 .foregroundColor(theme.primaryText)
                 .monospacedDigit()
         case .sacredTitle:
             content
-                .font(.system(size: 32, weight: .regular, design: .serif))
+                .font(.system(size: 32 * m, weight: .regular, design: .serif))
                 .foregroundColor(theme.primaryText)
         case .title:
             content
-                .font(.system(size: 22, weight: .semibold))
+                .font(.system(size: 22 * m, weight: .semibold))
                 .foregroundColor(theme.primaryText)
         case .section:
             content
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 12 * m, weight: .semibold))
                 .foregroundColor(theme.secondaryText)
                 .textCase(.uppercase)
                 .tracking(2.0)
         case .body:
             content
-                .font(.system(size: 16, weight: .regular))
+                .font(.system(size: 16 * m, weight: .regular))
                 .foregroundColor(theme.primaryText)
         case .sacredBody:
             content
-                .font(.system(size: 16, weight: .regular, design: .serif))
+                .font(.system(size: 16 * m, weight: .regular, design: .serif))
                 .foregroundColor(theme.primaryText)
         case .detail:
             content
-                .font(.system(size: 14, weight: .regular))
+                .font(.system(size: 14 * m, weight: .regular))
                 .foregroundColor(theme.secondaryText)
         case .caption:
             content
-                .font(.system(size: 12, weight: .regular))
+                .font(.system(size: 12 * m, weight: .regular))
                 .foregroundColor(theme.secondaryText)
         }
     }

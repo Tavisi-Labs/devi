@@ -61,13 +61,14 @@ struct SunArcView: View {
                         .tracking(3.0)
 
                     Text(countdownText)
-                        .font(.system(size: 52, weight: .light, design: .rounded))
+                        .scaledFont(size: 52, weight: .light, design: .rounded)
                         .foregroundColor(theme.primaryText)
                         .monospacedDigit()
+                        .minimumScaleFactor(0.8)
                         .contentTransition(.numericText())
 
                     Text(currentTime)
-                        .font(.system(size: 15, weight: .regular))
+                        .scaledFont(size: 15, weight: .regular)
                         .foregroundColor(theme.secondaryText)
                 }
                 .offset(y: 30) // More breathing room from arc center

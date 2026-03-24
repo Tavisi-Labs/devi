@@ -43,7 +43,7 @@ struct OnboardingView: View {
                         .tint(onboardingTheme.accentColor)
 
                     Text("Finding your location…")
-                        .font(.system(size: 14, weight: .medium))
+                        .scaledFont(size: 14, weight: .medium)
                         .foregroundColor(onboardingTheme.primaryText)
                 }
                 .padding(.horizontal, 22)
@@ -87,11 +87,11 @@ struct OnboardingView: View {
                     // Title + tagline
                     VStack(spacing: 8) {
                         Text("Devi")
-                            .font(.system(size: 28, weight: .regular, design: .serif))
+                            .scaledFont(size: 28, weight: .regular, design: .serif)
                             .foregroundColor(onboardingTheme.primaryText)
 
                         Text("Your Light Through Each Day")
-                            .font(.system(size: 17, weight: .regular))
+                            .scaledFont(size: 17, weight: .regular)
                             .foregroundColor(onboardingTheme.secondaryText)
                     }
 
@@ -99,7 +99,7 @@ struct OnboardingView: View {
 
                     // Location prompt
                     Text("Where will you observe today's panchang?")
-                        .font(.system(size: 15, weight: .regular))
+                        .scaledFont(size: 15, weight: .regular)
                         .foregroundColor(onboardingTheme.secondaryText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
@@ -120,7 +120,7 @@ struct OnboardingView: View {
 
                     // "or choose your city" separator
                     Text("or choose your city")
-                        .font(.system(size: 14, weight: .regular))
+                        .scaledFont(size: 14, weight: .regular)
                         .foregroundColor(onboardingTheme.secondaryText.opacity(0.6))
 
                     // Popular city chips — horizontal scroll
@@ -132,7 +132,7 @@ struct OnboardingView: View {
                                     withAnimation { currentPage = 1 }
                                 } label: {
                                     Text(city.name)
-                                        .font(.system(size: 14, weight: .medium))
+                                        .scaledFont(size: 14, weight: .medium)
                                         .foregroundColor(onboardingTheme.primaryText)
                                         .lineLimit(1)
                                         .fixedSize()
@@ -160,7 +160,7 @@ struct OnboardingView: View {
                         }
                     } label: {
                         Text("Search other cities")
-                            .font(.system(size: 14, weight: .medium))
+                            .scaledFont(size: 14, weight: .medium)
                             .foregroundColor(onboardingTheme.accentColor.opacity(0.7))
                     }
                     .padding(.bottom, 32)
@@ -181,11 +181,11 @@ struct OnboardingView: View {
                             .foregroundColor(onboardingTheme.accentColor)
 
                         Text("Stay Attuned")
-                            .font(.system(size: 26, weight: .semibold, design: .serif))
+                            .scaledFont(size: 26, weight: .semibold, design: .serif)
                             .foregroundColor(onboardingTheme.primaryText)
 
                         Text("Get notified for important daily times")
-                            .font(.system(size: 15))
+                            .scaledFont(size: 15)
                             .foregroundColor(onboardingTheme.secondaryText)
                     }
                     .padding(.top, 48)
@@ -206,7 +206,7 @@ struct OnboardingView: View {
                     .padding(.horizontal, 24)
 
                     Text("You can change these anytime in settings")
-                        .font(.system(size: 13))
+                        .scaledFont(size: 13)
                         .foregroundColor(onboardingTheme.secondaryText.opacity(0.6))
                 }
             }
@@ -245,7 +245,7 @@ struct OnboardingView: View {
                 .frame(width: 24)
 
             Text(label)
-                .font(.system(size: 15, weight: .regular))
+                .scaledFont(size: 15, weight: .regular)
                 .foregroundColor(onboardingTheme.primaryText)
 
             Spacer()
@@ -275,11 +275,11 @@ struct PanchangEducationSheet: View {
                         // Five Limbs
                         VStack(alignment: .leading, spacing: 12) {
                             Text("The Five Limbs of Time")
-                                .font(.system(size: 22, weight: .semibold, design: .serif))
+                                .scaledFont(size: 22, weight: .semibold, design: .serif)
                                 .foregroundColor(theme.primaryText)
 
                             Text("Panchang means pancha (five) + anga (limb) \u{2014} the five elements that define each day in the Vedic calendar.")
-                                .font(.system(size: 15))
+                                .scaledFont(size: 15)
                                 .foregroundColor(theme.secondaryText)
                                 .lineSpacing(4)
 
@@ -295,11 +295,11 @@ struct PanchangEducationSheet: View {
                         // Sacred Hours
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Sacred Hours")
-                                .font(.system(size: 22, weight: .semibold, design: .serif))
+                                .scaledFont(size: 22, weight: .semibold, design: .serif)
                                 .foregroundColor(theme.primaryText)
 
                             Text("Some hours are ideal for new ventures; others are best observed with caution.")
-                                .font(.system(size: 15))
+                                .scaledFont(size: 15)
                                 .foregroundColor(theme.secondaryText)
                                 .lineSpacing(4)
 
@@ -336,10 +336,10 @@ struct PanchangEducationSheet: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                     .foregroundColor(theme.primaryText)
                 Text(desc)
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText)
                     .lineSpacing(3)
             }
@@ -359,10 +359,10 @@ struct PanchangEducationSheet: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .scaledFont(size: 15, weight: .semibold)
                     .foregroundColor(theme.primaryText)
                 Text(desc)
-                    .font(.system(size: 13))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText)
                     .lineSpacing(3)
             }

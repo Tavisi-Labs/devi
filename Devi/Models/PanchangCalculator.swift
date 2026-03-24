@@ -558,9 +558,55 @@ enum PanchangCalculator {
         "2026-11-11": ["Bhai Dooj"],
         "2026-11-15": ["Chhath Puja"],
         "2026-11-24": ["Kartik Purnima", "Dev Diwali"],
+
+        // ── Additional festivals (user-requested) ──
+        "2026-03-14": ["Panguni Uttram"],
+        "2026-04-15": ["Vishu"],
+        "2026-06-29": ["Rath Yatra"],
+        "2026-07-18": ["Nag Panchami"],
+        "2026-08-07": ["Varalakshmi Vratam"],
+        "2026-09-05": ["Dahi Handi"],
+        "2026-09-24": ["Anant Chaturdashi"],
+        "2026-10-02": ["Mahalaya"],
+        "2026-11-20": ["Tulsi Vivah"],
+        "2026-11-30": ["Geeta Jayanti"],
+        "2026-12-25": ["Vaikuntha Ekadashi"],
     ]
 
     static func festivals(for dateString: String) -> [String] {
         festivalData[dateString] ?? []
+    }
+
+    // MARK: - Samvathsara (60-Year Jupiter Cycle)
+
+    /// The 60 samvathsara names in order. Index 0 = Prabhava (year 1 of cycle).
+    private static let samvathsaraNames = [
+        "Prabhava", "Vibhava", "Shukla", "Pramodoota", "Prajothpatti",
+        "Āngirasa", "Shrīmukha", "Bhāva", "Yuva", "Dhātri",
+        "Īshvara", "Bahudhānya", "Pramāthi", "Vikrama", "Vṛṣa",
+        "Chitrabhānu", "Svabhānu", "Tāraṇa", "Pārthiva", "Vyaya",
+        "Sarvajit", "Sarvadhāri", "Virodhi", "Vikṛti", "Khara",
+        "Nandana", "Vijaya", "Jaya", "Manmatha", "Durmukhi",
+        "Hevilambi", "Vilambi", "Vikāri", "Shārvari", "Plava",
+        "Shubhakṛt", "Shobhakṛt", "Krodhi", "Vishvāvasu", "Parābhava",
+        "Plavanga", "Kīlaka", "Saumya", "Sādhāraṇa", "Virodhikṛt",
+        "Paridhāvi", "Pramādi", "Ānanda", "Rākshasa", "Nala",
+        "Pingala", "Kālayukti", "Siddhārthi", "Raudri", "Durmati",
+        "Dundubhi", "Rudhirodgāri", "Raktākshi", "Krodhana", "Akshaya",
+    ]
+
+    /// Returns the samvathsara name for a given date.
+    /// The Vedic year starts at Chaitra Shukla Pratipada (typically mid-March to mid-April).
+    /// Epoch: 2000-2001 = Vikṛti (index 23). So offset = year - 2000 + 23.
+    static func samvathsaraName(for date: Date) -> String {
+        let cal = Calendar(identifier: .gregorian)
+        var year = cal.component(.year, from: date)
+        let month = cal.component(.month, from: date)
+        // Before approximately mid-March, still in previous Vedic year
+        if month < 3 || (month == 3 && cal.component(.day, from: date) < 14) {
+            year -= 1
+        }
+        let idx = ((year - 2000 + 23) % 60 + 60) % 60
+        return samvathsaraNames[idx]
     }
 }

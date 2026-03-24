@@ -1628,6 +1628,177 @@ enum PanchangDescriptions {
             ],
             associatedDeity: "All Devas / Ganga / Shiva"
         ),
+
+        // ── Additional festivals (user-requested) ──
+
+        "Panguni Uttram": FestivalInfo(
+            name: "Panguni Uttram",
+            meaning: "The full moon in the Tamil month of Panguni under Uttara Phalguni nakshatra",
+            description: "Panguni Uttram celebrates divine marriages — Shiva and Parvati, Murugan and Devasena, Vishnu and Lakshmi. Temples across Tamil Nadu hold grand celestial wedding ceremonies (Thirukalyanam). It is one of the most important festivals in the Tamil Shaivite and Vaishnavite traditions.",
+            significance: "This day commemorates the cosmic union of divine couples. The Uttara Phalguni nakshatra signifies marital bliss and partnership. Devotees believe witnessing the divine wedding brings blessings for marital harmony and spiritual union.",
+            observances: [
+                "Witness the divine wedding ceremony (Thirukalyanam) at a temple",
+                "Visit Murugan temples, especially Tirupparankundram",
+                "Offer flower garlands and sacred thread",
+                "Observe a fast and perform special pujas",
+                "Donate to newly married couples or marriage funds"
+            ],
+            associatedDeity: "Shiva & Parvati / Murugan & Devasena / Vishnu & Lakshmi"
+        ),
+        "Vishu": FestivalInfo(
+            name: "Vishu",
+            meaning: "Equal — marking the vernal equinox in the Malayalam calendar",
+            description: "Vishu is the Malayalam New Year celebrated in Kerala, marking the Sun's transit into Mesha (Aries). The festival centers on the Vishukkani — an auspicious arrangement of fruits, flowers, gold, rice, and the Vishnu idol that is the first thing seen at dawn. Elders give Vishu Kaineettam (coins) to younger family members.",
+            significance: "Vishu represents the astronomical new year in Kerala's solar calendar. Seeing the Vishukkani at dawn is believed to bring prosperity for the entire year. The equal day-night of the equinox symbolizes balance and new beginnings.",
+            observances: [
+                "Prepare and view the Vishukkani at dawn",
+                "Give Vishu Kaineettam (money) to children",
+                "Prepare the Sadya feast with traditional dishes",
+                "Burst firecrackers (Vishu Padakkam)",
+                "Wear new clothes (Puthukodi)"
+            ],
+            associatedDeity: "Krishna / Vishnu"
+        ),
+        "Rath Yatra": FestivalInfo(
+            name: "Rath Yatra",
+            meaning: "Chariot Journey — the grand procession of Lord Jagannath",
+            description: "Rath Yatra is the annual chariot festival of Lord Jagannath in Puri, Odisha — one of the most spectacular events in Hinduism. Three massive wooden chariots carry Jagannath, Balabhadra, and Subhadra from the Jagannath Temple to Gundicha Temple, pulled by thousands of devotees. The English word 'juggernaut' derives from Jagannath.",
+            significance: "Rath Yatra symbolizes the Lord's journey to his aunt's house and his accessibility to all devotees, regardless of caste or status. Pulling the chariot rope is considered equal to performing a thousand Ashwamedha yagnas. The festival has been held unbroken for over 800 years.",
+            observances: [
+                "Pull the chariot ropes (even touching them brings merit)",
+                "Visit the Jagannath Temple in Puri or local Rath Yatra processions",
+                "Offer Mahaprasad — the sacred food of Lord Jagannath",
+                "Chant 'Jai Jagannath' during the procession",
+                "Observe fast and perform Vishnu puja"
+            ],
+            associatedDeity: "Jagannath (Vishnu) / Balabhadra / Subhadra"
+        ),
+        "Nag Panchami": FestivalInfo(
+            name: "Nag Panchami",
+            meaning: "Serpent Fifth — worship of the Naga deities on Panchami tithi",
+            description: "Nag Panchami is the festival of serpent worship observed on Shravana Shukla Panchami. Snakes hold deep significance in Hindu mythology — Shesha supports Vishnu, Vasuki was used to churn the cosmic ocean, and Shiva wears Naga as an ornament. Devotees offer milk, turmeric, and flowers to snake idols and anthills.",
+            significance: "Serpents represent kundalini energy, fertility, and the connection between earth and the divine. Worshipping Nagas on this day protects against snake bites, removes Kaal Sarpa dosha, and brings blessings from the subterranean realm. The festival honors the debt humanity owes to the serpent kingdom.",
+            observances: [
+                "Offer milk, turmeric paste, and flowers to Naga images",
+                "Visit temples with Naga shrines or natural anthills",
+                "Draw rangoli patterns of serpents at the entrance",
+                "Avoid digging the earth or plowing fields on this day",
+                "Chant the Naga Gayatri or Sarpa Sukta mantras"
+            ],
+            associatedDeity: "Nagas (Shesha, Vasuki, Takshaka)"
+        ),
+        "Varalakshmi Vratam": FestivalInfo(
+            name: "Varalakshmi Vratam",
+            meaning: "The Vow to Lakshmi who Grants Boons (Vara = boon)",
+            description: "Varalakshmi Vratam is a major South Indian festival observed by married women on the Friday before Shravana Purnima. A kalasha (sacred pot) is decorated as Goddess Lakshmi and worshipped with elaborate rituals. The vrata is equivalent to worshipping Ashta Lakshmi — the eight forms of the Goddess of Wealth.",
+            significance: "This vratam is believed to bestow the blessings of all eight forms of Lakshmi — wealth, courage, knowledge, fertility, food, success, bliss, and cosmic power. It is one of the most widely observed women's festivals in South India.",
+            observances: [
+                "Set up a decorated kalasha with a coconut, mango leaves, and sacred thread",
+                "Tie the Varalakshmi sacred thread (tora) on the right wrist",
+                "Offer lotus flowers, turmeric, kumkum, and fruits to the Goddess",
+                "Recite the Varalakshmi Vratam Katha (story of the merchant's wife)",
+                "Invite married women (sumangalis) and offer them gifts"
+            ],
+            associatedDeity: "Lakshmi (Ashta Lakshmi)"
+        ),
+        "Dahi Handi": FestivalInfo(
+            name: "Dahi Handi",
+            meaning: "Curd Pot — human pyramids to break a clay pot of buttermilk",
+            description: "Dahi Handi is celebrated the day after Krishna Janmashtami, primarily in Maharashtra and Gujarat. Teams of young men (Govindas) form human pyramids to reach and break a clay pot of curd hung high above the ground, reenacting young Krishna's mischievous butter-stealing exploits in Gokul.",
+            significance: "The festival celebrates Krishna's playful childhood and teaches teamwork, physical courage, and community spirit. The human pyramid represents how collective effort can achieve what seems impossible individually — a spiritual metaphor for devotion overcoming material obstacles.",
+            observances: [
+                "Form human pyramids (Govinda pathaks) to break the handi",
+                "Sing Krishna bhajans and dance during the procession",
+                "Prepare buttermilk, curd, and makhan (butter) offerings",
+                "Watch or participate in community Dahi Handi competitions",
+                "Visit Krishna temples and offer special prayers"
+            ],
+            associatedDeity: "Krishna (Govinda)"
+        ),
+        "Anant Chaturdashi": FestivalInfo(
+            name: "Anant Chaturdashi",
+            meaning: "The Infinite Fourteenth — honoring Vishnu's endless form",
+            description: "Anant Chaturdashi marks the conclusion of Ganesh Chaturthi with grand Ganesh Visarjan (immersion) processions. It is also a sacred day for worshipping Vishnu in his Ananta (infinite) form, wearing the Anant thread with 14 knots. The day carries the energy of both endings and infinity.",
+            significance: "The 14-knotted Anant thread symbolizes Vishnu's protection through the 14 worlds. Ganesh Visarjan on this day teaches non-attachment — we welcome the Lord with love and release him back to the cosmic ocean. 'Ganpati Bappa Morya, Purchya Varshi Laukarya' echoes through Mumbai's streets.",
+            observances: [
+                "Perform Ganesh Visarjan with music, dancing, and devotion",
+                "Tie the Anant thread (14 knots) and worship Vishnu",
+                "Recite the Anant Vrat Katha",
+                "Offer 14 types of fruits and flowers",
+                "Observe fast and perform Vishnu puja"
+            ],
+            associatedDeity: "Vishnu (Ananta) / Ganesh"
+        ),
+        "Mahalaya": FestivalInfo(
+            name: "Mahalaya",
+            meaning: "The Great Dissolution — end of Pitru Paksha, dawn of Devi Paksha",
+            description: "Mahalaya marks the end of the 16-day Pitru Paksha (ancestor fortnight) and the beginning of Devi Paksha, heralding the arrival of Goddess Durga. In Bengal, the dawn of Mahalaya is sacred — families wake before sunrise to listen to Birendra Krishna Bhadra's iconic radio recitation of the Chandipath, a tradition since 1931.",
+            significance: "Mahalaya is the pivot between ancestor worship and divine feminine celebration. The goddess is believed to begin her journey from Kailash to her parental home on Earth. The Chandipath recitation at dawn is so embedded in Bengali culture that it defines the start of the Durga Puja season.",
+            observances: [
+                "Wake before dawn to listen to the Chandipath (Mahishasura Mardini)",
+                "Perform Tarpanam for ancestors on the banks of a river",
+                "Begin preparations for Durga Puja",
+                "Offer sesame and water to the departed",
+                "Visit cremation ghats or river banks for ancestor rituals"
+            ],
+            associatedDeity: "Durga / Pitrus (Ancestors)"
+        ),
+        "Tulsi Vivah": FestivalInfo(
+            name: "Tulsi Vivah",
+            meaning: "The Sacred Marriage of the Tulsi Plant to Lord Vishnu",
+            description: "Tulsi Vivah is the ceremonial wedding of the sacred Tulsi (holy basil) plant to Shaligram (a fossilized form of Vishnu). Observed on Prabodhini Ekadashi or the days following, it marks the end of the Chaturmas period when marriages were prohibited. Tulsi Vivah 'opens' the marriage season.",
+            significance: "Tulsi is considered the earthly form of Goddess Vrinda (Lakshmi). Her marriage to Vishnu completes the cosmic cycle disrupted during Chaturmas. Performing or witnessing Tulsi Vivah is equivalent to performing a Kanya Daan (giving a daughter in marriage) — one of the highest acts of merit.",
+            observances: [
+                "Decorate the Tulsi plant as a bride with a sari, jewelry, and flowers",
+                "Place a Shaligram stone next to the Tulsi for the wedding",
+                "Perform the complete vivah (wedding) ritual with mantras",
+                "Light sugarcane sticks as torches around the mandap",
+                "Distribute prasad and sweets to neighbors"
+            ],
+            associatedDeity: "Vishnu / Lakshmi (as Tulsi/Vrinda)"
+        ),
+        "Geeta Jayanti": FestivalInfo(
+            name: "Geeta Jayanti",
+            meaning: "Birthday of the Bhagavad Gita — the day Krishna spoke the Song Divine",
+            description: "Geeta Jayanti commemorates the day Lord Krishna delivered the Bhagavad Gita to Arjuna on the battlefield of Kurukshetra, on Margashirsha Shukla Ekadashi. The 700 verses spoken that day became humanity's most profound philosophical text on duty, devotion, knowledge, and liberation.",
+            significance: "The Gita addresses the universal human crisis of Arjuna — the paralysis of indecision. Krishna's teaching that one must perform righteous action without attachment to results (Nishkama Karma) remains the foundation of Hindu philosophy. Geeta Jayanti is celebrated as the birthday of this sacred knowledge.",
+            observances: [
+                "Recite or listen to the complete Bhagavad Gita (700 shlokas)",
+                "Attend Gita discourses and study circles",
+                "Meditate on your favorite Gita shloka",
+                "Visit Krishna temples or Kurukshetra",
+                "Distribute copies of the Bhagavad Gita"
+            ],
+            associatedDeity: "Krishna"
+        ),
+        "Vaikuntha Ekadashi": FestivalInfo(
+            name: "Vaikuntha Ekadashi",
+            meaning: "The Ekadashi that opens the gates of Vaikuntha (Vishnu's abode)",
+            description: "Vaikuntha Ekadashi is the most sacred of all 24 Ekadashis, observed on Margashirsha/Dhanu Shukla Ekadashi. The Padma Purana declares that on this day, the gates of Vaikuntha (Vishnu's supreme heaven) open for all devotees. In South India, temples open the Vaikuntha Dwaram — a special northern door used only on this day.",
+            significance: "Fasting on this Ekadashi is considered equivalent to observing all other Ekadashis combined. The Vaikuntha Dwaram ceremony at Srirangam, Tirumala, and other Vishnu temples draws millions. Devotees believe that anyone who observes this Ekadashi with full devotion attains moksha.",
+            observances: [
+                "Observe strict nirjala (waterless) or phalahar fast",
+                "Pass through the Vaikuntha Dwaram at a Vishnu temple",
+                "Chant Vishnu Sahasranama and Om Namo Narayanaya",
+                "Stay awake through the night in kirtan and meditation",
+                "Break the fast the next morning during the parana window"
+            ],
+            associatedDeity: "Vishnu (Narayana)"
+        ),
+        "Satya Narayana Pooja": FestivalInfo(
+            name: "Satya Narayana Pooja",
+            meaning: "Worship of the True Lord (Satya = truth, Narayana = Vishnu)",
+            description: "Satya Narayana Pooja is a popular household puja performed on every Purnima (full moon). The ritual involves reciting the five chapters of the Satya Narayana Katha from the Skanda Purana, which narrates how devotees from all walks of life — a woodcutter, a merchant, a king — were blessed by keeping their vows to Satya Narayana.",
+            significance: "This puja is performed for general well-being, prosperity, and fulfillment of wishes. It is one of the most accessible Vedic rituals — any family member can perform it at home without a priest. The Katha emphasizes the power of truthful devotion and the consequences of breaking sacred vows.",
+            observances: [
+                "Prepare the puja mandap with banana leaves and mango leaves",
+                "Offer Panchamrit (milk, curd, ghee, honey, sugar) and banana prasad",
+                "Recite the five chapters of the Satya Narayana Katha",
+                "Distribute prasad (especially the banana-wheat-sugar mixture) to all present",
+                "Perform on Purnima or after auspicious events (housewarming, new job, etc.)"
+            ],
+            associatedDeity: "Vishnu (Satya Narayana)"
+        ),
     ]
 
     // MARK: - Fasting Days (Vrata)

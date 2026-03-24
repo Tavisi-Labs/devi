@@ -27,6 +27,11 @@ class PanchangViewModel: ObservableObject {
     @Published var isResolvingLocation: Bool = false
     @Published var hasCompletedOnboarding: Bool = false
     @Published var notificationsAuthorized: Bool = false
+    @Published var fontScale: DeviFontScale = .standard {
+        didSet { UserDefaults.standard.set(fontScale.rawValue, forKey: "fontScale") }
+    }
+    @Published var samvathsaraName: String = ""
+    @Published var todayFestivals: [String] = []
 
     // MARK: - Notification Preferences (persisted via UserDefaults)
 
@@ -107,6 +112,12 @@ class PanchangViewModel: ObservableObject {
         if ud.object(forKey: "notif.navratri") != nil { notifNavratriMorning = ud.bool(forKey: "notif.navratri") }
         if ud.object(forKey: "notif.eclipse") != nil { notifEclipseAlert = ud.bool(forKey: "notif.eclipse") }
         if ud.object(forKey: "notif.minutesBefore") != nil { notifMinutesBefore = ud.integer(forKey: "notif.minutesBefore") }
+
+        // Load persisted font scale
+        if let scaleStr = ud.string(forKey: "fontScale"),
+           let scale = DeviFontScale(rawValue: scaleStr) {
+            fontScale = scale
+        }
 
         // Load persisted city (if user previously selected one)
         if let cityName = ud.string(forKey: "city.name"),
@@ -228,6 +239,16 @@ class PanchangViewModel: ObservableObject {
         // Load upcoming events
         loadUpcomingEvents(from: todayString)
 
+        // Samvathsara year name (60-year Jupiter cycle)
+        samvathsaraName = PanchangCalculator.samvathsaraName(for: Date())
+
+        // Today's festivals (for banner display)
+        todayFestivals = PanchangCalculator.festivals(for: todayString)
+        // Also check if today is Purnima for Satya Narayana Pooja
+        if todayPanchang?.tithi.name == "Purnima" && !todayFestivals.contains("Satya Narayana Pooja") {
+            todayFestivals.append("Satya Narayana Pooja")
+        }
+
         // Set initial theme
         if let solar = todayPanchang?.solar {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
@@ -272,8 +293,8 @@ class PanchangViewModel: ObservableObject {
         var events: [UpcomingEvent] = []
         var seenNames: Set<String> = []  // Deduplicate across days
 
-        // Scan next 30 days for festivals and fasting days
-        for offset in 1...30 {
+        // Scan next 60 days for festivals and fasting days
+        for offset in 1...60 {
             guard let date = calendar.date(byAdding: .day, value: offset, to: today) else { continue }
             let ds = dateFormatter.string(from: date)
 
@@ -296,13 +317,24 @@ class PanchangViewModel: ObservableObject {
                 events.append(UpcomingEvent(
                     name: label, dateString: ds, daysAway: offset, type: .fasting
                 ))
+
+                // Satya Narayana Pooja on every Purnima
+                if panchang.tithi.name == "Purnima" {
+                    let snKey = "Satya Narayana Pooja-\(ds)"
+                    if !seenNames.contains(snKey) {
+                        seenNames.insert(snKey)
+                        events.append(UpcomingEvent(
+                            name: "Satya Narayana Pooja", dateString: ds, daysAway: offset, type: .festival
+                        ))
+                    }
+                }
             }
         }
 
         // Merge eclipse events (if any)
         for eclipse in eclipseEvents {
             let days = eclipse.daysFrom(todayString)
-            if days > 0 && days <= 30 {
+            if days > 0 && days <= 60 {
                 events.append(UpcomingEvent(
                     name: eclipse.displayName,
                     dateString: eclipse.dateString,

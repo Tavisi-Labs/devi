@@ -50,10 +50,10 @@ struct SettingsView: View {
                                     .foregroundColor(.orange)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text("Notifications Disabled")
-                                        .font(.system(size: 15, weight: .medium))
+                                        .scaledFont(size: 15, weight: .medium)
                                         .foregroundColor(.primary)
                                     Text("Tap to open Settings")
-                                        .font(.system(size: 13))
+                                        .scaledFont(size: 13)
                                         .foregroundColor(.secondary)
                                 }
                                 Spacer()
@@ -62,6 +62,20 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                }
+
+                // MARK: - Text Size
+                Section {
+                    Picker("Text Size", selection: $vm.fontScale) {
+                        ForEach(DeviFontScale.allCases, id: \.self) { scale in
+                            Text(scale.rawValue).tag(scale)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Text Size")
+                } footer: {
+                    Text("Default is 15% larger than Compact. Changes apply immediately.")
                 }
 
                 // MARK: - Notifications
@@ -245,7 +259,7 @@ struct CityPickerView: View {
                         .tint(Color(hex: "d4a857"))
                     Text("Searching...")
                         .foregroundColor(.secondary)
-                        .font(.system(size: 14))
+                        .scaledFont(size: 14)
                     Spacer()
                 }
             }
@@ -265,7 +279,7 @@ struct CityPickerView: View {
                                 .foregroundColor(.primary)
                             if !completion.subtitle.isEmpty {
                                 Text(completion.subtitle)
-                                    .font(.system(size: 13))
+                                    .scaledFont(size: 13)
                                     .foregroundColor(.secondary)
                             }
                         }
@@ -311,7 +325,7 @@ struct CityPickerView: View {
                     .tint(Color(hex: "d4a857"))
                     .scaleEffect(1.2)
                 Text("Loading city details...")
-                    .font(.system(size: 14, weight: .medium))
+                    .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(.white)
             }
             .padding(24)

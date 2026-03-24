@@ -74,7 +74,7 @@ struct EclipseCard: View {
                     .foregroundColor(eclipseBlue)
 
                 Text("GRAHAN")
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(size: 13, weight: .bold)
                     .foregroundColor(eclipseBlue)
                     .tracking(2)
             }
@@ -93,7 +93,7 @@ struct EclipseCard: View {
 
             // Proximity badge
             Text(eclipse.proximityLabel(from: todayDateString))
-                .font(.system(size: 11, weight: .bold))
+                .scaledFont(size: 11, weight: .bold)
                 .foregroundColor(daysAway == 0 ? .white : eclipseBlue)
                 .tracking(1)
                 .padding(.horizontal, 10)
@@ -113,17 +113,17 @@ struct EclipseCard: View {
         VStack(alignment: .leading, spacing: 4) {
             // Devanagari
             Text(eclipse.body.devanagari)
-                .font(.system(size: 15, weight: .regular))
+                .scaledFont(size: 15)
                 .foregroundColor(eclipseSilver.opacity(0.8))
 
             // Sanskrit name
             Text(eclipse.body.sanskritName)
-                .font(.system(size: 30, weight: .semibold, design: .serif))
+                .scaledFont(size: 30, weight: .semibold, design: .serif)
                 .foregroundColor(theme.primaryText)
 
             // Eclipse type subtitle
             Text(eclipse.displayName)
-                .font(.system(size: 15, weight: .regular))
+                .scaledFont(size: 15)
                 .foregroundColor(theme.secondaryText)
         }
     }
@@ -133,7 +133,7 @@ struct EclipseCard: View {
     private var contactTimesSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("CONTACT TIMES")
-                .font(.system(size: 10, weight: .medium))
+                .scaledFont(size: 10, weight: .medium)
                 .foregroundColor(theme.secondaryText)
                 .tracking(1)
 
@@ -147,13 +147,13 @@ struct EclipseCard: View {
                                    height: contact.label == "Maximum" ? 8 : 5)
 
                         Text(contact.label)
-                            .font(.system(size: 13, weight: contact.label == "Maximum" ? .semibold : .regular))
+                            .scaledFont(size: 13, weight: contact.label == "Maximum" ? .semibold : .regular)
                             .foregroundColor(contact.label == "Maximum" ? theme.primaryText : theme.secondaryText)
 
                         Spacer()
 
                         Text(deviFormatTime(contact.time, timezoneIdentifier: timezoneIdentifier))
-                            .font(.system(size: 13, weight: .medium, design: .monospaced))
+                            .scaledFont(size: 13, weight: .medium, design: .monospaced)
                             .foregroundColor(theme.primaryText)
                     }
                 }
@@ -175,11 +175,11 @@ struct EclipseCard: View {
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text("MAGNITUDE")
-                        .font(.system(size: 10, weight: .medium))
+                        .scaledFont(size: 10, weight: .medium)
                         .foregroundColor(theme.secondaryText)
                         .tracking(1)
                     Text(String(format: "%.3f", eclipse.magnitude))
-                        .font(.system(size: 14, weight: .medium))
+                        .scaledFont(size: 14, weight: .medium)
                         .foregroundColor(theme.primaryText)
                 }
             }
@@ -193,11 +193,11 @@ struct EclipseCard: View {
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text("VISIBILITY")
-                            .font(.system(size: 10, weight: .medium))
+                            .scaledFont(size: 10, weight: .medium)
                             .foregroundColor(theme.secondaryText)
                             .tracking(1)
                         Text("Below Horizon")
-                            .font(.system(size: 14, weight: .medium))
+                            .scaledFont(size: 14, weight: .medium)
                             .foregroundColor(theme.cautionColor)
                     }
                 }
@@ -210,7 +210,7 @@ struct EclipseCard: View {
     private func mythologyCard(_ note: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(note)
-                .font(.system(size: 13, weight: .regular, design: .serif))
+                .scaledFont(size: 13, design: .serif)
                 .foregroundColor(theme.secondaryText)
                 .lineSpacing(4)
                 .italic()

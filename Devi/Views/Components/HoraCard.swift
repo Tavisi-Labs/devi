@@ -27,7 +27,7 @@ struct HoraCard: View {
                 Text("HORA")
                     .deviLabel(.caption, theme: theme)
                 Text("· Planetary Hours")
-                    .font(.system(size: 11, weight: .regular))
+                    .scaledFont(size: 11)
                     .foregroundColor(theme.secondaryText.opacity(0.5))
                 Spacer()
             }
@@ -76,16 +76,16 @@ struct HoraRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(hora.planetSanskrit)
-                        .font(.system(size: 15, weight: .medium, design: .serif))
+                        .scaledFont(size: 15, weight: .medium, design: .serif)
                         .foregroundColor(theme.primaryText)
 
                     Text("(\(hora.planetName))")
-                        .font(.system(size: 13, weight: .regular))
+                        .scaledFont(size: 13)
                         .foregroundColor(theme.secondaryText)
 
                     if hora.isActive {
                         Text("NOW")
-                            .font(.system(size: 10, weight: .bold))
+                            .scaledFont(size: 10, weight: .bold)
                             .foregroundColor(planetColor)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -95,7 +95,7 @@ struct HoraRow: View {
                 }
 
                 Text("\(formatTime(hora.startTime)) — \(formatTime(hora.endTime))")
-                    .font(.system(size: 13, weight: .regular))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText)
             }
 

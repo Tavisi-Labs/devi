@@ -56,6 +56,17 @@ struct HomeView: View {
                     // MARK: - Today's Details
                     todayDetails
 
+                    // MARK: - Today's Festival Banner
+                    ForEach(vm.todayFestivals, id: \.self) { festival in
+                        Button {
+                            selectedElement = .festival(festival)
+                        } label: {
+                            festivalBanner(festival)
+                        }
+                        .buttonStyle(.plain)
+                        .deviEntrance()
+                    }
+
                     // MARK: - Fasting indicator (if applicable)
                     if let panchang = vm.todayPanchang, let fastType = panchang.tithi.fastingType {
                         let enrichedName = enrichedFastingName(fastType, panchang: panchang)
@@ -198,18 +209,25 @@ struct HomeView: View {
 
             // Centered city name
             Text(vm.currentCity.name)
-                .font(.system(size: 16, weight: .medium))
+                .scaledFont(size: 16, weight: .medium)
                 .foregroundColor(vm.theme.primaryText)
 
             // Centered Vedic date + Gregorian date
             if let panchang = vm.todayPanchang {
                 Text("\(panchang.lunarMonth) \u{00B7} \(panchang.tithi.paksha.rawValue) Paksha")
-                    .font(.system(size: 13, weight: .regular))
+                    .scaledFont(size: 13, weight: .regular)
                     .foregroundColor(vm.theme.secondaryText)
             }
 
+            // Samvathsara year name
+            if !vm.samvathsaraName.isEmpty, let panchang = vm.todayPanchang {
+                Text("\(vm.samvathsaraName) Samvathsara \u{00B7} \(panchang.lunarMonth) M\u{0101}sa")
+                    .scaledFont(size: 12, weight: .regular, design: .serif)
+                    .foregroundColor(vm.theme.secondaryText.opacity(0.7))
+            }
+
             Text(formattedDate)
-                .font(.system(size: 12, weight: .regular))
+                .scaledFont(size: 12, weight: .regular)
                 .foregroundColor(vm.theme.secondaryText.opacity(0.7))
         }
     }
@@ -238,7 +256,7 @@ struct HomeView: View {
                     selectedElement = .nakshatra(panchang.nakshatra)
                 } label: {
                     Text("\(panchang.nakshatra.name) Nakshatra")
-                        .font(.system(size: 15, weight: .regular, design: .serif))
+                        .scaledFont(size: 15, weight: .regular, design: .serif)
                         .foregroundColor(vm.theme.secondaryText)
                 }
                 .buttonStyle(.plain)
@@ -253,12 +271,13 @@ struct HomeView: View {
             // Left: Tithi ends
             VStack(spacing: 3) {
                 Text("TITHI ENDS")
-                    .font(.system(size: 10, weight: .medium))
+                    .scaledFont(size: 10, weight: .medium)
                     .foregroundColor(vm.theme.secondaryText)
                     .tracking(0.5)
                 Text(formatTime(panchang.tithi.endTime))
-                    .font(.system(size: 14, weight: .medium))
+                    .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(vm.theme.primaryText)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
 
@@ -273,8 +292,9 @@ struct HomeView: View {
                     .font(.system(size: 8))
                     .foregroundColor(vm.theme.secondaryText)
                 Text(panchang.nakshatra.name)
-                    .font(.system(size: 14, weight: .medium, design: .serif))
+                    .scaledFont(size: 14, weight: .medium, design: .serif)
                     .foregroundColor(vm.theme.primaryText)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
 
@@ -286,12 +306,13 @@ struct HomeView: View {
             // Right: Sunset/Sunrise time
             VStack(spacing: 3) {
                 Text(vm.isDaytime ? "SUNSET" : "SUNRISE")
-                    .font(.system(size: 10, weight: .medium))
+                    .scaledFont(size: 10, weight: .medium)
                     .foregroundColor(vm.theme.secondaryText)
                     .tracking(0.5)
                 Text(formatTime(vm.isDaytime ? panchang.solar.sunset : panchang.solar.sunrise))
-                    .font(.system(size: 14, weight: .medium))
+                    .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(vm.theme.primaryText)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity)
         }
@@ -308,7 +329,7 @@ struct HomeView: View {
                 .foregroundColor(Color(hex: "c54b2a"))
 
             Text("Today is \(displayName)")
-                .font(.system(size: 14, weight: .medium))
+                .scaledFont(size: 14, weight: .medium)
                 .foregroundColor(vm.theme.primaryText)
 
             Spacer()
@@ -320,6 +341,31 @@ struct HomeView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(Color(hex: "c54b2a").opacity(0.15))
+        .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 12)
+        .padding(.horizontal)
+    }
+
+    // MARK: - Festival Banner
+
+    private func festivalBanner(_ name: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 14))
+                .foregroundColor(Color(hex: "d4a857"))
+
+            Text("Today: \(name)")
+                .scaledFont(size: 14, weight: .medium)
+                .foregroundColor(vm.theme.primaryText)
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(vm.theme.secondaryText.opacity(0.4))
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(Color(hex: "d4a857").opacity(0.15))
         .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 12)
         .padding(.horizontal)
     }
@@ -377,13 +423,13 @@ struct HomeView: View {
         Button(action: action) {
             HStack {
                 Text(label)
-                    .font(.system(size: 15, weight: .regular))
+                    .scaledFont(size: 15, weight: .regular)
                     .foregroundColor(vm.theme.secondaryText)
 
                 Spacer()
 
                 Text(value)
-                    .font(.system(size: 15, weight: .medium, design: sacredValue ? .serif : .default))
+                    .scaledFont(size: 15, weight: .medium, design: sacredValue ? .serif : .default)
                     .foregroundColor(vm.theme.primaryText)
 
                 Image(systemName: "chevron.right")
@@ -400,13 +446,13 @@ struct HomeView: View {
     private func detailRow(_ label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 15, weight: .regular))
+                .scaledFont(size: 15, weight: .regular)
                 .foregroundColor(vm.theme.secondaryText)
 
             Spacer()
 
             Text(value)
-                .font(.system(size: 15, weight: .medium))
+                .scaledFont(size: 15, weight: .medium)
                 .foregroundColor(vm.theme.primaryText)
         }
         .padding(.horizontal, 20)
@@ -415,43 +461,89 @@ struct HomeView: View {
 
     // MARK: - Upcoming Events
 
+    private var thisWeekEvents: [UpcomingEvent] {
+        vm.upcomingEvents.filter { $0.daysAway <= 7 }
+    }
+
+    private var comingUpEvents: [UpcomingEvent] {
+        vm.upcomingEvents.filter { $0.daysAway > 7 }
+    }
+
     private var upcomingSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             OrnamentalDivider("UPCOMING", theme: vm.theme)
 
-            VStack(spacing: 0) {
-                ForEach(vm.upcomingEvents) { event in
-                    Button {
-                        selectedElement = panchangElement(for: event)
-                    } label: {
-                        HStack {
-                            Circle()
-                                .fill(eventDotColor(event.type))
-                                .frame(width: 6, height: 6)
+            if !thisWeekEvents.isEmpty {
+                Text("THIS WEEK")
+                    .deviLabel(.section, theme: vm.theme)
+                    .padding(.horizontal, 20)
 
-                            Text(event.name)
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(vm.theme.primaryText)
-
-                            Spacer()
-
-                            Text(event.formattedDate)
-                                .font(.system(size: 13, weight: .regular))
-                                .foregroundColor(vm.theme.secondaryText)
-
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(vm.theme.secondaryText.opacity(0.4))
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .contentShape(Rectangle())
+                VStack(spacing: 0) {
+                    ForEach(thisWeekEvents) { event in
+                        upcomingEventRow(event)
                     }
-                    .buttonStyle(.plain)
                 }
+                .deviCard(theme: vm.theme, elevation: .raised)
+                .padding(.horizontal)
+            }
+
+            if !comingUpEvents.isEmpty {
+                Text("COMING UP")
+                    .deviLabel(.section, theme: vm.theme)
+                    .padding(.horizontal, 20)
+                    .padding(.top, thisWeekEvents.isEmpty ? 0 : 8)
+
+                VStack(spacing: 0) {
+                    ForEach(comingUpEvents) { event in
+                        upcomingEventRow(event)
+                    }
+                }
+                .deviCard(theme: vm.theme, elevation: .flat)
+                .padding(.horizontal)
             }
         }
         .deviEntrance(delay: 0.24)
+    }
+
+    private func upcomingEventRow(_ event: UpcomingEvent) -> some View {
+        Button {
+            selectedElement = panchangElement(for: event)
+        } label: {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(eventDotColor(event.type))
+                    .frame(width: 6, height: 6)
+
+                Text(event.name)
+                    .scaledFont(size: 15, weight: .medium)
+                    .foregroundColor(vm.theme.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer()
+
+                // Relative time badge
+                Text("\(event.daysAway)d")
+                    .scaledFont(size: 11, weight: .semibold)
+                    .foregroundColor(vm.theme.secondaryText)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(vm.theme.primaryText.opacity(0.06))
+                    .clipShape(Capsule())
+
+                Text(event.formattedDate)
+                    .scaledFont(size: 13, weight: .regular)
+                    .foregroundColor(vm.theme.secondaryText)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(vm.theme.secondaryText.opacity(0.4))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Helpers

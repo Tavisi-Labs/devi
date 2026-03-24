@@ -81,16 +81,16 @@ struct ChoghadiyaRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(choghadiya.name)
-                        .font(.system(size: 15, weight: .medium))
+                        .scaledFont(size: 15, weight: .medium)
                         .foregroundColor(theme.primaryText)
 
                     Text("(\(choghadiya.quality.rawValue))")
-                        .font(.system(size: 12, weight: .regular))
+                        .scaledFont(size: 12)
                         .foregroundColor(qualityColor.opacity(0.8))
 
                     if choghadiya.isActive {
                         Text("NOW")
-                            .font(.system(size: 10, weight: .bold))
+                            .scaledFont(size: 10, weight: .bold)
                             .foregroundColor(qualityColor)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -100,7 +100,7 @@ struct ChoghadiyaRow: View {
                 }
 
                 Text("\(formatTime(choghadiya.startTime)) — \(formatTime(choghadiya.endTime))")
-                    .font(.system(size: 13, weight: .regular))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText)
             }
 

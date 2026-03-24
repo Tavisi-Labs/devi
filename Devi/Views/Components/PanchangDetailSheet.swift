@@ -34,7 +34,7 @@ struct PanchangDetailSheet: View {
                             Image(systemName: "square.and.arrow.up")
                                 .font(.system(size: 12))
                             Text("Share")
-                                .font(.system(size: 13, weight: .medium))
+                                .scaledFont(size: 13, weight: .medium)
                         }
                         .foregroundColor(theme.secondaryText)
                         .padding(.horizontal, 12)
@@ -47,7 +47,7 @@ struct PanchangDetailSheet: View {
                 // Subtitle / meaning
                 if let subtitle = subtitleText {
                     Text(subtitle)
-                        .font(.system(size: 16, weight: .regular, design: .serif))
+                        .scaledFont(size: 16, weight: .regular, design: .serif)
                         .foregroundColor(theme.secondaryText)
                 }
 
@@ -200,11 +200,11 @@ struct PanchangDetailSheet: View {
                                 .fill(idx == 0 ? theme.accentColor : theme.secondaryText.opacity(0.4))
                                 .frame(width: idx == 0 ? 8 : 5, height: idx == 0 ? 8 : 5)
                             Text(k.name)
-                                .font(.system(size: 14, weight: idx == 0 ? .semibold : .regular, design: .serif))
+                                .scaledFont(size: 14, weight: idx == 0 ? .semibold : .regular, design: .serif)
                                 .foregroundColor(idx == 0 ? theme.primaryText : theme.secondaryText)
                             Spacer()
                             Text("until \(deviFormatTime(k.endTime, timezoneIdentifier: timezoneIdentifier))")
-                                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                .scaledFont(size: 13, weight: .medium, design: .monospaced)
                                 .foregroundColor(theme.primaryText)
                         }
                     }
@@ -247,11 +247,11 @@ struct PanchangDetailSheet: View {
                                 .frame(width: contact.label == "Maximum" ? 8 : 5,
                                        height: contact.label == "Maximum" ? 8 : 5)
                             Text(contact.label)
-                                .font(.system(size: 13, weight: contact.label == "Maximum" ? .semibold : .regular))
+                                .scaledFont(size: 13, weight: contact.label == "Maximum" ? .semibold : .regular)
                                 .foregroundColor(contact.label == "Maximum" ? theme.primaryText : theme.secondaryText)
                             Spacer()
                             Text(deviFormatTime(contact.time, timezoneIdentifier: timezoneIdentifier))
-                                .font(.system(size: 13, weight: .medium, design: .monospaced))
+                                .scaledFont(size: 13, weight: .medium, design: .monospaced)
                                 .foregroundColor(theme.primaryText)
                         }
                     }
@@ -332,13 +332,13 @@ struct PanchangDetailSheet: View {
         case .mantra(let m):
             VStack(spacing: 12) {
                 Text(m.devanagari)
-                    .font(.system(size: 22, weight: .regular))
+                    .scaledFont(size: 22, weight: .regular)
                     .foregroundColor(theme.primaryText)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
 
                 Text(m.transliteration)
-                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .scaledFont(size: 14, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }
@@ -524,7 +524,7 @@ struct PanchangDetailSheet: View {
                     Text(attr.0.uppercased())
                         .deviLabel(.caption, theme: theme)
                     Text(attr.1)
-                        .font(.system(size: 14, weight: .medium))
+                        .scaledFont(size: 14, weight: .medium)
                         .foregroundColor(theme.primaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -597,7 +597,7 @@ struct PanchangDetailSheet: View {
                             .font(.system(size: 12))
                             .foregroundColor(theme.auspiciousColor)
                         Text("Good for")
-                            .font(.system(size: 14, weight: .semibold))
+                            .scaledFont(size: 14, weight: .semibold)
                             .foregroundColor(theme.primaryText)
                     }
 
@@ -619,7 +619,7 @@ struct PanchangDetailSheet: View {
                             .font(.system(size: 12))
                             .foregroundColor(theme.inauspiciousColor)
                         Text("Avoid")
-                            .font(.system(size: 14, weight: .semibold))
+                            .scaledFont(size: 14, weight: .semibold)
                             .foregroundColor(theme.primaryText)
                     }
 
@@ -650,7 +650,7 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Samudra Manthan")
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
 
@@ -668,7 +668,7 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Spiritual Significance")
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
 
@@ -692,24 +692,24 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Mantras for Eclipse")
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
 
             ForEach(info.mantras, id: \.transliteration) { mantra in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(mantra.devanagari)
-                        .font(.system(size: 17, weight: .regular))
+                        .scaledFont(size: 17, weight: .regular)
                         .foregroundColor(theme.primaryText.opacity(0.9))
                         .lineSpacing(4)
 
                     Text(mantra.transliteration)
-                        .font(.system(size: 13, weight: .regular, design: .serif))
+                        .scaledFont(size: 13, weight: .regular, design: .serif)
                         .foregroundColor(theme.secondaryText)
                         .italic()
 
                     Text(mantra.purpose)
-                        .font(.system(size: 12, weight: .regular))
+                        .scaledFont(size: 12, weight: .regular)
                         .foregroundColor(theme.secondaryText.opacity(0.7))
                 }
                 .padding(12)
@@ -731,18 +731,18 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(theme.accentColor)
                 Text("Mantra for \(day.goddessName)")
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(day.mantra)
-                    .font(.system(size: 17, weight: .regular))
+                    .scaledFont(size: 17, weight: .regular)
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
 
                 Text(day.mantraTranslit)
-                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .scaledFont(size: 13, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }
@@ -764,18 +764,18 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "c54b2a"))
                 Text("Mantra for \(deity)")
-                    .font(.system(size: 14, weight: .semibold))
+                    .scaledFont(size: 14, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(mantra.devanagari)
-                    .font(.system(size: 17, weight: .regular))
+                    .scaledFont(size: 17, weight: .regular)
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
 
                 Text(mantra.transliteration)
-                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .scaledFont(size: 13, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }

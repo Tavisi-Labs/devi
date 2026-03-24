@@ -18,7 +18,7 @@ struct OrnamentalDivider: View {
 
             if let label {
                 Text(label)
-                    .font(.system(size: 12, weight: .medium))
+                    .scaledFont(size: 12, weight: .medium)
                     .foregroundColor(theme.secondaryText)
                     .textCase(.uppercase)
                     .tracking(2.0)

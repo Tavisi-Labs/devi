@@ -67,12 +67,12 @@ struct TimeWindowRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(window.type.rawValue)
-                        .font(.system(size: 15, weight: .medium))
+                        .scaledFont(size: 15, weight: .medium)
                         .foregroundColor(theme.primaryText)
 
                     if window.isActive {
                         Text("NOW")
-                            .font(.system(size: 10, weight: .bold))
+                            .scaledFont(size: 10, weight: .bold)
                             .foregroundColor(statusColor)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -82,7 +82,7 @@ struct TimeWindowRow: View {
                 }
 
                 Text("\(formatTime(window.start)) — \(formatTime(window.end))")
-                    .font(.system(size: 13, weight: .regular))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText)
             }
 

@@ -20,7 +20,7 @@ struct NavratriCard: View {
                     .foregroundColor(dayColor)
 
                 Text("NAVRATRI DAY \(day.dayNumber)")
-                    .font(.system(size: 13, weight: .bold))
+                    .scaledFont(size: 13, weight: .bold)
                     .foregroundColor(dayColor)
                     .tracking(2)
 
@@ -45,11 +45,11 @@ struct NavratriCard: View {
             // Goddess name (bumped to 30pt serif)
             VStack(alignment: .leading, spacing: 4) {
                 Text(day.goddessName)
-                    .font(.system(size: 30, weight: .semibold, design: .serif))
+                    .scaledFont(size: 30, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
 
                 Text(day.goddessEpithet)
-                    .font(.system(size: 15, weight: .regular))
+                    .scaledFont(size: 15)
                     .foregroundColor(theme.secondaryText)
             }
 
@@ -67,11 +67,11 @@ struct NavratriCard: View {
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text("WEAR")
-                            .font(.system(size: 10, weight: .medium))
+                            .scaledFont(size: 10, weight: .medium)
                             .foregroundColor(theme.secondaryText)
                             .tracking(1)
                         Text(day.colorName)
-                            .font(.system(size: 14, weight: .medium))
+                            .scaledFont(size: 14, weight: .medium)
                             .foregroundColor(theme.primaryText)
                     }
                 }
@@ -84,11 +84,11 @@ struct NavratriCard: View {
 
                     VStack(alignment: .leading, spacing: 1) {
                         Text("OFFERING")
-                            .font(.system(size: 10, weight: .medium))
+                            .scaledFont(size: 10, weight: .medium)
                             .foregroundColor(theme.secondaryText)
                             .tracking(1)
                         Text(day.offering)
-                            .font(.system(size: 14, weight: .medium))
+                            .scaledFont(size: 14, weight: .medium)
                             .foregroundColor(theme.primaryText)
                     }
                 }
@@ -97,12 +97,12 @@ struct NavratriCard: View {
             // Mantra (wrapped in flat inner card)
             VStack(alignment: .leading, spacing: 6) {
                 Text(day.mantra)
-                    .font(.system(size: 17, weight: .regular))
+                    .scaledFont(size: 17)
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
 
                 Text(day.mantraTranslit)
-                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .scaledFont(size: 13, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }

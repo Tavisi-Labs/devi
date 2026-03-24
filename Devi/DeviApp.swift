@@ -24,6 +24,7 @@ struct DeviApp: App {
                     OnboardingView(vm: vm)
                 }
             }
+            .environment(\.deviFontScale, vm.fontScale)
             .preferredColorScheme(.dark) // Always dark — the gradients ARE the theme
             .task {
                 // One-time setup on first appearance

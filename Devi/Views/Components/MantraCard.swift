@@ -19,7 +19,7 @@ struct MantraCard: View {
                         Text("MANTRA")
                             .deviLabel(.caption, theme: theme)
                         Text("for \(mantra.deity)")
-                            .font(.system(size: 13, weight: .regular, design: .serif))
+                            .scaledFont(size: 13, design: .serif)
                             .foregroundColor(theme.secondaryText)
                     }
                     Spacer()
@@ -30,7 +30,7 @@ struct MantraCard: View {
 
                 // Devanagari mantra
                 Text(mantra.devanagari)
-                    .font(.system(size: 26, weight: .regular))
+                    .scaledFont(size: 26)
                     .foregroundColor(theme.primaryText)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
@@ -38,13 +38,13 @@ struct MantraCard: View {
 
                 // Transliteration
                 Text(mantra.transliteration)
-                    .font(.system(size: 15, weight: .regular, design: .serif))
+                    .scaledFont(size: 15, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
 
                 // Meaning in flat inner card
                 Text(mantra.meaning)
-                    .font(.system(size: 13, weight: .regular))
+                    .scaledFont(size: 13)
                     .foregroundColor(theme.secondaryText.opacity(0.8))
                     .multilineTextAlignment(.center)
                     .lineSpacing(3)
@@ -59,7 +59,7 @@ struct MantraCard: View {
                         .font(.system(size: 10))
                         .foregroundColor(theme.accentColor.opacity(0.7))
                     Text("Chant \(mantra.repetitions) times · \(mantra.bestTimeToChant)")
-                        .font(.system(size: 11, weight: .medium))
+                        .scaledFont(size: 11, weight: .medium)
                         .foregroundColor(theme.secondaryText.opacity(0.6))
                 }
             }
