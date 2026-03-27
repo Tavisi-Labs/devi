@@ -138,7 +138,7 @@ struct NavratriCard: View {
         Color(hex: "0F1B33").ignoresSafeArea()
 
         NavratriCard(
-            day: NavratriDay.chaitraNavratri2026[4], // Day 5 - Skandamata
+            day: NavratriDay.goddesses[4], // Day 5 - Skandamata
             theme: DeviTheme.forPeriod(.evening)
         )
         .padding()

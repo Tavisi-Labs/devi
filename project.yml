@@ -43,3 +43,16 @@ targets:
     dependencies:
       - package: Solar
       - package: SwissEphemeris
+  DeviTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - DeviTests
+    dependencies:
+      - target: Devi
+      - package: SwissEphemeris
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: true
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Devi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Devi"
+        BUNDLE_LOADER: "$(TEST_HOST)"

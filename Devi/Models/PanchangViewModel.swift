@@ -266,10 +266,14 @@ class PanchangViewModel: ObservableObject {
     }
 
     private func checkNavratri(dateString: String) {
-        let periods = [NavratriPeriod.chaitraNavratri2026, NavratriPeriod.sharadNavratri2026]
+        guard let year = Int(dateString.prefix(4)) else {
+            currentNavratriDay = nil
+            return
+        }
+        let periods = FestivalEngine.navratriPeriods(forYear: year)
         for period in periods {
             if let dayNum = period.dayNumber(for: dateString) {
-                currentNavratriDay = NavratriDay.chaitraNavratri2026[dayNum - 1]
+                currentNavratriDay = NavratriDay.goddesses[dayNum - 1]
                 return
             }
         }
@@ -495,11 +499,12 @@ class PanchangViewModel: ObservableObject {
 
         // Collect navratri data for each day
         var navratriDays: [String: NavratriDay] = [:]
-        let periods = [NavratriPeriod.chaitraNavratri2026, NavratriPeriod.sharadNavratri2026]
+        let year = Calendar.current.component(.year, from: Date())
+        let periods = FestivalEngine.navratriPeriods(forYear: year)
         for day in days {
             for period in periods {
                 if let dayNum = period.dayNumber(for: day.dateString) {
-                    navratriDays[day.dateString] = NavratriDay.chaitraNavratri2026[dayNum - 1]
+                    navratriDays[day.dateString] = NavratriDay.goddesses[dayNum - 1]
                     break
                 }
             }

@@ -146,6 +146,14 @@ struct SettingsView: View {
                         Label("Send Feedback", systemImage: "envelope")
                     }
 
+                    Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/privacy")!) {
+                        Label("Privacy Policy", systemImage: "hand.raised")
+                    }
+
+                    Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/support")!) {
+                        Label("Support", systemImage: "questionmark.circle")
+                    }
+
                     Button {
                         vm.resetOnboarding()
                         dismiss()

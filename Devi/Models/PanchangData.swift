@@ -255,7 +255,8 @@ struct NavratriDay: Identifiable {
     let mantra: String       // In Devanagari
     let mantraTranslit: String
     
-    static let chaitraNavratri2026: [NavratriDay] = [
+    /// The 9 goddesses of Navratri — same cycle for both Chaitra and Sharad, every year.
+    static let goddesses: [NavratriDay] = [
         NavratriDay(
             dayNumber: 1,
             goddessName: "Shailputri",
@@ -366,17 +367,7 @@ struct NavratriPeriod {
         return days + 1
     }
     
-    static let chaitraNavratri2026 = NavratriPeriod(
-        name: "Chaitra Navratri",
-        startDate: "2026-03-19",
-        endDate: "2026-03-27"
-    )
-    
-    static let sharadNavratri2026 = NavratriPeriod(
-        name: "Sharad Navratri",
-        startDate: "2026-10-11",
-        endDate: "2026-10-19"
-    )
+    // NavratriPeriod instances are now computed dynamically by FestivalEngine.navratriPeriods(forYear:)
 }
 
 // MARK: - Eclipse Data

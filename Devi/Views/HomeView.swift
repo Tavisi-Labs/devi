@@ -7,6 +7,8 @@ struct HomeView: View {
     @ObservedObject var vm: PanchangViewModel
     @State private var showSettings = false
     @State private var selectedElement: PanchangElement?
+    @State private var shareCardImage: ShareableCardImage?
+    @State private var isRenderingCard = false
 
     var body: some View {
         ZStack {
@@ -188,6 +190,30 @@ struct HomeView: View {
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
+
+                    // Image share button
+                    if let cardImage = shareCardImage {
+                        ShareLink(item: cardImage, preview: SharePreview("Devi Daily Panchang")) {
+                            Image(systemName: "camera.fill")
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(vm.theme.secondaryText)
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        Button {
+                            renderShareCard()
+                        } label: {
+                            Image(systemName: isRenderingCard ? "hourglass" : "camera")
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(vm.theme.secondaryText)
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isRenderingCard)
+                    }
                 } else {
                     Spacer().frame(width: 44, height: 44)
                 }
@@ -570,7 +596,7 @@ struct HomeView: View {
     /// Parses Navratri event names into NavratriDay structs.
     /// "Chaitra Navratri Begins" → Day 1, "Chaitra Navratri Day 3" → Day 3, etc.
     private func navratriDay(from eventName: String) -> NavratriDay? {
-        let days = NavratriDay.chaitraNavratri2026  // Same goddess data for both periods
+        let days = NavratriDay.goddesses  // Same goddess data for both Chaitra and Sharad
 
         if eventName.contains("Navratri Begins") {
             return days.first
@@ -625,6 +651,21 @@ struct HomeView: View {
             return baseType
         default:
             return baseType
+        }
+    }
+
+    private func renderShareCard() {
+        guard let panchang = vm.todayPanchang else { return }
+        isRenderingCard = true
+        // Render off the next run loop to avoid blocking the UI
+        Task { @MainActor in
+            shareCardImage = ShareCardRenderer.renderAsTransferable(
+                panchang: panchang,
+                city: vm.currentCity,
+                navratriDay: vm.currentNavratriDay,
+                theme: vm.theme
+            )
+            isRenderingCard = false
         }
     }
 
