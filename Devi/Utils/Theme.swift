@@ -62,6 +62,17 @@ extension View {
     }
 }
 
+// MARK: - Theme Style
+
+enum DeviThemeStyle: String, CaseIterable, Identifiable {
+    case classic       = "Classic"
+    case vividTemple   = "Vivid Temple"
+    case sunriseGarden = "Sunrise Garden"
+    case cosmicJewel   = "Cosmic Jewel"
+    case goldenDawn    = "Golden Dawn"
+    var id: String { rawValue }
+}
+
 // MARK: - Time Period
 
 enum TimePeriod {
@@ -110,54 +121,16 @@ struct DeviTheme {
 
     // MARK: - Time-based themes
 
-    static func forPeriod(_ period: TimePeriod) -> DeviTheme {
-        switch period {
-        case .brahmaMuhurta:
-            return DeviTheme(
-                backgroundGradientTop: Color(hex: "0B1026"),
-                backgroundGradientMid: Color(hex: "162044"),
-                backgroundGradientBottom: Color(hex: "2B3A5E"),
-                accentColor: Color(hex: "C9A96E"),
-                primaryText: Color(hex: "E8E4DC"),
-                secondaryText: Color(hex: "E8E4DC").opacity(0.6)
-            )
-        case .morning:
-            return DeviTheme(
-                backgroundGradientTop: Color(hex: "1E3A5F"),
-                backgroundGradientMid: Color(hex: "D4854A"),
-                backgroundGradientBottom: Color(hex: "E8A74D"),
-                accentColor: Color(hex: "8B3E1C"),
-                primaryText: Color(hex: "FAF3E8"),
-                secondaryText: Color(hex: "FAF3E8").opacity(0.7)
-            )
-        case .afternoon:
-            return DeviTheme(
-                backgroundGradientTop: Color(hex: "1B4B7A"),
-                backgroundGradientMid: Color(hex: "3B7CB8"),
-                backgroundGradientBottom: Color(hex: "8FB8D4"),
-                accentColor: Color(hex: "B8860B"),
-                primaryText: Color(hex: "1A1A2E"),
-                secondaryText: Color(hex: "1A1A2E").opacity(0.55)
-            )
-        case .evening:
-            return DeviTheme(
-                backgroundGradientTop: Color(hex: "0F1B33"),
-                backgroundGradientMid: Color(hex: "3D2245"),
-                backgroundGradientBottom: Color(hex: "6B3040"),
-                accentColor: Color(hex: "C4813D"),
-                primaryText: Color(hex: "F5EDE0"),
-                secondaryText: Color(hex: "F5EDE0").opacity(0.6)
-            )
-        case .night:
-            return DeviTheme(
-                backgroundGradientTop: Color(hex: "060B18"),
-                backgroundGradientMid: Color(hex: "0D1528"),
-                backgroundGradientBottom: Color(hex: "141E33"),
-                accentColor: Color(hex: "8A9BB8"),
-                primaryText: Color(hex: "E8E4DC"),
-                secondaryText: Color(hex: "E8E4DC").opacity(0.5)
-            )
-        }
+    static func forPeriod(_ period: TimePeriod, style: DeviThemeStyle = .classic) -> DeviTheme {
+        let p = ThemePaletteRegistry.palette(for: style, period: period)
+        return DeviTheme(
+            backgroundGradientTop: Color(hex: p.bgTop),
+            backgroundGradientMid: Color(hex: p.bgMid),
+            backgroundGradientBottom: Color(hex: p.bgBottom),
+            accentColor: Color(hex: p.accent),
+            primaryText: Color(hex: p.primaryText),
+            secondaryText: Color(hex: p.secondaryText).opacity(p.secondaryTextOpacity)
+        )
     }
 
     // The full background gradient (3-stop atmospheric sky)
@@ -173,46 +146,19 @@ struct DeviTheme {
         )
     }
 
-    // Arc gradient for the sun timer — adapts to time of day
-    static func arcGradient(for period: TimePeriod) -> LinearGradient {
-        switch period {
-        case .brahmaMuhurta:
-            return LinearGradient(
-                colors: [Color(hex: "6366f1"), Color(hex: "a855f7")],
-                startPoint: .leading, endPoint: .trailing
-            )
-        case .morning:
-            return LinearGradient(
-                colors: [Color(hex: "f59e0b"), Color(hex: "ef4444")],
-                startPoint: .leading, endPoint: .trailing
-            )
-        case .afternoon:
-            return LinearGradient(
-                colors: [Color(hex: "d4a857"), Color(hex: "f0c040")],
-                startPoint: .leading, endPoint: .trailing
-            )
-        case .evening:
-            return LinearGradient(
-                colors: [Color(hex: "ea580c"), Color(hex: "9a3412")],
-                startPoint: .leading, endPoint: .trailing
-            )
-        case .night:
-            return LinearGradient(
-                colors: [Color(hex: "94a3b8"), Color(hex: "64748b")],
-                startPoint: .leading, endPoint: .trailing
-            )
-        }
+    // Arc gradient for the sun timer — adapts to time of day and style
+    static func arcGradient(for period: TimePeriod, style: DeviThemeStyle = .classic) -> LinearGradient {
+        let p = ThemePaletteRegistry.palette(for: style, period: period)
+        return LinearGradient(
+            colors: [Color(hex: p.arcStart), Color(hex: p.arcEnd)],
+            startPoint: .leading, endPoint: .trailing
+        )
     }
 
     // Arc shadow color — matches the gradient start for visual coherence
-    static func arcShadowColor(for period: TimePeriod) -> Color {
-        switch period {
-        case .brahmaMuhurta: return Color(hex: "6366f1")
-        case .morning:       return Color(hex: "f59e0b")
-        case .afternoon:     return Color(hex: "f0c040")
-        case .evening:       return Color(hex: "ea580c")
-        case .night:         return Color(hex: "94a3b8")
-        }
+    static func arcShadowColor(for period: TimePeriod, style: DeviThemeStyle = .classic) -> Color {
+        let p = ThemePaletteRegistry.palette(for: style, period: period)
+        return Color(hex: p.arcShadow)
     }
 }
 
@@ -481,5 +427,30 @@ struct DeviEntranceModifier: ViewModifier {
 extension View {
     func deviEntrance(delay: Double = 0) -> some View {
         modifier(DeviEntranceModifier(delay: delay))
+    }
+}
+
+// MARK: - Breathing Animation Modifier (for NOW badges)
+
+/// Applies a subtle opacity oscillation (dim ↔ bright) to simulate breathing.
+/// Used on all "NOW" badges across cards to make active states feel alive.
+struct BreathingModifier: ViewModifier {
+    @State private var isBreathing = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(isBreathing ? 1.0 : 0.5)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
+                    isBreathing = true
+                }
+            }
+    }
+}
+
+extension View {
+    /// Makes a view "breathe" — oscillating opacity between 50% and 100%.
+    func breathing() -> some View {
+        modifier(BreathingModifier())
     }
 }

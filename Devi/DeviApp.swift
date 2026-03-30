@@ -16,7 +16,7 @@ struct DeviApp: App {
     }
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup {  
             Group {
                 if vm.hasCompletedOnboarding {
                     HomeView(vm: vm)

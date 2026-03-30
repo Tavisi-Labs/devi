@@ -9,6 +9,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var showCityPicker = false
     @State private var showPanchangEducation = false
+    @State private var apiKey: String = ""
 
     var body: some View {
         NavigationStack {
@@ -78,6 +79,43 @@ struct SettingsView: View {
                     Text("Default is 15% larger than Compact. Changes apply immediately.")
                 }
 
+                // MARK: - Theme
+                Section {
+                    ForEach(DeviThemeStyle.allCases) { style in
+                        Button {
+                            vm.setThemeStyle(style)
+                        } label: {
+                            HStack(spacing: 12) {
+                                // 3 overlapping circles showing the morning palette
+                                ThemeSwatchView(style: style)
+
+                                VStack(alignment: .leading, spacing: 1) {
+                                    Text(style.rawValue)
+                                        .scaledFont(size: 15, weight: .medium)
+                                        .foregroundColor(.primary)
+                                    Text(themeSubtitle(style))
+                                        .scaledFont(size: 12)
+                                        .foregroundColor(.secondary)
+                                }
+
+                                Spacer()
+
+                                if vm.themeStyle == style {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(Color(hex: "d4a857"))
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                            }
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                } header: {
+                    Text("Theme")
+                } footer: {
+                    Text("Changes the color palette across all time periods.")
+                }
+
                 // MARK: - Notifications
                 Section {
                     Toggle(isOn: $vm.notifDailySummary) {
@@ -133,6 +171,37 @@ struct SettingsView: View {
                     Text("Learn")
                 }
 
+                // MARK: - Cosmic Signature (AI)
+                Section {
+                    HStack {
+                        Label("API Key", systemImage: "key")
+                        Spacer()
+                        if apiKey.isEmpty {
+                            Text("Not set")
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text("••••\(String(apiKey.suffix(4)))")
+                                .foregroundColor(.secondary)
+                                .monospacedDigit()
+                        }
+                    }
+
+                    SecureField("sk-ant-...", text: $apiKey)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .font(.system(size: 14, design: .monospaced))
+                        .onChange(of: apiKey) { _, newValue in
+                            let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                            if !trimmed.isEmpty {
+                                KeychainHelper.save(key: "anthropic_api_key", value: trimmed)
+                            }
+                        }
+                } header: {
+                    Text("Cosmic Signature (AI)")
+                } footer: {
+                    Text("Optional. Paste your Anthropic API key to get AI-generated daily insights. Without a key, insights are composed from Vedic descriptions offline.")
+                }
+
                 // MARK: - About
                 Section {
                     HStack {
@@ -175,6 +244,9 @@ struct SettingsView: View {
             }
             .task {
                 await vm.checkNotificationAuthorization()
+            }
+            .onAppear {
+                apiKey = KeychainHelper.read(key: "anthropic_api_key") ?? ""
             }
             .sheet(isPresented: $showCityPicker) {
                 CityPickerView(selectedCity: vm.currentCity) { city in
@@ -355,6 +427,43 @@ struct CityPickerView: View {
             }
             isResolving = false
         }
+    }
+}
+
+// MARK: - Theme Swatch (3 overlapping circles from morning palette)
+
+private struct ThemeSwatchView: View {
+    let style: DeviThemeStyle
+
+    var body: some View {
+        let palette = ThemePaletteRegistry.palette(for: style, period: .morning)
+        ZStack {
+            Circle()
+                .fill(Color(hex: palette.bgBottom))
+                .frame(width: 22, height: 22)
+                .offset(x: 8)
+
+            Circle()
+                .fill(Color(hex: palette.bgMid))
+                .frame(width: 22, height: 22)
+
+            Circle()
+                .fill(Color(hex: palette.bgTop))
+                .frame(width: 22, height: 22)
+                .offset(x: -8)
+        }
+        .frame(width: 38, height: 22)
+    }
+}
+
+/// Short description for each theme style
+private func themeSubtitle(_ style: DeviThemeStyle) -> String {
+    switch style {
+    case .classic:       return "Original dark palette"
+    case .vividTemple:   return "Electric saffron & vivid indigo"
+    case .sunriseGarden: return "Warm plum, teal & terracotta"
+    case .cosmicJewel:   return "Deep space gemstones"
+    case .goldenDawn:    return "Brightest, near light-mode"
     }
 }
 

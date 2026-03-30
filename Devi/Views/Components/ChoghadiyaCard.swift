@@ -1,5 +1,5 @@
 // MARK: - Views/Components/ChoghadiyaCard.swift
-// Day/Night choghadiya sections with quality-colored rows
+// Dual horizontal scroll strips for Day and Night choghadiya periods
 
 import SwiftUI
 
@@ -7,6 +7,8 @@ struct ChoghadiyaCard: View {
     let choghadiyas: [Choghadiya]
     let theme: DeviTheme
     let timezoneIdentifier: String
+    /// The effective "now" for active/past checks (supports sun arc scrubbing)
+    var effectiveNow: Date = Date()
     var onTapChoghadiya: ((Choghadiya) -> Void)? = nil
 
     private var dayChoghadiyas: [Choghadiya] {
@@ -17,20 +19,27 @@ struct ChoghadiyaCard: View {
         choghadiyas.filter { !$0.isDaytime }
     }
 
-    var body: some View {
-        VStack(spacing: 16) {
-            // DAY section
-            choghadiyaSection(title: "CHOGHADIYA · Day", items: dayChoghadiyas)
+    private var currentDayId: String? {
+        dayChoghadiyas.first(where: { $0.isActive(at: effectiveNow) })?.id
+    }
 
-            // NIGHT section
-            choghadiyaSection(title: "CHOGHADIYA · Night", items: nightChoghadiyas)
+    private var currentNightId: String? {
+        nightChoghadiyas.first(where: { $0.isActive(at: effectiveNow) })?.id
+    }
+
+    var body: some View {
+        VStack(spacing: 12) {
+            choghadiyaStrip(title: "CHOGHADIYA · Day", items: dayChoghadiyas, currentId: currentDayId)
+            choghadiyaStrip(title: "CHOGHADIYA · Night", items: nightChoghadiyas, currentId: currentNightId)
         }
         .deviEntrance(delay: 0.16)
     }
 
+    // MARK: - Strip
+
     @ViewBuilder
-    private func choghadiyaSection(title: String, items: [Choghadiya]) -> some View {
-        VStack(spacing: 0) {
+    private func choghadiyaStrip(title: String, items: [Choghadiya], currentId: String?) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             // Header
             HStack {
                 Text(title)
@@ -39,102 +48,97 @@ struct ChoghadiyaCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.top, 14)
-            .padding(.bottom, 8)
+            .padding(.bottom, 10)
 
-            ForEach(Array(items.enumerated()), id: \.element.id) { index, chog in
-                if let onTap = onTapChoghadiya {
-                    Button {
-                        onTap(chog)
-                    } label: {
-                        ChoghadiyaRow(choghadiya: chog, theme: theme, timezoneIdentifier: timezoneIdentifier, showChevron: true)
+            // Horizontal strip
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(items) { chog in
+                            Button {
+                                onTapChoghadiya?(chog)
+                            } label: {
+                                choghadiyaColumn(chog)
+                            }
+                            .buttonStyle(.plain)
+                            .id(chog.id)
+                        }
                     }
-                    .buttonStyle(.plain)
-                } else {
-                    ChoghadiyaRow(choghadiya: chog, theme: theme, timezoneIdentifier: timezoneIdentifier)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 14)
                 }
-
-                if index < items.count - 1 {
-                    Divider()
-                        .background(theme.primaryText.opacity(0.08))
+                .onAppear {
+                    if let id = currentId {
+                        proxy.scrollTo(id, anchor: .center)
+                    }
                 }
             }
         }
         .deviCard(theme: theme, elevation: .raised)
     }
-}
 
-// MARK: - Choghadiya Row
+    // MARK: - Column
 
-struct ChoghadiyaRow: View {
-    let choghadiya: Choghadiya
-    let theme: DeviTheme
-    let timezoneIdentifier: String
-    var showChevron: Bool = false
+    private func choghadiyaColumn(_ chog: Choghadiya) -> some View {
+        VStack(spacing: 4) {
+            // Quality dot
+            Circle()
+                .fill(qualityColor(chog.quality))
+                .frame(width: 8, height: 8)
 
-    var body: some View {
-        HStack(spacing: 12) {
-            // Quality icon
-            Image(systemName: qualityIcon)
-                .font(.system(size: 10))
-                .foregroundColor(qualityColor)
+            // Name
+            Text(chog.name)
+                .scaledFont(size: 13, weight: .medium)
+                .foregroundColor(theme.primaryText)
+                .lineLimit(1)
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(choghadiya.name)
-                        .scaledFont(size: 15, weight: .medium)
-                        .foregroundColor(theme.primaryText)
+            // Quality label
+            Text(chog.quality.rawValue)
+                .scaledFont(size: 9)
+                .foregroundColor(qualityColor(chog.quality).opacity(0.8))
+                .lineLimit(1)
 
-                    Text("(\(choghadiya.quality.rawValue))")
-                        .scaledFont(size: 12)
-                        .foregroundColor(qualityColor.opacity(0.8))
+            // Start time
+            Text(formatTime(chog.startTime))
+                .scaledFont(size: 11)
+                .foregroundColor(theme.secondaryText)
+                .monospacedDigit()
 
-                    if choghadiya.isActive {
-                        Text("NOW")
-                            .scaledFont(size: 10, weight: .bold)
-                            .foregroundColor(qualityColor)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(qualityColor.opacity(0.2))
-                            .clipShape(Capsule())
-                    }
-                }
-
-                Text("\(formatTime(choghadiya.startTime)) — \(formatTime(choghadiya.endTime))")
-                    .scaledFont(size: 13)
-                    .foregroundColor(theme.secondaryText)
-            }
-
-            Spacer()
-
-            if showChevron {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(theme.secondaryText.opacity(0.4))
+            // NOW badge
+            if chog.isActive(at: effectiveNow) {
+                Text("NOW")
+                    .scaledFont(size: 8, weight: .bold)
+                    .foregroundColor(qualityColor(chog.quality))
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 1)
+                    .background(qualityColor(chog.quality).opacity(0.2))
+                    .clipShape(Capsule())
+                    .breathing()
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .frame(width: 68)
+        .padding(.vertical, 6)
+        .background(
+            chog.isActive(at: effectiveNow)
+                ? RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(theme.primaryText.opacity(0.06))
+                : nil
+        )
+        .opacity(isPast(chog) ? 0.35 : 1.0)
         .contentShape(Rectangle())
-        .opacity(isPast ? 0.4 : 1.0)
     }
 
-    private var isPast: Bool {
-        Date() > choghadiya.endTime
+    // MARK: - Helpers
+
+    private func isPast(_ chog: Choghadiya) -> Bool {
+        effectiveNow > chog.endTime
     }
 
-    private var qualityColor: Color {
-        switch choghadiya.quality {
-        case .auspicious: return theme.auspiciousColor
+    private func qualityColor(_ quality: ChoghadiyaQuality) -> Color {
+        switch quality {
+        case .auspicious:   return theme.auspiciousColor
         case .inauspicious: return theme.inauspiciousColor
-        case .neutral: return theme.cautionColor
-        }
-    }
-
-    private var qualityIcon: String {
-        switch choghadiya.quality {
-        case .auspicious: return "checkmark.circle.fill"
-        case .inauspicious: return "xmark.circle.fill"
-        case .neutral: return "exclamationmark.circle.fill"
+        case .neutral:      return theme.cautionColor
         }
     }
 

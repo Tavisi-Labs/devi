@@ -81,9 +81,10 @@ struct TimeWindow: Codable, Identifiable {
         type == .abhijitMuhurta || type == .brahmaMuhurta
     }
     
-    var isActive: Bool {
-        let now = Date()
-        return now >= start && now <= end
+    var isActive: Bool { isActive(at: Date()) }
+
+    func isActive(at date: Date) -> Bool {
+        date >= start && date <= end
     }
     
     var statusColor: WindowColor {
@@ -113,9 +114,10 @@ struct Hora: Codable, Identifiable {
     let isDaytime: Bool
     let sequenceIndex: Int       // 0-23 (0-11 day, 12-23 night)
 
-    var isActive: Bool {
-        let now = Date()
-        return now >= startTime && now < endTime
+    var isActive: Bool { isActive(at: Date()) }
+
+    func isActive(at date: Date) -> Bool {
+        date >= startTime && date < endTime
     }
 }
 
@@ -137,9 +139,10 @@ struct Choghadiya: Codable, Identifiable {
     let isDaytime: Bool
     let sequenceIndex: Int       // 0-15 (0-7 day, 8-15 night)
 
-    var isActive: Bool {
-        let now = Date()
-        return now >= startTime && now < endTime
+    var isActive: Bool { isActive(at: Date()) }
+
+    func isActive(at date: Date) -> Bool {
+        date >= startTime && date < endTime
     }
 }
 
@@ -167,19 +170,21 @@ struct SolarData: Codable {
     let moonset: Date?
     
     /// 0.0 at sunrise, 0.5 at solar noon, 1.0 at sunset
-    var sunProgress: Double {
-        let now = Date()
-        guard now >= sunrise && now <= sunset else {
-            return now < sunrise ? 0.0 : 1.0
+    var sunProgress: Double { sunProgress(at: Date()) }
+
+    func sunProgress(at date: Date) -> Double {
+        guard date >= sunrise && date <= sunset else {
+            return date < sunrise ? 0.0 : 1.0
         }
         let total = sunset.timeIntervalSince(sunrise)
-        let elapsed = now.timeIntervalSince(sunrise)
+        let elapsed = date.timeIntervalSince(sunrise)
         return elapsed / total
     }
-    
-    var isDaytime: Bool {
-        let now = Date()
-        return now >= sunrise && now <= sunset
+
+    var isDaytime: Bool { isDaytime(at: Date()) }
+
+    func isDaytime(at date: Date) -> Bool {
+        date >= sunrise && date <= sunset
     }
     
     /// Seconds until next sunrise or sunset

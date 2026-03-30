@@ -30,8 +30,37 @@ class PanchangViewModel: ObservableObject {
     @Published var fontScale: DeviFontScale = .standard {
         didSet { UserDefaults.standard.set(fontScale.rawValue, forKey: "fontScale") }
     }
+    @Published var themeStyle: DeviThemeStyle = .classic {
+        didSet { UserDefaults.standard.set(themeStyle.rawValue, forKey: "themeStyle") }
+    }
     @Published var samvathsaraName: String = ""
     @Published var todayFestivals: [String] = []
+
+    // MARK: - Cosmic Signature (AI)
+    @Published var cosmicSignature: String?
+    @Published var isLoadingSignature = false
+    private let cosmicService = CosmicSignatureService()
+    private var signatureTask: Task<Void, Never>?
+
+    // MARK: - Haptic Triggers
+    /// Incremented when countdown hits 0:00:00 — triggers heavy haptic
+    @Published var countdownZeroTrigger: Int = 0
+    /// Virtual time offset for sun arc scrubbing (nil = live)
+    @Published var virtualTimeOffset: TimeInterval? = nil
+
+    /// The effective "now" — either real time or scrubbed virtual time
+    var effectiveNow: Date {
+        virtualTimeOffset.map { Date().addingTimeInterval($0) } ?? Date()
+    }
+
+    // MARK: - Day Navigation
+    @Published var dayOffset: Int = 0  // -1 yesterday, 0 today, +1 tomorrow
+
+    var displayDate: Date {
+        Calendar.current.date(byAdding: .day, value: dayOffset, to: Date()) ?? Date()
+    }
+
+    var isViewingToday: Bool { dayOffset == 0 }
 
     // MARK: - Notification Preferences (persisted via UserDefaults)
 
@@ -81,11 +110,11 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Computed
 
     var sunProgress: Double {
-        todayPanchang?.solar.sunProgress ?? 0.5
+        todayPanchang?.solar.sunProgress(at: effectiveNow) ?? 0.5
     }
 
     var isDaytime: Bool {
-        todayPanchang?.solar.isDaytime ?? true
+        todayPanchang?.solar.isDaytime(at: effectiveNow) ?? true
     }
 
     var activeTimeWindows: [TimeWindow] {
@@ -94,6 +123,142 @@ class PanchangViewModel: ObservableObject {
 
     var isNavratriActive: Bool {
         currentNavratriDay != nil
+    }
+
+    // MARK: - Right Now Items (aggregates active hora + choghadiya + time windows)
+
+    struct RightNowItem: Identifiable {
+        let id: String
+        let label: String
+        let statusColor: Color
+        let endTime: Date
+        let isActive: Bool    // true = NOW, false = NEXT
+        let element: PanchangElement
+    }
+
+    var rightNowItems: [RightNowItem] {
+        guard let panchang = todayPanchang else { return [] }
+        let now = effectiveNow
+        var items: [RightNowItem] = []
+
+        // Current hora
+        if let hora = panchang.horas.first(where: { $0.isActive(at: now) }) {
+            items.append(RightNowItem(
+                id: "hora-now", label: "\(hora.planetSanskrit) Hora",
+                statusColor: horaColor(hora.planetName), endTime: hora.endTime,
+                isActive: true, element: .hora(hora)
+            ))
+        } else if let next = panchang.horas.first(where: { now < $0.startTime }) {
+            items.append(RightNowItem(
+                id: "hora-next", label: "\(next.planetSanskrit) Hora",
+                statusColor: horaColor(next.planetName), endTime: next.startTime,
+                isActive: false, element: .hora(next)
+            ))
+        }
+
+        // Current choghadiya
+        if let chog = panchang.choghadiyas.first(where: { $0.isActive(at: now) }) {
+            items.append(RightNowItem(
+                id: "chog-now", label: "\(chog.name) Choghadiya",
+                statusColor: choghadiyaColor(chog.quality), endTime: chog.endTime,
+                isActive: true, element: .choghadiya(chog)
+            ))
+        } else if let next = panchang.choghadiyas.first(where: { now < $0.startTime }) {
+            items.append(RightNowItem(
+                id: "chog-next", label: "\(next.name) Choghadiya",
+                statusColor: choghadiyaColor(next.quality), endTime: next.startTime,
+                isActive: false, element: .choghadiya(next)
+            ))
+        }
+
+        // Active time windows (multiple can be active simultaneously)
+        for window in panchang.timeWindows {
+            if window.isActive(at: now) {
+                items.append(RightNowItem(
+                    id: "tw-\(window.type.rawValue)", label: window.type.rawValue,
+                    statusColor: windowColor(window.statusColor), endTime: window.end,
+                    isActive: true, element: .timeWindow(window)
+                ))
+            }
+        }
+
+        // If no windows active, show the next upcoming one
+        if !panchang.timeWindows.contains(where: { $0.isActive(at: now) }),
+           let next = panchang.timeWindows.filter({ now < $0.start }).sorted(by: { $0.start < $1.start }).first {
+            items.append(RightNowItem(
+                id: "tw-\(next.type.rawValue)", label: next.type.rawValue,
+                statusColor: windowColor(next.statusColor), endTime: next.start,
+                isActive: false, element: .timeWindow(next)
+            ))
+        }
+
+        return items
+    }
+
+    // MARK: - Capped Upcoming Events
+
+    var cappedUpcomingEvents: [UpcomingEvent] {
+        Array(upcomingEvents.prefix(5))
+    }
+
+    var upcomingEventsByMonth: [(month: String, events: [UpcomingEvent])] {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let monthFormatter = DateFormatter()
+        monthFormatter.dateFormat = "MMMM yyyy"
+
+        var grouped: [(month: String, events: [UpcomingEvent])] = []
+        var currentMonth = ""
+        var currentEvents: [UpcomingEvent] = []
+
+        for event in upcomingEvents {
+            guard let date = formatter.date(from: event.dateString) else { continue }
+            let month = monthFormatter.string(from: date).uppercased()
+            if month != currentMonth {
+                if !currentEvents.isEmpty {
+                    grouped.append((month: currentMonth, events: currentEvents))
+                }
+                currentMonth = month
+                currentEvents = [event]
+            } else {
+                currentEvents.append(event)
+            }
+        }
+        if !currentEvents.isEmpty {
+            grouped.append((month: currentMonth, events: currentEvents))
+        }
+        return grouped
+    }
+
+    // MARK: - Color Helpers (for RightNowItems)
+
+    private func horaColor(_ planetName: String) -> Color {
+        switch planetName {
+        case "Sun":     return Color(hex: "D4A040")
+        case "Moon":    return Color(hex: "B8C4D8")
+        case "Mars":    return Color(hex: "C45050")
+        case "Mercury": return Color(hex: "4AAD6E")
+        case "Jupiter": return Color(hex: "C9A96E")
+        case "Venus":   return Color(hex: "D47AAD")
+        case "Saturn":  return Color(hex: "7B8EC4")
+        default:        return Color(hex: "888888")
+        }
+    }
+
+    private func choghadiyaColor(_ quality: ChoghadiyaQuality) -> Color {
+        switch quality {
+        case .auspicious:   return Color(hex: "3DA66A")
+        case .inauspicious: return Color(hex: "C45050")
+        case .neutral:      return Color(hex: "D4A040")
+        }
+    }
+
+    private func windowColor(_ status: TimeWindow.WindowColor) -> Color {
+        switch status {
+        case .auspicious:   return Color(hex: "3DA66A")
+        case .inauspicious: return Color(hex: "C45050")
+        case .caution:      return Color(hex: "D4A040")
+        }
     }
 
     // MARK: - Init
@@ -117,6 +282,12 @@ class PanchangViewModel: ObservableObject {
         if let scaleStr = ud.string(forKey: "fontScale"),
            let scale = DeviFontScale(rawValue: scaleStr) {
             fontScale = scale
+        }
+
+        // Load persisted theme style
+        if let styleStr = ud.string(forKey: "themeStyle"),
+           let style = DeviThemeStyle(rawValue: styleStr) {
+            themeStyle = style
         }
 
         // Load persisted city (if user previously selected one)
@@ -184,6 +355,9 @@ class PanchangViewModel: ObservableObject {
 
         let remaining = target.timeIntervalSince(now)
         guard remaining > 0 else {
+            if countdownText != "0.00.00" {
+                countdownZeroTrigger += 1
+            }
             countdownText = "0.00.00"
             countdownLabel = label
             return
@@ -203,8 +377,16 @@ class PanchangViewModel: ObservableObject {
         if newPeriod != timePeriod {
             withAnimation(.easeInOut(duration: 8)) { // 8s gradient transition
                 timePeriod = newPeriod
-                theme = DeviTheme.forPeriod(newPeriod)
+                theme = DeviTheme.forPeriod(newPeriod, style: themeStyle)
             }
+        }
+    }
+
+    /// Call this from UI to switch theme style — avoids re-entrant @Published issues
+    func setThemeStyle(_ style: DeviThemeStyle) {
+        themeStyle = style
+        withAnimation(.easeInOut(duration: 0.5)) {
+            theme = DeviTheme.forPeriod(timePeriod, style: style)
         }
     }
 
@@ -219,41 +401,80 @@ class PanchangViewModel: ObservableObject {
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
-        let todayString = dateFormatter.string(from: Date())
 
-        // Compute today's panchang dynamically via Swiss Ephemeris
-        todayPanchang = cachedPanchang(for: Date(), dateString: todayString)
+        // Use displayDate (accounts for day navigation offset)
+        let targetDate = displayDate
+        let targetString = dateFormatter.string(from: targetDate)
 
-        // Compute tomorrow's sunrise for after-sunset countdown
-        if let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) {
-            let tomorrowString = dateFormatter.string(from: tomorrow)
-            tomorrowSunrise = cachedPanchang(for: tomorrow, dateString: tomorrowString).solar.sunrise
+        // Compute panchang dynamically via Swiss Ephemeris
+        todayPanchang = cachedPanchang(for: targetDate, dateString: targetString)
+
+        // Compute next day's sunrise for after-sunset countdown
+        if let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: targetDate) {
+            let nextDayString = dateFormatter.string(from: nextDay)
+            tomorrowSunrise = cachedPanchang(for: nextDay, dateString: nextDayString).solar.sunrise
         }
 
         // Check Navratri
-        checkNavratri(dateString: todayString)
+        checkNavratri(dateString: targetString)
 
         // Load eclipse data (still from mock data store)
+        let todayString = dateFormatter.string(from: Date())
         loadEclipseData(todayString: todayString)
 
-        // Load upcoming events
+        // Load upcoming events (always from actual today)
         loadUpcomingEvents(from: todayString)
 
         // Samvathsara year name (60-year Jupiter cycle)
-        samvathsaraName = PanchangCalculator.samvathsaraName(for: Date())
+        samvathsaraName = PanchangCalculator.samvathsaraName(for: targetDate)
 
-        // Today's festivals (for banner display)
-        todayFestivals = PanchangCalculator.festivals(for: todayString)
-        // Also check if today is Purnima for Satya Narayana Pooja
+        // Festivals for the displayed day
+        todayFestivals = PanchangCalculator.festivals(for: targetString)
         if todayPanchang?.tithi.name == "Purnima" && !todayFestivals.contains("Satya Narayana Pooja") {
             todayFestivals.append("Satya Narayana Pooja")
         }
 
-        // Set initial theme
-        if let solar = todayPanchang?.solar {
+        // Set initial theme (always based on real time, not day offset)
+        if let solar = todayPanchang?.solar, isViewingToday {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
-            theme = DeviTheme.forPeriod(timePeriod)
+            theme = DeviTheme.forPeriod(timePeriod, style: themeStyle)
         }
+
+        // Fetch cosmic signature (async, non-blocking)
+        if let panchang = todayPanchang {
+            fetchCosmicSignature(panchang: panchang)
+        }
+    }
+
+    private func fetchCosmicSignature(panchang: DailyPanchang) {
+        signatureTask?.cancel()
+        isLoadingSignature = true
+        signatureTask = Task {
+            let result = await cosmicService.fetchSignature(
+                panchang: panchang,
+                city: currentCity.name
+            )
+            guard !Task.isCancelled else { return }
+            cosmicSignature = result
+            isLoadingSignature = false
+        }
+    }
+
+    // MARK: - Day Navigation
+
+    func navigateDay(by offset: Int) {
+        let newOffset = max(-7, min(7, dayOffset + offset))
+        guard newOffset != dayOffset else { return }
+        dayOffset = newOffset
+        virtualTimeOffset = nil  // Reset any scrub state
+        loadData()
+    }
+
+    func returnToToday() {
+        guard dayOffset != 0 else { return }
+        dayOffset = 0
+        virtualTimeOffset = nil
+        loadData()
     }
 
     /// Returns panchang from cache or computes it fresh via PanchangCalculator.

@@ -15,18 +15,35 @@ struct SunArcView: View {
     let countdownLabel: String
     let theme: DeviTheme
     let timePeriod: TimePeriod
+    let themeStyle: DeviThemeStyle
     let timezoneIdentifier: String
+    /// Called during drag with the scrubbed progress (0.0–1.0)
+    var onScrub: ((Double) -> Void)? = nil
+    /// Called when drag ends — snap back to live
+    var onScrubEnd: (() -> Void)? = nil
 
-    // Animation state for the sun dot pulse
-    @State private var isPulsing = false
+    @State private var isScrubbing = false
+    @State private var scrubProgress: Double = 0.0
+    @State private var lastHourTick: Int = -1
 
     private let arcSize: CGFloat = 320
+
+    /// The progress value to display — scrubbed or live
+    private var displayProgress: Double {
+        isScrubbing ? scrubProgress : progress
+    }
+
+    /// The time represented by the current scrub position
+    private var scrubTime: Date {
+        let total = sunset.timeIntervalSince(sunrise)
+        return sunrise.addingTimeInterval(total * scrubProgress)
+    }
 
     var body: some View {
         VStack(spacing: 8) {
             // The arc + sun dot + time display
             ZStack {
-                // Dashed track arc (textured background), with daytime progress + dot overlaid
+                // Dashed track arc
                 SunArcShape()
                     .stroke(
                         theme.primaryText.opacity(0.12),
@@ -34,44 +51,82 @@ struct SunArcView: View {
                     )
                     .frame(width: arcSize, height: arcSize / 2)
                     .overlay {
-                        if isDaytime {
+                        if isDaytime || isScrubbing {
                             ZStack {
                                 SunArcShape()
-                                    .trim(from: 0, to: progress)
+                                    .trim(from: 0, to: displayProgress)
                                     .stroke(
-                                        DeviTheme.arcGradient(for: timePeriod),
+                                        DeviTheme.arcGradient(for: timePeriod, style: themeStyle),
                                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                                     )
-                                    .shadow(color: DeviTheme.arcShadowColor(for: timePeriod).opacity(0.35), radius: 6, x: 0, y: 0)
+                                    .shadow(color: DeviTheme.arcShadowColor(for: timePeriod, style: themeStyle).opacity(0.35), radius: 6, x: 0, y: 0)
 
                                 SunDot(
-                                    progress: progress,
+                                    progress: displayProgress,
                                     arcSize: arcSize,
-                                    theme: theme,
-                                    isPulsing: isPulsing
+                                    theme: theme
                                 )
                             }
                         }
                     }
+                    // Interactive drag gesture overlay
+                    .overlay {
+                        if isDaytime {
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .gesture(arcDragGesture)
+                        }
+                    }
+
+                // Scrub time pill (shown during drag)
+                if isScrubbing {
+                    let angle = Angle.degrees(180 + (scrubProgress * 180))
+                    let radius = arcSize / 2
+                    let cx = arcSize / 2 + radius * CGFloat(cos(angle.radians))
+                    let cy = arcSize / 2 + radius * CGFloat(sin(angle.radians))
+
+                    Text(formatTime(scrubTime))
+                        .scaledFont(size: 12, weight: .semibold)
+                        .foregroundColor(theme.primaryText)
+                        .monospacedDigit()
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .position(x: cx, y: cy - 30)
+                        .transition(.opacity)
+                }
 
                 // Center content: label → hero countdown → current time
                 VStack(spacing: 4) {
-                    Text(countdownLabel)
+                    Text(isScrubbing ? "AT THIS TIME" : countdownLabel)
                         .deviLabel(.section, theme: theme)
                         .tracking(3.0)
+                        .contentTransition(.interpolate)
 
-                    Text(countdownText)
-                        .scaledFont(size: 52, weight: .light, design: .rounded)
-                        .foregroundColor(theme.primaryText)
-                        .monospacedDigit()
-                        .minimumScaleFactor(0.8)
-                        .contentTransition(.numericText())
+                    if isScrubbing {
+                        Text(formatTime(scrubTime))
+                            .scaledFont(size: 52, weight: .light, design: .rounded)
+                            .foregroundColor(theme.primaryText)
+                            .monospacedDigit()
+                            .minimumScaleFactor(0.8)
+                            .contentTransition(.numericText())
+                    } else {
+                        Text(countdownText)
+                            .scaledFont(size: 52, weight: .light, design: .rounded)
+                            .foregroundColor(theme.primaryText)
+                            .monospacedDigit()
+                            .minimumScaleFactor(0.8)
+                            .contentTransition(.numericText(countsDown: true))
+                    }
 
                     Text(currentTime)
                         .scaledFont(size: 15, weight: .regular)
                         .foregroundColor(theme.secondaryText)
+                        .contentTransition(.numericText())
+                        .opacity(isScrubbing ? 0.3 : 1.0)
                 }
-                .offset(y: 30) // More breathing room from arc center
+                .offset(y: 30)
             }
             .frame(height: arcSize / 2 + 60)
 
@@ -95,12 +150,49 @@ struct SunArcView: View {
             }
             .padding(.horizontal, 48)
         }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 5).repeatForever(autoreverses: true)) {
-                isPulsing = true
-            }
-        }
     }
+
+    // MARK: - Drag Gesture
+
+    private var arcDragGesture: some Gesture {
+        DragGesture(minimumDistance: 5)
+            .onChanged { value in
+                let center = CGPoint(x: arcSize / 2, y: arcSize / 2)
+                let dx = value.location.x - center.x
+                let dy = value.location.y - center.y
+
+                // Convert drag position to angle (arc runs from 180° to 0°)
+                var angle = atan2(dy, dx)
+                if angle > 0 { angle = 0 } // Clamp below the horizon
+                // Map angle: -π (left/sunrise) → 0 (right/sunset) → progress 0.0–1.0
+                let p = 1.0 - (Double(-angle) / .pi)
+                let clampedProgress = max(0, min(1, p))
+
+                if !isScrubbing {
+                    isScrubbing = true
+                    lastHourTick = -1
+                }
+                scrubProgress = clampedProgress
+
+                onScrub?(clampedProgress)
+
+                // Track hour crossings for haptic feedback
+                let total = sunset.timeIntervalSince(sunrise)
+                let scrubbedDate = sunrise.addingTimeInterval(total * clampedProgress)
+                let currentHour = Calendar.current.component(.hour, from: scrubbedDate)
+                if currentHour != lastHourTick {
+                    lastHourTick = currentHour
+                }
+            }
+            .onEnded { _ in
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    isScrubbing = false
+                }
+                onScrubEnd?()
+            }
+    }
+
+    // MARK: - Helpers
 
     private func formatTime(_ date: Date) -> String {
         deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
@@ -132,15 +224,47 @@ struct SunArcShape: Shape {
     }
 }
 
-// MARK: - Sun Dot (positioned along the arc)
+// MARK: - Sun Dot (positioned along the arc, with organic 4-phase heartbeat)
 
 struct SunDot: View {
     let progress: Double
     let arcSize: CGFloat
     let theme: DeviTheme
-    let isPulsing: Bool
 
     private let sunGold = Color(hex: "f0c040")
+
+    /// 4-phase heartbeat: asymmetric timing mimics a living pulse
+    /// (fast peak, slow exhale → subconsciously reads as "alive")
+    enum PulsePhase: CaseIterable {
+        case rest, inhale, peak, exhale
+
+        var scale: CGFloat {
+            switch self {
+            case .rest:    return 1.0
+            case .inhale:  return 1.04
+            case .peak:    return 1.08
+            case .exhale:  return 1.0
+            }
+        }
+
+        var glowOpacity: Double {
+            switch self {
+            case .rest:    return 0.06
+            case .inhale:  return 0.08
+            case .peak:    return 0.12
+            case .exhale:  return 0.06
+            }
+        }
+
+        var haloRadius: CGFloat {
+            switch self {
+            case .rest:    return 12
+            case .inhale:  return 14
+            case .peak:    return 16
+            case .exhale:  return 12
+            }
+        }
+    }
 
     var body: some View {
         let angle = Angle.degrees(180 + (progress * 180))
@@ -150,45 +274,54 @@ struct SunDot: View {
         let x = center.x + radius * CGFloat(cos(angle.radians))
         let y = center.y + radius * CGFloat(sin(angle.radians))
 
-        ZStack {
-            // Faint halo layer
-            Circle()
-                .fill(sunGold.opacity(0.06))
-                .frame(width: 80, height: 80)
-                .blur(radius: 12)
+        PhaseAnimator(PulsePhase.allCases) { phase in
+            ZStack {
+                // Faint halo layer — breathes with phase
+                Circle()
+                    .fill(sunGold.opacity(phase.glowOpacity))
+                    .frame(width: 80, height: 80)
+                    .blur(radius: phase.haloRadius)
 
-            // Warm radial glow (3-stop)
-            Circle()
-                .fill(
-                    RadialGradient(
-                        stops: [
-                            .init(color: sunGold.opacity(0.25), location: 0),
-                            .init(color: sunGold.opacity(0.08), location: 0.5),
-                            .init(color: .clear, location: 1.0)
-                        ],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 28
+                // Warm radial glow (3-stop)
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            stops: [
+                                .init(color: sunGold.opacity(0.25), location: 0),
+                                .init(color: sunGold.opacity(0.08), location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 28
+                        )
                     )
-                )
-                .frame(width: 56, height: 56)
-                .scaleEffect(isPulsing ? 1.04 : 1.0)
+                    .frame(width: 56, height: 56)
+                    .scaleEffect(phase.scale)
 
-            // Outer ring
-            Circle()
-                .fill(sunGold.opacity(0.3))
-                .frame(width: 28, height: 28)
-                .scaleEffect(isPulsing ? 1.02 : 1.0)
+                // Outer ring
+                Circle()
+                    .fill(sunGold.opacity(0.3))
+                    .frame(width: 28, height: 28)
+                    .scaleEffect(phase.scale * 0.98)
 
-            // Inner dot
-            Circle()
-                .fill(theme.accentColor)
-                .frame(width: 14, height: 14)
+                // Inner dot
+                Circle()
+                    .fill(theme.accentColor)
+                    .frame(width: 14, height: 14)
 
-            // Center highlight
-            Circle()
-                .fill(Color.white.opacity(0.6))
-                .frame(width: 5, height: 5)
+                // Center highlight
+                Circle()
+                    .fill(Color.white.opacity(0.6))
+                    .frame(width: 5, height: 5)
+            }
+        } animation: { phase in
+            switch phase {
+            case .rest:    .easeOut(duration: 1.5)
+            case .inhale:  .easeIn(duration: 2.0)
+            case .peak:    .easeInOut(duration: 0.8)
+            case .exhale:  .easeOut(duration: 2.5)
+            }
         }
         .position(x: x, y: y)
     }
@@ -213,6 +346,7 @@ struct SunDot: View {
             countdownLabel: "SUNSET IN",
             theme: DeviTheme.forPeriod(.evening),
             timePeriod: .evening,
+            themeStyle: .classic,
             timezoneIdentifier: "America/New_York"
         )
     }
