@@ -25,6 +25,7 @@ struct SunArcView: View {
     @State private var isScrubbing = false
     @State private var scrubProgress: Double = 0.0
     @State private var lastHourTick: Int = -1
+    @State private var clockBreathing: Bool = false
 
     private let arcSize: CGFloat = 320
 
@@ -56,10 +57,10 @@ struct SunArcView: View {
                                 SunArcShape()
                                     .trim(from: 0, to: displayProgress)
                                     .stroke(
-                                        DeviTheme.arcGradient(for: timePeriod, style: themeStyle),
+                                        DeviTheme.arcGradient(for: timePeriod, style: themeStyle, appearance: theme.isLight ? .alwaysLight : .alwaysDark),
                                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                                     )
-                                    .shadow(color: DeviTheme.arcShadowColor(for: timePeriod, style: themeStyle).opacity(0.35), radius: 6, x: 0, y: 0)
+                                    .shadow(color: DeviTheme.arcShadowColor(for: timePeriod, style: themeStyle, appearance: theme.isLight ? .alwaysLight : .alwaysDark).opacity(0.35), radius: 6, x: 0, y: 0)
 
                                 SunDot(
                                     progress: displayProgress,
@@ -100,24 +101,29 @@ struct SunArcView: View {
                 // Center content: label → hero countdown → current time
                 VStack(spacing: 4) {
                     Text(isScrubbing ? "AT THIS TIME" : countdownLabel)
-                        .deviLabel(.section, theme: theme)
+                        .scaledFont(size: 13, weight: .regular, design: .serif)
+                        .italic()
+                        .foregroundColor(theme.secondaryText)
                         .tracking(3.0)
                         .contentTransition(.interpolate)
 
                     if isScrubbing {
                         Text(formatTime(scrubTime))
-                            .scaledFont(size: 52, weight: .light, design: .rounded)
+                            .scaledFont(size: 48, weight: .light, design: .serif)
                             .foregroundColor(theme.primaryText)
                             .monospacedDigit()
                             .minimumScaleFactor(0.8)
                             .contentTransition(.numericText())
                     } else {
                         Text(countdownText)
-                            .scaledFont(size: 52, weight: .light, design: .rounded)
+                            .scaledFont(size: 48, weight: .light, design: .serif)
                             .foregroundColor(theme.primaryText)
                             .monospacedDigit()
                             .minimumScaleFactor(0.8)
                             .contentTransition(.numericText(countsDown: true))
+                            .opacity(clockBreathing ? 0.85 : 1.0)
+                            .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: clockBreathing)
+                            .onAppear { clockBreathing = true }
                     }
 
                     Text(currentTime)
@@ -130,22 +136,62 @@ struct SunArcView: View {
             }
             .frame(height: arcSize / 2 + 60)
 
-            // Sunrise / Sunset labels below the arc
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(isDaytime ? "Sunrise" : "Moonrise")
-                        .deviLabel(.section, theme: theme)
-                    Text(isDaytime ? formatTime(sunrise) : formatOptionalTime(moonrise))
-                        .deviLabel(.body, theme: theme)
+            // Sun + Moon times below the arc
+            VStack(spacing: 10) {
+                // Sun times (always visible)
+                HStack {
+                    HStack(spacing: 4) {
+                        Image(systemName: "sunrise.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(theme.accentColor.opacity(0.7))
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text("Sunrise")
+                                .deviLabel(.caption, theme: theme)
+                            Text(formatTime(sunrise))
+                                .deviLabel(.body, theme: theme)
+                        }
+                    }
+                    Spacer()
+                    HStack(spacing: 4) {
+                        VStack(alignment: .trailing, spacing: 1) {
+                            Text("Sunset")
+                                .deviLabel(.caption, theme: theme)
+                            Text(formatTime(sunset))
+                                .deviLabel(.body, theme: theme)
+                        }
+                        Image(systemName: "sunset.fill")
+                            .font(.system(size: 10))
+                            .foregroundColor(theme.accentColor.opacity(0.7))
+                    }
                 }
 
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(isDaytime ? "Sunset" : "Moonset")
-                        .deviLabel(.section, theme: theme)
-                    Text(isDaytime ? formatTime(sunset) : formatOptionalTime(moonset))
-                        .deviLabel(.body, theme: theme)
+                // Moon times (when available)
+                if moonrise != nil || moonset != nil {
+                    HStack {
+                        HStack(spacing: 4) {
+                            Image(systemName: "moonrise.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(Color(hex: "B8C4D8").opacity(0.6))
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Moonrise")
+                                    .deviLabel(.caption, theme: theme)
+                                Text(formatOptionalTime(moonrise))
+                                    .deviLabel(.body, theme: theme)
+                            }
+                        }
+                        Spacer()
+                        HStack(spacing: 4) {
+                            VStack(alignment: .trailing, spacing: 1) {
+                                Text("Moonset")
+                                    .deviLabel(.caption, theme: theme)
+                                Text(formatOptionalTime(moonset))
+                                    .deviLabel(.body, theme: theme)
+                            }
+                            Image(systemName: "moonset.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(Color(hex: "B8C4D8").opacity(0.6))
+                        }
+                    }
                 }
             }
             .padding(.horizontal, 48)
@@ -161,12 +207,18 @@ struct SunArcView: View {
                 let dx = value.location.x - center.x
                 let dy = value.location.y - center.y
 
-                // Convert drag position to angle (arc runs from 180° to 0°)
-                var angle = atan2(dy, dx)
-                if angle > 0 { angle = 0 } // Clamp below the horizon
-                // Map angle: -π (left/sunrise) → 0 (right/sunset) → progress 0.0–1.0
-                let p = 1.0 - (Double(-angle) / .pi)
-                let clampedProgress = max(0, min(1, p))
+                // Convert drag position to progress along the arc
+                let p: Double
+                if dy < 0 {
+                    // Above center — use angular mapping (works perfectly for the arc)
+                    let angle = atan2(dy, dx)
+                    p = 1.0 - (Double(-angle) / .pi)
+                } else {
+                    // Below center — use horizontal position as linear proxy
+                    let halfWidth = arcSize / 2
+                    p = Double((dx + halfWidth) / (2 * halfWidth))
+                }
+                let clampedProgress = max(0.01, min(0.99, p))
 
                 if !isScrubbing {
                     isScrubbing = true

@@ -73,6 +73,22 @@ enum DeviThemeStyle: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+// MARK: - Appearance Mode
+
+enum DeviAppearanceMode: String, CaseIterable {
+    case auto        = "Auto"
+    case alwaysLight = "Always Light"
+    case alwaysDark  = "Always Dark"
+
+    func isLight(for period: TimePeriod) -> Bool {
+        switch self {
+        case .auto:        return period == .morning || period == .afternoon
+        case .alwaysLight: return true
+        case .alwaysDark:  return false
+        }
+    }
+}
+
 // MARK: - Time Period
 
 enum TimePeriod {
@@ -113,6 +129,7 @@ struct DeviTheme {
     let accentColor: Color
     let primaryText: Color
     let secondaryText: Color
+    let isLight: Bool  // Whether this theme instance is a light palette
 
     // Consistent semantic status colors across all themes
     let auspiciousColor: Color = Color(hex: "3DA66A")
@@ -121,15 +138,17 @@ struct DeviTheme {
 
     // MARK: - Time-based themes
 
-    static func forPeriod(_ period: TimePeriod, style: DeviThemeStyle = .classic) -> DeviTheme {
-        let p = ThemePaletteRegistry.palette(for: style, period: period)
+    static func forPeriod(_ period: TimePeriod, style: DeviThemeStyle = .classic, appearance: DeviAppearanceMode = .alwaysDark) -> DeviTheme {
+        let isLight = appearance.isLight(for: period)
+        let p = ThemePaletteRegistry.palette(for: style, period: period, isLight: isLight)
         return DeviTheme(
             backgroundGradientTop: Color(hex: p.bgTop),
             backgroundGradientMid: Color(hex: p.bgMid),
             backgroundGradientBottom: Color(hex: p.bgBottom),
             accentColor: Color(hex: p.accent),
             primaryText: Color(hex: p.primaryText),
-            secondaryText: Color(hex: p.secondaryText).opacity(p.secondaryTextOpacity)
+            secondaryText: Color(hex: p.secondaryText).opacity(p.secondaryTextOpacity),
+            isLight: isLight
         )
     }
 
@@ -147,8 +166,9 @@ struct DeviTheme {
     }
 
     // Arc gradient for the sun timer — adapts to time of day and style
-    static func arcGradient(for period: TimePeriod, style: DeviThemeStyle = .classic) -> LinearGradient {
-        let p = ThemePaletteRegistry.palette(for: style, period: period)
+    static func arcGradient(for period: TimePeriod, style: DeviThemeStyle = .classic, appearance: DeviAppearanceMode = .alwaysDark) -> LinearGradient {
+        let isLight = appearance.isLight(for: period)
+        let p = ThemePaletteRegistry.palette(for: style, period: period, isLight: isLight)
         return LinearGradient(
             colors: [Color(hex: p.arcStart), Color(hex: p.arcEnd)],
             startPoint: .leading, endPoint: .trailing
@@ -156,8 +176,9 @@ struct DeviTheme {
     }
 
     // Arc shadow color — matches the gradient start for visual coherence
-    static func arcShadowColor(for period: TimePeriod, style: DeviThemeStyle = .classic) -> Color {
-        let p = ThemePaletteRegistry.palette(for: style, period: period)
+    static func arcShadowColor(for period: TimePeriod, style: DeviThemeStyle = .classic, appearance: DeviAppearanceMode = .alwaysDark) -> Color {
+        let isLight = appearance.isLight(for: period)
+        let p = ThemePaletteRegistry.palette(for: style, period: period, isLight: isLight)
         return Color(hex: p.arcShadow)
     }
 }
@@ -176,72 +197,141 @@ struct DeviCardModifier: ViewModifier {
     let cornerRadius: CGFloat
 
     func body(content: Content) -> some View {
-        let effectiveRadius = elevation == .prominent ? max(cornerRadius, 24) : cornerRadius
+        let effectiveRadius = elevation == .prominent ? max(cornerRadius, 18) : cornerRadius
 
         content
             .background {
-                switch elevation {
-                case .flat:
-                    RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                        .fill(theme.primaryText.opacity(0.04))
-                case .raised:
-                    ZStack {
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(.ultraThinMaterial.opacity(0.25))
-
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(theme.primaryText.opacity(0.03))
-                    }
-                case .prominent:
-                    ZStack {
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(.ultraThinMaterial.opacity(0.6))
-
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .fill(theme.primaryText.opacity(0.08))
-
-                        // Inner gradient for prominent cards
-                        LinearGradient(
-                            colors: [theme.accentColor.opacity(0.06), .clear],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous))
-                    }
+                if theme.isLight {
+                    lightBackground(effectiveRadius)
+                } else {
+                    darkBackground(effectiveRadius)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous))
-            .overlay(
-                Group {
-                    switch elevation {
-                    case .flat:
-                        EmptyView()
-                    case .raised:
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .stroke(theme.primaryText.opacity(0.05), lineWidth: 0.5)
-                    case .prominent:
-                        RoundedRectangle(cornerRadius: effectiveRadius, style: .continuous)
-                            .stroke(theme.accentColor.opacity(0.15), lineWidth: 1)
-                    }
-                }
-            )
             .shadow(
-                color: {
-                    switch elevation {
-                    case .flat: return .clear
-                    case .raised: return Color.black.opacity(0.08)
-                    case .prominent: return Color.black.opacity(0.12)
-                    }
-                }(),
-                radius: elevation == .prominent ? 8 : 4,
+                color: shadowColor,
+                radius: shadowRadius,
                 x: 0,
-                y: elevation == .prominent ? 3 : 2
+                y: shadowY
             )
+    }
+
+    // MARK: - Dark Mode Backgrounds (upgraded)
+    @ViewBuilder
+    private func darkBackground(_ r: CGFloat) -> some View {
+        switch elevation {
+        case .flat:
+            RoundedRectangle(cornerRadius: r, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [theme.primaryText.opacity(0.06), theme.primaryText.opacity(0.02)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+        case .raised:
+            ZStack {
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(.ultraThinMaterial.opacity(0.30))
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.primaryText.opacity(0.08), theme.primaryText.opacity(0.02)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+            }
+        case .prominent:
+            ZStack {
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(.ultraThinMaterial.opacity(0.50))
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.primaryText.opacity(0.10), theme.primaryText.opacity(0.03)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                LinearGradient(
+                    colors: [theme.accentColor.opacity(0.15), .clear],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                .clipShape(RoundedRectangle(cornerRadius: r, style: .continuous))
+            }
+        }
+    }
+
+    // MARK: - Light Mode Backgrounds
+    @ViewBuilder
+    private func lightBackground(_ r: CGFloat) -> some View {
+        switch elevation {
+        case .flat:
+            RoundedRectangle(cornerRadius: r, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [theme.primaryText.opacity(0.03), theme.primaryText.opacity(0.01)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+        case .raised:
+            ZStack {
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(Color.white.opacity(0.85))
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.primaryText.opacity(0.04), theme.primaryText.opacity(0.015)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+            }
+        case .prominent:
+            ZStack {
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(Color.white.opacity(0.90))
+                RoundedRectangle(cornerRadius: r, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [theme.primaryText.opacity(0.05), theme.primaryText.opacity(0.02)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                    )
+                LinearGradient(
+                    colors: [theme.accentColor.opacity(0.08), .clear],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+                .clipShape(RoundedRectangle(cornerRadius: r, style: .continuous))
+            }
+        }
+    }
+
+    // MARK: - Shadow
+    private var shadowColor: Color {
+        switch elevation {
+        case .flat: return .clear
+        case .raised: return Color.black.opacity(theme.isLight ? 0.06 : 0.12)
+        case .prominent: return Color.black.opacity(theme.isLight ? 0.08 : 0.18)
+        }
+    }
+
+    private var shadowRadius: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .raised: return theme.isLight ? 6 : 8
+        case .prominent: return theme.isLight ? 10 : 12
+        }
+    }
+
+    private var shadowY: CGFloat {
+        switch elevation {
+        case .flat: return 0
+        case .raised: return 2
+        case .prominent: return 3
+        }
     }
 }
 
 extension View {
-    func deviCard(theme: DeviTheme, elevation: DeviCardElevation = .raised, cornerRadius: CGFloat = 20) -> some View {
+    func deviCard(theme: DeviTheme, elevation: DeviCardElevation = .raised, cornerRadius: CGFloat = 14) -> some View {
         modifier(DeviCardModifier(theme: theme, elevation: elevation, cornerRadius: cornerRadius))
     }
 }
@@ -354,6 +444,7 @@ struct ThemedLabel: ViewModifier {
         case sacredBody  // 16pt regular serif
         case detail      // 14pt secondary
         case caption     // 12pt timestamps
+        case insight     // 13pt regular serif at 70% — inline Vedic meanings/deity names
     }
 
     func body(content: Content) -> some View {
@@ -396,6 +487,10 @@ struct ThemedLabel: ViewModifier {
             content
                 .font(.system(size: 12 * m, weight: .regular))
                 .foregroundColor(theme.secondaryText)
+        case .insight:
+            content
+                .font(.system(size: 13 * m, weight: .regular, design: .serif))
+                .foregroundColor(theme.secondaryText.opacity(0.85))
         }
     }
 }
@@ -427,6 +522,58 @@ struct DeviEntranceModifier: ViewModifier {
 extension View {
     func deviEntrance(delay: Double = 0) -> some View {
         modifier(DeviEntranceModifier(delay: delay))
+    }
+}
+
+// MARK: - Directional Reveal Animation Modifier
+
+enum DeviRevealDirection {
+    case fadeUp
+    case fadeLeft
+    case fadeRight
+    case scale
+}
+
+struct DeviRevealModifier: ViewModifier {
+    let delay: Double
+    let direction: DeviRevealDirection
+    @State private var isAppearing = false
+
+    func body(content: Content) -> some View {
+        content
+            .offset(
+                x: isAppearing ? 0 : horizontalOffset,
+                y: isAppearing ? 0 : verticalOffset
+            )
+            .scaleEffect(isAppearing ? 1 : scaleValue)
+            .opacity(isAppearing ? 1 : 0)
+            .onAppear {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(delay)) {
+                    isAppearing = true
+                }
+            }
+    }
+
+    private var horizontalOffset: CGFloat {
+        switch direction {
+        case .fadeLeft: return -20
+        case .fadeRight: return 20
+        default: return 0
+        }
+    }
+
+    private var verticalOffset: CGFloat {
+        direction == .fadeUp ? 20 : 0
+    }
+
+    private var scaleValue: CGFloat {
+        direction == .scale ? 0.85 : 1.0
+    }
+}
+
+extension View {
+    func deviReveal(delay: Double = 0, direction: DeviRevealDirection = .fadeUp) -> some View {
+        modifier(DeviRevealModifier(delay: delay, direction: direction))
     }
 }
 

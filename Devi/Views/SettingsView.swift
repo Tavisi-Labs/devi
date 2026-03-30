@@ -11,235 +11,352 @@ struct SettingsView: View {
     @State private var showPanchangEducation = false
     @State private var apiKey: String = ""
 
+    private var theme: DeviTheme { vm.theme }
+
     var body: some View {
         NavigationStack {
-            List {
-                // MARK: - Location
-                Section {
-                    Button {
-                        showCityPicker = true
-                    } label: {
-                        HStack {
-                            Label("City", systemImage: "location.fill")
-                            Spacer()
-                            Text(vm.currentCity.name)
-                                .foregroundColor(.secondary)
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.secondary.opacity(0.5))
+            ScrollView {
+                VStack(spacing: 16) {
+
+                    // MARK: - Card 1 — Location
+                    Text("LOCATION")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    VStack(spacing: 0) {
+                        Button {
+                            showCityPicker = true
+                        } label: {
+                            HStack {
+                                Label {
+                                    Text("City")
+                                        .foregroundColor(theme.primaryText)
+                                } icon: {
+                                    Image(systemName: "location.fill")
+                                        .foregroundColor(theme.accentColor)
+                                }
+                                Spacer()
+                                Text(vm.currentCity.name)
+                                    .foregroundColor(theme.secondaryText)
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(theme.secondaryText.opacity(0.5))
+                            }
+                            .padding(16)
+                            .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
+                        .buttonStyle(.plain)
+
+                        if !vm.notificationsAuthorized {
+                            Divider().opacity(0.2)
+
+                            Button {
+                                if let url = URL(string: UIApplication.openSettingsURLString) {
+                                    UIApplication.shared.open(url)
+                                }
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "exclamationmark.triangle.fill")
+                                        .foregroundColor(.orange)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Notifications Disabled")
+                                            .scaledFont(size: 15, weight: .medium)
+                                            .foregroundColor(theme.primaryText)
+                                        Text("Tap to open Settings")
+                                            .scaledFont(size: 13)
+                                            .foregroundColor(theme.secondaryText)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(16)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.primary)
-                } header: {
-                    Text("Location")
-                } footer: {
+                    .deviCard(theme: theme, elevation: .raised)
+
                     Text("Panchang times are calculated for this city.")
-                }
-                
-                // MARK: - Notification Permission Banner
-                if !vm.notificationsAuthorized {
-                    Section {
-                        Button {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .foregroundColor(.orange)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Notifications Disabled")
-                                        .scaledFont(size: 15, weight: .medium)
-                                        .foregroundColor(.primary)
-                                    Text("Tap to open Settings")
-                                        .scaledFont(size: 13)
-                                        .foregroundColor(.secondary)
-                                }
-                                Spacer()
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                // MARK: - Text Size
-                Section {
-                    Picker("Text Size", selection: $vm.fontScale) {
-                        ForEach(DeviFontScale.allCases, id: \.self) { scale in
-                            Text(scale.rawValue).tag(scale)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                } header: {
-                    Text("Text Size")
-                } footer: {
-                    Text("Default is 15% larger than Compact. Changes apply immediately.")
-                }
+                    // MARK: - Card 2 — Display
+                    Text("DISPLAY")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
 
-                // MARK: - Theme
-                Section {
-                    ForEach(DeviThemeStyle.allCases) { style in
-                        Button {
-                            vm.setThemeStyle(style)
-                        } label: {
-                            HStack(spacing: 12) {
-                                // 3 overlapping circles showing the morning palette
-                                ThemeSwatchView(style: style)
+                    VStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Text Size")
+                                .scaledFont(size: 15, weight: .medium)
+                                .foregroundColor(theme.primaryText)
 
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(style.rawValue)
-                                        .scaledFont(size: 15, weight: .medium)
-                                        .foregroundColor(.primary)
-                                    Text(themeSubtitle(style))
-                                        .scaledFont(size: 12)
-                                        .foregroundColor(.secondary)
-                                }
-
-                                Spacer()
-
-                                if vm.themeStyle == style {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(Color(hex: "d4a857"))
-                                        .font(.system(size: 14, weight: .semibold))
+                            Picker("Text Size", selection: $vm.fontScale) {
+                                ForEach(DeviFontScale.allCases, id: \.self) { scale in
+                                    Text(scale.rawValue).tag(scale)
                                 }
                             }
-                            .contentShape(Rectangle())
+                            .pickerStyle(.segmented)
                         }
-                        .buttonStyle(.plain)
+
+                        Divider().opacity(0.2)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Appearance")
+                                .scaledFont(size: 15, weight: .medium)
+                                .foregroundColor(theme.primaryText)
+
+                            Picker("Appearance", selection: Binding(
+                                get: { vm.appearanceMode },
+                                set: { vm.setAppearanceMode($0) }
+                            )) {
+                                ForEach(DeviAppearanceMode.allCases, id: \.self) { mode in
+                                    Text(mode.rawValue).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
                     }
-                } header: {
-                    Text("Theme")
-                } footer: {
+                    .padding(16)
+                    .deviCard(theme: theme, elevation: .raised)
+
+                    Text("Default text is 15% larger than Compact. Auto switches appearance for morning and afternoon.")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // MARK: - Card 3 — Theme
+                    Text("THEME")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+
+                    VStack(spacing: 0) {
+                        ForEach(Array(DeviThemeStyle.allCases.enumerated()), id: \.element.id) { index, style in
+                            if index > 0 {
+                                Divider().opacity(0.2).padding(.leading, 54)
+                            }
+
+                            Button {
+                                vm.setThemeStyle(style)
+                            } label: {
+                                HStack(spacing: 12) {
+                                    ThemeSwatchView(style: style)
+
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text(style.rawValue)
+                                            .scaledFont(size: 15, weight: .medium)
+                                            .foregroundColor(theme.primaryText)
+                                        Text(themeSubtitle(style))
+                                            .scaledFont(size: 12)
+                                            .foregroundColor(theme.secondaryText)
+                                    }
+
+                                    Spacer()
+
+                                    if vm.themeStyle == style {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(theme.accentColor)
+                                            .font(.system(size: 18, weight: .semibold))
+                                    } else {
+                                        Image(systemName: "circle")
+                                            .foregroundColor(theme.secondaryText.opacity(0.4))
+                                            .font(.system(size: 18))
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .deviCard(theme: theme, elevation: .raised)
+
                     Text("Changes the color palette across all time periods.")
-                }
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                // MARK: - Notifications
-                Section {
-                    Toggle(isOn: $vm.notifDailySummary) {
-                        Label("Daily Summary", systemImage: "sun.and.horizon")
-                    }
-                    Toggle(isOn: $vm.notifSunrise) {
-                        Label("Sunrise", systemImage: "sunrise.fill")
-                    }
-                    Toggle(isOn: $vm.notifSunset) {
-                        Label("Sunset / Sandhya", systemImage: "sunset.fill")
-                    }
-                    Toggle(isOn: $vm.notifRahuKalamWarning) {
-                        Label("Rahu Kalam Warning", systemImage: "exclamationmark.circle")
-                    }
-                    Toggle(isOn: $vm.notifAbhijitMuhurta) {
-                        Label("Abhijit Muhurta", systemImage: "checkmark.circle")
-                    }
-                    Toggle(isOn: $vm.notifBrahmaMuhurta) {
-                        Label("Brahma Muhurta", systemImage: "moon.stars")
-                    }
-                    Toggle(isOn: $vm.notifNavratriMorning) {
-                        Label("Navratri Daily", systemImage: "sparkle")
-                    }
-                    Toggle(isOn: $vm.notifEclipseAlert) {
-                        Label("Eclipse Alert", systemImage: "moon.circle")
-                    }
-                    Stepper(value: $vm.notifMinutesBefore, in: 5...60, step: 5) {
-                        Label("\(vm.notifMinutesBefore) min before", systemImage: "clock")
-                    }
-                } header: {
-                    Text("Notifications")
-                } footer: {
-                    Text("Event notifications are sent \(vm.notifMinutesBefore) minutes before. Daily summary arrives 30 minutes before sunrise.")
-                }
-                
-                // MARK: - Learn
-                Section {
-                    Button {
-                        showPanchangEducation = true
-                    } label: {
+                    // MARK: - Card 4 — Notifications
+                    Text("NOTIFICATIONS")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+
+                    VStack(spacing: 0) {
+                        settingsToggle("Daily Summary", icon: "sun.and.horizon", isOn: $vm.notifDailySummary)
+                        settingsDivider
+                        settingsToggle("Sunrise", icon: "sunrise.fill", isOn: $vm.notifSunrise)
+                        settingsDivider
+                        settingsToggle("Sunset / Sandhya", icon: "sunset.fill", isOn: $vm.notifSunset)
+                        settingsDivider
+                        settingsToggle("Rahu Kalam Warning", icon: "exclamationmark.circle", isOn: $vm.notifRahuKalamWarning)
+                        settingsDivider
+                        settingsToggle("Abhijit Muhurta", icon: "checkmark.circle", isOn: $vm.notifAbhijitMuhurta)
+                        settingsDivider
+                        settingsToggle("Brahma Muhurta", icon: "moon.stars", isOn: $vm.notifBrahmaMuhurta)
+                        settingsDivider
+                        settingsToggle("Navratri Daily", icon: "sparkle", isOn: $vm.notifNavratriMorning)
+                        settingsDivider
+                        settingsToggle("Eclipse Alert", icon: "moon.circle", isOn: $vm.notifEclipseAlert)
+                        settingsDivider
+
                         HStack {
-                            Label("Learn about Panchang", systemImage: "book")
+                            Label {
+                                Text("\(vm.notifMinutesBefore) min before")
+                                    .foregroundColor(theme.primaryText)
+                            } icon: {
+                                Image(systemName: "clock")
+                                    .foregroundColor(theme.accentColor)
+                            }
                             Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.secondary.opacity(0.5))
+                            Stepper("", value: $vm.notifMinutesBefore, in: 5...60, step: 5)
+                                .labelsHidden()
                         }
-                        .contentShape(Rectangle())
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
                     }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.primary)
-                } header: {
-                    Text("Learn")
-                }
+                    .deviCard(theme: theme, elevation: .raised)
 
-                // MARK: - Cosmic Signature (AI)
-                Section {
-                    HStack {
-                        Label("API Key", systemImage: "key")
-                        Spacer()
-                        if apiKey.isEmpty {
-                            Text("Not set")
-                                .foregroundColor(.secondary)
-                        } else {
-                            Text("••••\(String(apiKey.suffix(4)))")
-                                .foregroundColor(.secondary)
-                                .monospacedDigit()
-                        }
-                    }
+                    Text("Event notifications are sent \(vm.notifMinutesBefore) minutes before. Daily summary arrives 30 minutes before sunrise.")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                    SecureField("sk-ant-...", text: $apiKey)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .font(.system(size: 14, design: .monospaced))
-                        .onChange(of: apiKey) { _, newValue in
-                            let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                            if !trimmed.isEmpty {
-                                KeychainHelper.save(key: "anthropic_api_key", value: trimmed)
+                    // MARK: - Card 5 — Cosmic Signature
+                    Text("COSMIC SIGNATURE (AI)")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+
+                    VStack(spacing: 12) {
+                        HStack {
+                            Label {
+                                Text("API Key")
+                                    .foregroundColor(theme.primaryText)
+                            } icon: {
+                                Image(systemName: "key")
+                                    .foregroundColor(theme.accentColor)
+                            }
+                            Spacer()
+                            if apiKey.isEmpty {
+                                Text("Not set")
+                                    .foregroundColor(theme.secondaryText)
+                            } else {
+                                Text("••••\(String(apiKey.suffix(4)))")
+                                    .foregroundColor(theme.secondaryText)
+                                    .monospacedDigit()
                             }
                         }
-                } header: {
-                    Text("Cosmic Signature (AI)")
-                } footer: {
-                    Text("Optional. Paste your Anthropic API key to get AI-generated daily insights. Without a key, insights are composed from Vedic descriptions offline.")
+
+                        SecureField("sk-ant-...", text: $apiKey)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .font(.system(size: 14, design: .monospaced))
+                            .padding(10)
+                            .background(theme.primaryText.opacity(0.06))
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .onChange(of: apiKey) { _, newValue in
+                                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
+                                if !trimmed.isEmpty {
+                                    KeychainHelper.save(key: "anthropic_api_key", value: trimmed)
+                                }
+                            }
+                    }
+                    .padding(16)
+                    .deviCard(theme: theme, elevation: .raised)
+
+                    Text("Optional. Paste your Anthropic API key for AI-generated daily insights. Without a key, insights use Vedic descriptions offline.")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // MARK: - Card 6 — About & Learn
+                    Text("ABOUT & LEARN")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+
+                    VStack(spacing: 0) {
+                        // Learn row
+                        Button {
+                            showPanchangEducation = true
+                        } label: {
+                            settingsRow(title: "Learn about Panchang", icon: "book", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+
+                        settingsDivider
+
+                        // Version row
+                        HStack {
+                            Label {
+                                Text("Version")
+                                    .foregroundColor(theme.primaryText)
+                            } icon: {
+                                Image(systemName: "info.circle")
+                                    .foregroundColor(theme.accentColor)
+                            }
+                            Spacer()
+                            HStack(spacing: 6) {
+                                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.9.0")
+                                    .foregroundColor(theme.secondaryText)
+                                Text("EARLY ACCESS")
+                                    .font(.system(size: 8, weight: .bold))
+                                    .foregroundColor(theme.accentColor)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().stroke(theme.accentColor.opacity(0.4), lineWidth: 0.5))
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+
+                        settingsDivider
+
+                        // Feedback
+                        Link(destination: URL(string: "mailto:hello@deviapp.com")!) {
+                            settingsRow(title: "Send Feedback", icon: "envelope", showChevron: true)
+                        }
+
+                        settingsDivider
+
+                        // Privacy Policy
+                        Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/privacy")!) {
+                            settingsRow(title: "Privacy Policy", icon: "hand.raised", showChevron: true)
+                        }
+
+                        settingsDivider
+
+                        // Support
+                        Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/support")!) {
+                            settingsRow(title: "Support", icon: "questionmark.circle", showChevron: true)
+                        }
+
+                        settingsDivider
+
+                        // Restart Onboarding
+                        Button {
+                            vm.resetOnboarding()
+                            dismiss()
+                        } label: {
+                            settingsRow(title: "Restart Onboarding", icon: "arrow.counterclockwise", showChevron: false)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .deviCard(theme: theme, elevation: .raised)
                 }
-
-                // MARK: - About
-                Section {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.9.0")
-                            .foregroundColor(.secondary)
-                    }
-
-                    Link(destination: URL(string: "mailto:hello@deviapp.com")!) {
-                        Label("Send Feedback", systemImage: "envelope")
-                    }
-
-                    Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/privacy")!) {
-                        Label("Privacy Policy", systemImage: "hand.raised")
-                    }
-
-                    Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/support")!) {
-                        Label("Support", systemImage: "questionmark.circle")
-                    }
-
-                    Button {
-                        vm.resetOnboarding()
-                        dismiss()
-                    } label: {
-                        Label("Restart Onboarding", systemImage: "arrow.counterclockwise")
-                    }
-                } header: {
-                    Text("About")
-                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+                .padding(.bottom, 32)
             }
-            .tint(Color(hex: "d4a857"))
+            .background(theme.backgroundGradient.ignoresSafeArea())
+            .tint(theme.accentColor)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color(hex: "d4a857"))
+                        .foregroundColor(theme.accentColor)
                 }
             }
             .task {
@@ -258,6 +375,48 @@ struct SettingsView: View {
                 PanchangEducationSheet()
             }
         }
+    }
+
+    // MARK: - Reusable row helpers
+
+    private func settingsRow(title: String, icon: String, showChevron: Bool) -> some View {
+        HStack {
+            Label {
+                Text(title)
+                    .foregroundColor(theme.primaryText)
+            } icon: {
+                Image(systemName: icon)
+                    .foregroundColor(theme.accentColor)
+            }
+            Spacer()
+            if showChevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(theme.secondaryText.opacity(0.5))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+    }
+
+    private func settingsToggle(_ title: String, icon: String, isOn: Binding<Bool>) -> some View {
+        Toggle(isOn: isOn) {
+            Label {
+                Text(title)
+                    .foregroundColor(theme.primaryText)
+            } icon: {
+                Image(systemName: icon)
+                    .foregroundColor(theme.accentColor)
+            }
+        }
+        .tint(theme.accentColor)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+    }
+
+    private var settingsDivider: some View {
+        Divider().opacity(0.2).padding(.leading, 54)
     }
 }
 
@@ -459,11 +618,11 @@ private struct ThemeSwatchView: View {
 /// Short description for each theme style
 private func themeSubtitle(_ style: DeviThemeStyle) -> String {
     switch style {
-    case .classic:       return "Original dark palette"
-    case .vividTemple:   return "Electric saffron & vivid indigo"
-    case .sunriseGarden: return "Warm plum, teal & terracotta"
-    case .cosmicJewel:   return "Deep space gemstones"
-    case .goldenDawn:    return "Brightest, near light-mode"
+    case .classic:       return "Mahogany library, antique gold"
+    case .vividTemple:   return "Oil-lamp saffron & deep indigo"
+    case .sunriseGarden: return "Organic earth tones & sage"
+    case .cosmicJewel:   return "Gemstone gallery, per-period jewel"
+    case .goldenDawn:    return "Golden hour warmth throughout"
     }
 }
 

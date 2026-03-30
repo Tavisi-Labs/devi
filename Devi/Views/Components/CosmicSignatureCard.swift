@@ -8,6 +8,17 @@ struct CosmicSignatureCard: View {
     let isLoading: Bool
     let theme: DeviTheme
 
+    @State private var revealedWordCount: Int = 0
+    @State private var typewriterTimer: Timer? = nil
+    @State private var hasStartedTypewriter = false
+
+    /// The portion of the signature revealed so far by the typewriter animation.
+    private var visibleText: String {
+        guard let signature else { return "" }
+        let words = signature.split(separator: " ").map(String.init)
+        return words.prefix(revealedWordCount).joined(separator: " ")
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
@@ -32,18 +43,50 @@ struct CosmicSignatureCard: View {
                         ShimmerView(theme: theme)
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 6))
-            } else if let text = signature {
-                Text(text)
+            } else if signature != nil {
+                Text(visibleText)
                     .font(.system(size: 15, weight: .regular, design: .serif))
                     .foregroundColor(theme.primaryText.opacity(0.85))
                     .lineSpacing(4)
                     .multilineTextAlignment(.leading)
-                    .contentTransition(.interpolate)
             }
         }
         .padding(16)
         .deviCard(theme: theme, elevation: .prominent)
         .deviEntrance(delay: 0.06)
+        .onAppear {
+            if let text = signature, !text.isEmpty, !hasStartedTypewriter {
+                hasStartedTypewriter = true
+                startTypewriter(for: text)
+            }
+        }
+        .onChange(of: signature) { oldValue, newValue in
+            if let newText = newValue, !newText.isEmpty, !hasStartedTypewriter {
+                hasStartedTypewriter = true
+                revealedWordCount = 0
+                startTypewriter(for: newText)
+            }
+        }
+        .onDisappear {
+            typewriterTimer?.invalidate()
+            typewriterTimer = nil
+        }
+    }
+
+    // MARK: - Typewriter Animation
+
+    private func startTypewriter(for text: String) {
+        typewriterTimer?.invalidate()
+        let wordCount = text.split(separator: " ").count
+        typewriterTimer = Timer.scheduledTimer(withTimeInterval: 0.08, repeats: true) { timer in
+            withAnimation(.easeOut(duration: 0.15)) {
+                revealedWordCount += 1
+            }
+            if revealedWordCount >= wordCount {
+                timer.invalidate()
+                typewriterTimer = nil
+            }
+        }
     }
 }
 

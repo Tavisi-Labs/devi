@@ -1,5 +1,5 @@
 // MARK: - Views/Components/TimeWindowsCard.swift
-// 2-column status grid for auspicious/inauspicious time windows
+// Vertical branching timeline — auspicious right, inauspicious left
 
 import SwiftUI
 
@@ -7,14 +7,12 @@ struct TimeWindowsCard: View {
     let windows: [TimeWindow]
     let theme: DeviTheme
     let timezoneIdentifier: String
-    /// The effective "now" for active/past checks (supports sun arc scrubbing)
     var effectiveNow: Date = Date()
     var onTapWindow: ((TimeWindow) -> Void)? = nil
 
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
+    private var sortedWindows: [TimeWindow] {
+        windows.sorted { $0.start < $1.start }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -23,19 +21,30 @@ struct TimeWindowsCard: View {
                 Text("MUHURTA & KALAM")
                     .deviLabel(.caption, theme: theme)
                 Spacer()
+
+                // Legend
+                HStack(spacing: 12) {
+                    legendDot(color: theme.auspiciousColor, label: "Auspicious")
+                    legendDot(color: theme.inauspiciousColor, label: "Avoid")
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 14)
-            .padding(.bottom, 10)
+            .padding(.bottom, 12)
 
-            LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(windows) { window in
+            // Branching timeline
+            VStack(spacing: 0) {
+                ForEach(Array(sortedWindows.enumerated()), id: \.element.id) { index, window in
                     Button {
                         onTapWindow?(window)
                     } label: {
-                        windowCell(window)
+                        timelineNode(window: window, index: index)
                     }
                     .buttonStyle(.plain)
+                    .deviReveal(
+                        delay: 0.1 + Double(index) * 0.08,
+                        direction: window.isAuspicious ? .fadeRight : .fadeLeft
+                    )
                 }
             }
             .padding(.horizontal, 12)
@@ -45,21 +54,90 @@ struct TimeWindowsCard: View {
         .deviEntrance(delay: 0.08)
     }
 
-    // MARK: - Cell
+    // MARK: - Timeline Node
 
-    private func windowCell(_ window: TimeWindow) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+    private func timelineNode(window: TimeWindow, index: Int) -> some View {
+        let isActive = window.isActive(at: effectiveNow)
+        let past = isPast(window)
+        let color = statusColor(window)
+        let isRight = window.isAuspicious
+
+        return HStack(spacing: 0) {
+            if isRight {
+                // Left spacer for right-branching (auspicious)
+                Spacer()
+                    .frame(maxWidth: .infinity)
+
+                // Center spine dot
+                timelineDot(color: color, isActive: isActive)
+
+                // Right content
+                nodeContent(window: window, color: color, isActive: isActive, past: past)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 10)
+            } else {
+                // Left content (inauspicious)
+                nodeContent(window: window, color: color, isActive: isActive, past: past)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 10)
+
+                // Center spine dot
+                timelineDot(color: color, isActive: isActive)
+
+                // Right spacer
+                Spacer()
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.vertical, 8)
+        .opacity(past ? 0.4 : 1.0)
+        .contentShape(Rectangle())
+    }
+
+    // MARK: - Timeline Dot
+
+    private func timelineDot(color: Color, isActive: Bool) -> some View {
+        ZStack {
+            if isActive {
+                Circle()
+                    .fill(color.opacity(0.25))
+                    .frame(width: 20, height: 20)
+                    .breathing()
+            }
+
+            Circle()
+                .fill(color)
+                .frame(width: isActive ? 10 : 6, height: isActive ? 10 : 6)
+
+            // Vertical line segment above and below
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(theme.primaryText.opacity(0.1))
+                    .frame(width: 2)
+            }
+            .frame(width: 2, height: 40)
+            .opacity(0.6)
+        }
+        .frame(width: 24)
+    }
+
+    // MARK: - Node Content
+
+    private func nodeContent(window: TimeWindow, color: Color, isActive: Bool, past: Bool) -> some View {
+        VStack(alignment: window.isAuspicious ? .leading : .trailing, spacing: 4) {
             HStack(spacing: 6) {
-                Image(systemName: statusIcon(window))
-                    .font(.system(size: 10))
-                    .foregroundColor(statusColor(window))
-                    .symbolEffect(.pulse, isActive: window.isActive(at: effectiveNow) && !window.isAuspicious)
+                if !window.isAuspicious {
+                    statusBadge(window: window, color: color, isActive: isActive, past: past)
+                }
 
                 Text(window.type.rawValue)
-                    .scaledFont(size: 13, weight: .medium)
+                    .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(theme.primaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+
+                if window.isAuspicious {
+                    statusBadge(window: window, color: color, isActive: isActive, past: past)
+                }
             }
 
             Text("\(formatTime(window.start)) – \(formatTime(window.end))")
@@ -67,54 +145,64 @@ struct TimeWindowsCard: View {
                 .foregroundColor(theme.secondaryText)
                 .monospacedDigit()
 
-            // Status label
-            statusLabel(window)
+            // Recommendation from PanchangDescriptions
+            if let info = timeWindowInfoKey(for: window),
+               let twInfo = PanchangDescriptions.timeWindowInfo(for: info) {
+                Text(shortRecommendation(twInfo.recommendation))
+                    .deviLabel(.insight, theme: theme)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(window.isActive(at: effectiveNow) ? statusColor(window).opacity(0.08) : theme.primaryText.opacity(0.03))
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(isActive ? color.opacity(0.08) : theme.primaryText.opacity(0.02))
         )
-        .overlay(
-            window.isActive(at: effectiveNow)
-                ? RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(statusColor(window).opacity(0.3), lineWidth: 1)
-                : nil
-        )
-        .opacity(isPast(window) ? 0.4 : 1.0)
-        .contentShape(Rectangle())
     }
 
-    // MARK: - Status Label
+    // MARK: - Status Badge
 
     @ViewBuilder
-    private func statusLabel(_ window: TimeWindow) -> some View {
-        if window.isActive(at: effectiveNow) {
+    private func statusBadge(window: TimeWindow, color: Color, isActive: Bool, past: Bool) -> some View {
+        if isActive {
             Text("NOW")
-                .scaledFont(size: 9, weight: .bold)
-                .foregroundColor(statusColor(window))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(statusColor(window).opacity(0.2))
+                .scaledFont(size: 8, weight: .bold)
+                .foregroundColor(color)
+                .padding(.horizontal, 5)
+                .padding(.vertical, 1)
+                .background(color.opacity(0.2))
                 .clipShape(Capsule())
                 .breathing()
-        } else if isPast(window) {
+        } else if past {
             Text("PASSED")
-                .scaledFont(size: 9, weight: .medium)
+                .scaledFont(size: 8, weight: .medium)
                 .foregroundColor(theme.secondaryText.opacity(0.5))
         } else {
             let mins = minutesUntil(window.start)
             if mins < 60 {
-                Text("\(mins)m away")
-                    .scaledFont(size: 10)
+                Text("\(mins)m")
+                    .scaledFont(size: 9)
                     .foregroundColor(theme.secondaryText)
             } else {
-                let hours = mins / 60
-                Text("\(hours)h away")
-                    .scaledFont(size: 10)
+                Text("\(mins / 60)h")
+                    .scaledFont(size: 9)
                     .foregroundColor(theme.secondaryText)
             }
+        }
+    }
+
+    // MARK: - Legend Dot
+
+    private func legendDot(color: Color, label: String) -> some View {
+        HStack(spacing: 3) {
+            Circle()
+                .fill(color)
+                .frame(width: 5, height: 5)
+            Text(label)
+                .scaledFont(size: 9)
+                .foregroundColor(theme.secondaryText.opacity(0.6))
         }
     }
 
@@ -136,12 +224,22 @@ struct TimeWindowsCard: View {
         }
     }
 
-    private func statusIcon(_ window: TimeWindow) -> String {
-        switch window.statusColor {
-        case .auspicious:   return "checkmark.circle.fill"
-        case .inauspicious: return "xmark.circle.fill"
-        case .caution:      return "exclamationmark.circle.fill"
+    private func timeWindowInfoKey(for window: TimeWindow) -> String? {
+        switch window.type {
+        case .brahmaMuhurta: return "brahmaMuhurta"
+        case .abhijitMuhurta: return "abhijitMuhurta"
+        case .rahuKalam: return "rahuKalam"
+        case .gulikaKalam: return "gulikaKalam"
+        case .yamaganda: return "yamaganda"
         }
+    }
+
+    private func shortRecommendation(_ full: String) -> String {
+        // Extract just the first sentence or clause
+        if let dotRange = full.range(of: ". ") {
+            return String(full[full.startIndex..<dotRange.lowerBound])
+        }
+        return String(full.prefix(60))
     }
 
     private func formatTime(_ date: Date) -> String {

@@ -123,10 +123,21 @@ enum FestivalEngine {
             if prevSunLonSign >= 0 && sunSign != prevSunLonSign {
                 // Sun changed sign overnight
                 if sunSign == 9 { // Capricorn = sign index 9 (270°)
-                    addFestival(&result, date: dateString, names: ["Makar Sankranti", "Pongal"])
+                    addFestival(&result, date: dateString, names: [
+                        "Makar Sankranti", "Pongal", "Uttarayan", "Magh Bihu"
+                    ])
                 }
                 if sunSign == 0 { // Aries = sign index 0 (0°)
-                    addFestival(&result, date: dateString, names: ["Baisakhi", "Tamil New Year"])
+                    addFestival(&result, date: dateString, names: [
+                        "Baisakhi", "Tamil New Year", "Vishu",
+                        "Bohag Bihu", "Rongali Bihu", "Poila Boishakh"
+                    ])
+                }
+                if sunSign == 2 { // Gemini = sign index 2 (60°)
+                    addFestival(&result, date: dateString, names: ["Raja Parba"])
+                }
+                if sunSign == 4 { // Leo = sign index 4 (120°)
+                    addFestival(&result, date: dateString, names: ["Kati Bihu", "Kongali Bihu"])
                 }
             }
             prevSunLonSign = sunSign
@@ -195,9 +206,9 @@ enum FestivalEngine {
         chaitraNavratriStart: inout String?,
         sharadNavratriStart: inout String?
     ) {
-        // Vasant Panchami: Magha Shukla 5
+        // Vasant Panchami / Saraswati Puja: Magha Shukla 5
         if lunarMonth == "Magha" && paksha == .shukla && tithiNum == 5 {
-            addFestival(&result, date: dateString, names: ["Vasant Panchami"])
+            addFestival(&result, date: dateString, names: ["Vasant Panchami", "Saraswati Puja"])
         }
 
         // Maha Shivaratri: Phalguna/Magha Krishna 14
@@ -288,14 +299,14 @@ enum FestivalEngine {
             addFestival(&result, date: dateString, names: ["Naraka Chaturdashi"])
         }
 
-        // Diwali / Lakshmi Puja: Kartik Krishna 15 (Amavasya)
+        // Diwali / Lakshmi Puja / Kali Puja: Kartik Krishna 15 (Amavasya)
         if lunarMonth == "Kartik" && paksha == .krishna && tithiNum == 15 {
-            addFestival(&result, date: dateString, names: ["Diwali", "Lakshmi Puja"])
+            addFestival(&result, date: dateString, names: ["Diwali", "Lakshmi Puja", "Kali Puja"])
         }
 
-        // Govardhan Puja: Kartik Shukla 1
+        // Govardhan Puja / Annakut / Bestu Varas: Kartik Shukla 1
         if lunarMonth == "Kartik" && paksha == .shukla && tithiNum == 1 {
-            addFestival(&result, date: dateString, names: ["Govardhan Puja"])
+            addFestival(&result, date: dateString, names: ["Govardhan Puja", "Annakut", "Bestu Varas"])
         }
 
         // Bhai Dooj: Kartik Shukla 2
@@ -311,6 +322,130 @@ enum FestivalEngine {
         // Kartik Purnima / Dev Diwali: Kartik Shukla 15
         if lunarMonth == "Kartik" && paksha == .shukla && tithiNum == 15 {
             addFestival(&result, date: dateString, names: ["Kartik Purnima", "Dev Diwali"])
+        }
+
+        // ── Pan-Indian ──
+
+        // Nag Panchami: Shravana Shukla 5
+        if lunarMonth == "Shravana" && paksha == .shukla && tithiNum == 5 {
+            addFestival(&result, date: dateString, names: ["Nag Panchami"])
+        }
+
+        // Anant Chaturdashi: Bhadrapada Shukla 14
+        if lunarMonth == "Bhadrapada" && paksha == .shukla && tithiNum == 14 {
+            addFestival(&result, date: dateString, names: ["Anant Chaturdashi"])
+        }
+
+        // Sharad Purnima / Kojagari Purnima: Ashwin Shukla 15
+        if lunarMonth == "Ashwin" && paksha == .shukla && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Sharad Purnima", "Kojagari Purnima"])
+        }
+
+        // Mahalaya Amavasya: Ashwin Krishna 15
+        if lunarMonth == "Ashwin" && paksha == .krishna && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Mahalaya Amavasya"])
+        }
+
+        // ── North Indian ──
+
+        // Hariyali Teej: Shravana Shukla 3
+        if lunarMonth == "Shravana" && paksha == .shukla && tithiNum == 3 {
+            addFestival(&result, date: dateString, names: ["Hariyali Teej"])
+        }
+
+        // Hartalika Teej: Bhadrapada Shukla 3
+        if lunarMonth == "Bhadrapada" && paksha == .shukla && tithiNum == 3 {
+            addFestival(&result, date: dateString, names: ["Hartalika Teej"])
+        }
+
+        // Tulsi Vivah: Kartik Shukla 11
+        if lunarMonth == "Kartik" && paksha == .shukla && tithiNum == 11 {
+            addFestival(&result, date: dateString, names: ["Tulsi Vivah"])
+        }
+
+        // Ganga Dussehra: Jyeshtha Shukla 10
+        if lunarMonth == "Jyeshtha" && paksha == .shukla && tithiNum == 10 {
+            addFestival(&result, date: dateString, names: ["Ganga Dussehra"])
+        }
+
+        // Nirjala Ekadashi: Jyeshtha Shukla 11
+        if lunarMonth == "Jyeshtha" && paksha == .shukla && tithiNum == 11 {
+            addFestival(&result, date: dateString, names: ["Nirjala Ekadashi"])
+        }
+
+        // Ahoi Ashtami: Kartik Krishna 8
+        if lunarMonth == "Kartik" && paksha == .krishna && tithiNum == 8 {
+            addFestival(&result, date: dateString, names: ["Ahoi Ashtami"])
+        }
+
+        // ── Bengali ──
+
+        // Durga Puja Saptami: Ashwin Shukla 7
+        if lunarMonth == "Ashwin" && paksha == .shukla && tithiNum == 7 {
+            addFestival(&result, date: dateString, names: ["Durga Puja Saptami"])
+        }
+
+        // Durga Puja Ashtami: Ashwin Shukla 8
+        if lunarMonth == "Ashwin" && paksha == .shukla && tithiNum == 8 {
+            addFestival(&result, date: dateString, names: ["Durga Puja Ashtami"])
+        }
+
+        // Jamai Shashti: Jyeshtha Shukla 6
+        if lunarMonth == "Jyeshtha" && paksha == .shukla && tithiNum == 6 {
+            addFestival(&result, date: dateString, names: ["Jamai Shashti"])
+        }
+
+        // Poush Parbon: Pausha Shukla 15 (Pausha Purnima)
+        if lunarMonth == "Pausha" && paksha == .shukla && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Poush Parbon"])
+        }
+
+        // ── Telugu/Andhra ──
+
+        // Bathukamma (Finale): Ashwin Krishna 15
+        if lunarMonth == "Ashwin" && paksha == .krishna && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Bathukamma"])
+        }
+
+        // Bonalu: Ashadha Shukla 1
+        if lunarMonth == "Ashadha" && paksha == .shukla && tithiNum == 1 {
+            addFestival(&result, date: dateString, names: ["Bonalu"])
+        }
+
+        // ── Maharashtrian ──
+
+        // Vat Savitri / Vat Purnima: Jyeshtha Shukla 15
+        if lunarMonth == "Jyeshtha" && paksha == .shukla && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Vat Savitri", "Vat Purnima"])
+        }
+
+        // Bail Pola: Shravana Krishna 15 (Shravana Amavasya)
+        if lunarMonth == "Shravana" && paksha == .krishna && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Bail Pola"])
+        }
+
+        // ── Odia ──
+
+        // Jagannath Rath Yatra: Ashadha Shukla 2
+        if lunarMonth == "Ashadha" && paksha == .shukla && tithiNum == 2 {
+            addFestival(&result, date: dateString, names: ["Jagannath Rath Yatra"])
+        }
+
+        // Nuakhai: Bhadrapada Shukla 5
+        if lunarMonth == "Bhadrapada" && paksha == .shukla && tithiNum == 5 {
+            addFestival(&result, date: dateString, names: ["Nuakhai"])
+        }
+
+        // ── Tamil/South Indian ──
+
+        // Skanda Sashti: Kartik Shukla 6
+        if lunarMonth == "Kartik" && paksha == .shukla && tithiNum == 6 {
+            addFestival(&result, date: dateString, names: ["Skanda Sashti"])
+        }
+
+        // Aadi Amavasai: Shravana Krishna 15
+        if lunarMonth == "Shravana" && paksha == .krishna && tithiNum == 15 {
+            addFestival(&result, date: dateString, names: ["Aadi Amavasai"])
         }
     }
 
@@ -338,6 +473,20 @@ enum FestivalEngine {
         if (lunarMonth == "Phalguna" || lunarMonth == "Chaitra")
             && paksha == .shukla && tithiNum == 15 && nakIdx == 12 {
             addFestival(&result, date: dateString, names: ["Panguni Uttram"])
+        }
+
+        // Thaipusam: Pushya nakshatra (8) during Magha month, Shukla paksha
+        if lunarMonth == "Magha" && paksha == .shukla && nakIdx == 8 {
+            if result[dateString]?.contains("Thaipusam") != true {
+                addFestival(&result, date: dateString, names: ["Thaipusam"])
+            }
+        }
+
+        // Karthigai Deepam: Krittika nakshatra (3) during Kartik month, near Purnima (tithi >= 13)
+        if lunarMonth == "Kartik" && nakIdx == 3 && paksha == .shukla && tithiNum >= 13 {
+            if result[dateString]?.contains("Karthigai Deepam") != true {
+                addFestival(&result, date: dateString, names: ["Karthigai Deepam"])
+            }
         }
     }
 

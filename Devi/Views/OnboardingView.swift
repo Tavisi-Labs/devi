@@ -1,261 +1,724 @@
 // MARK: - Views/OnboardingView.swift
-// 2-screen onboarding: Welcome + Location, then Notifications
+// 3-page onboarding: Welcome → City (live tithi preview) → Notification presets
 
 import SwiftUI
 
+// MARK: - Notification Preset
+
+private enum NotificationPreset: String, CaseIterable {
+    case essential, sacredTimes, minimal
+
+    var title: String {
+        switch self {
+        case .essential:   return "Essential"
+        case .sacredTimes: return "Sacred Times"
+        case .minimal:     return "Minimal"
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .essential:   return "Sunrise, sunset & daily summary"
+        case .sacredTimes: return "All auspicious windows, festivals & eclipses"
+        case .minimal:     return "Just a daily morning brief"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .essential:   return "sunrise.fill"
+        case .sacredTimes: return "sparkles"
+        case .minimal:     return "bell"
+        }
+    }
+
+    var dailySummary: Bool { true }
+    var sunrise: Bool { self != .minimal }
+    var sunset: Bool { self != .minimal }
+    var rahuKalam: Bool { self == .sacredTimes }
+    var abhijit: Bool { self == .sacredTimes }
+    var brahma: Bool { self == .sacredTimes }
+    var navratri: Bool { self == .sacredTimes }
+    var eclipse: Bool { self == .sacredTimes }
+}
+
+// MARK: - OnboardingView
+
 struct OnboardingView: View {
     @ObservedObject var vm: PanchangViewModel
+
+    // Page navigation
     @State private var currentPage = 0
     @State private var showCityPicker = false
 
-    // Notification toggle states
-    @State private var notifSunrise = true
-    @State private var notifSunset = true
-    @State private var notifRahuKalam = true
-    @State private var notifAbhijit = false
-    @State private var notifBrahma = false
+    // Notification preset
+    @State private var selectedPreset: NotificationPreset = .essential
 
-    private let onboardingTheme = DeviTheme.forPeriod(.brahmaMuhurta)
+    // City selection state
+    @State private var citySelected = false
+
+    // Per-page entrance animation triggers
+    @State private var welcomeAppeared = false
+    @State private var cityPageAppeared = false
+    @State private var previewAppeared = false
+    @State private var notifPageAppeared = false
+
+    // Moon glow animation
+    @State private var glowPhase = false
+
+    private var theme: DeviTheme { vm.theme }
+    private var isDaytime: Bool {
+        vm.timePeriod == .morning || vm.timePeriod == .afternoon
+    }
 
     var body: some View {
         ZStack {
-            // Background
-            ZStack {
-                onboardingTheme.backgroundGradient
-                    .ignoresSafeArea()
-                StarFieldView(isDaytime: false, timePeriod: .brahmaMuhurta)
-                    .ignoresSafeArea()
-            }
+            // Background — theme-adaptive
+            theme.backgroundGradient
+                .ignoresSafeArea()
+            StarFieldView(isDaytime: isDaytime, timePeriod: vm.timePeriod)
+                .ignoresSafeArea()
 
-            // Page content — simple 2-page flow, no page indicator needed
-            TabView(selection: $currentPage) {
-                welcomeLocationPage.tag(0)
-                notificationPage.tag(1)
+            // Page content — button-driven, no swipe
+            Group {
+                switch currentPage {
+                case 0:  welcomePage
+                case 1:  cityPage
+                default: notificationPage
+                }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            ))
 
+            // Location resolving overlay
             if vm.isResolvingLocation {
                 Color.black.opacity(0.20)
                     .ignoresSafeArea()
 
                 VStack(spacing: 12) {
                     ProgressView()
-                        .tint(onboardingTheme.accentColor)
+                        .tint(theme.accentColor)
 
                     Text("Finding your location…")
                         .scaledFont(size: 14, weight: .medium)
-                        .foregroundColor(onboardingTheme.primaryText)
+                        .foregroundColor(theme.primaryText)
                 }
                 .padding(.horizontal, 22)
                 .padding(.vertical, 18)
-                .deviCard(theme: onboardingTheme, elevation: .raised, cornerRadius: 16)
+                .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
                 .padding(.horizontal, 40)
             }
         }
         .onChange(of: vm.isResolvingLocation) { _, isResolving in
-            guard !isResolving, currentPage == 0 else { return }
-            withAnimation { currentPage = 1 }
+            if !isResolving && currentPage == 1 && !citySelected {
+                // Location resolved — show preview
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    citySelected = true
+                }
+                triggerPreviewAnimation()
+            }
         }
         .sheet(isPresented: $showCityPicker) {
             CityPickerView(selectedCity: vm.currentCity) { city in
                 vm.selectCity(city)
                 showCityPicker = false
-                withAnimation { currentPage = 1 }
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    citySelected = true
+                }
+                triggerPreviewAnimation()
             }
         }
     }
 
-    // MARK: - Page 1: Welcome + Location
+    // MARK: - Page 1: Welcome
 
-    private var welcomeLocationPage: some View {
+    private var welcomePage: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            VStack(spacing: 28) {
+                // Hero moon — decorative half moon
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color(hex: "B8C4D8").opacity(glowPhase ? 0.25 : 0.12),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 30,
+                                endRadius: 60
+                            )
+                        )
+                        .frame(width: 120, height: 120)
+
+                    Canvas { context, size in
+                        drawMoon(
+                            context: context,
+                            size: size,
+                            illumination: 0.5,
+                            isWaxing: true
+                        )
+                    }
+                    .frame(width: 80, height: 80)
+                    .clipShape(Circle())
+                }
+                .scaleEffect(welcomeAppeared ? 1 : 0.7)
+                .opacity(welcomeAppeared ? 1 : 0)
+                .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: welcomeAppeared)
+
+                // App name
+                Text("Devi")
+                    .scaledFont(size: 36, weight: .regular, design: .serif)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [Color(hex: "d4a857"), Color(hex: "c49a4a")],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .opacity(welcomeAppeared ? 1 : 0)
+                    .offset(y: welcomeAppeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.5).delay(0.25), value: welcomeAppeared)
+
+                // Tagline
+                Text("Your Daily Vedic Companion")
+                    .scaledFont(size: 17, weight: .regular)
+                    .foregroundColor(theme.secondaryText)
+                    .opacity(welcomeAppeared ? 1 : 0)
+                    .offset(y: welcomeAppeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.5).delay(0.4), value: welcomeAppeared)
+
+                // Feature pillars
+                VStack(spacing: 14) {
+                    featurePillar(
+                        icon: "moon.circle",
+                        title: "Tithi & Nakshatra",
+                        subtitle: "Know the moon's journey",
+                        delay: 0.55
+                    )
+                    featurePillar(
+                        icon: "sun.max",
+                        title: "Sacred Time Windows",
+                        subtitle: "Catch auspicious moments",
+                        delay: 0.65
+                    )
+                    featurePillar(
+                        icon: "sparkle",
+                        title: "Festivals & Reminders",
+                        subtitle: "Never miss a celebration",
+                        delay: 0.75
+                    )
+                }
+                .padding(.horizontal, 32)
+            }
+
+            Spacer()
+
+            // Continue button
+            Button {
+                withAnimation(.easeInOut(duration: 0.4)) {
+                    currentPage = 1
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    cityPageAppeared = true
+                }
+            } label: {
+                Text("Continue")
+            }
+            .deviButton(.primary)
+            .padding(.horizontal, 32)
+            .padding(.bottom, 48)
+            .opacity(welcomeAppeared ? 1 : 0)
+            .offset(y: welcomeAppeared ? 0 : 16)
+            .animation(.easeOut(duration: 0.5).delay(0.9), value: welcomeAppeared)
+        }
+        .onAppear {
+            withAnimation {
+                welcomeAppeared = true
+            }
+            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
+                glowPhase = true
+            }
+        }
+    }
+
+    // MARK: - Page 2: City Selection
+
+    private var cityPage: some View {
         VStack(spacing: 0) {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     Spacer().frame(height: 48)
 
-                    // App icon
-                    ZStack {
-                        Circle()
-                            .fill(onboardingTheme.accentColor.opacity(0.1))
-                            .frame(width: 80, height: 80)
-
-                        Image(systemName: "sun.max")
-                            .font(.system(size: 32, weight: .light))
-                            .foregroundColor(onboardingTheme.accentColor)
+                    if !citySelected {
+                        // State A: Before city selection
+                        citySelectionContent
+                    } else {
+                        // State B: After city selection — show preview
+                        cityPreviewContent
                     }
-
-                    // Title + tagline
-                    VStack(spacing: 8) {
-                        Text("Devi")
-                            .scaledFont(size: 28, weight: .regular, design: .serif)
-                            .foregroundColor(onboardingTheme.primaryText)
-
-                        Text("Your Light Through Each Day")
-                            .scaledFont(size: 17, weight: .regular)
-                            .foregroundColor(onboardingTheme.secondaryText)
-                    }
-
-                    Spacer().frame(height: 12)
-
-                    // Location prompt
-                    Text("Where will you observe today's panchang?")
-                        .scaledFont(size: 15, weight: .regular)
-                        .foregroundColor(onboardingTheme.secondaryText)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-
-                    // Use My Location button
-                    Button {
-                        vm.requestLocation()
-                    } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: "location.fill")
-                                .font(.system(size: 14))
-                            Text("Use My Location")
-                        }
-                    }
-                    .deviButton(.primary)
-                    .padding(.horizontal, 32)
-                    .disabled(vm.isResolvingLocation)
-
-                    // "or choose your city" separator
-                    Text("or choose your city")
-                        .scaledFont(size: 14, weight: .regular)
-                        .foregroundColor(onboardingTheme.secondaryText.opacity(0.6))
-
-                    // Popular city chips — horizontal scroll
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(Array(UserCity.popularCities.prefix(12))) { city in
-                                Button {
-                                    vm.selectCity(city)
-                                    withAnimation { currentPage = 1 }
-                                } label: {
-                                    Text(city.name)
-                                        .scaledFont(size: 14, weight: .medium)
-                                        .foregroundColor(onboardingTheme.primaryText)
-                                        .lineLimit(1)
-                                        .fixedSize()
-                                        .padding(.horizontal, 16)
-                                        .padding(.vertical, 10)
-                                        .background(
-                                            Capsule()
-                                                .fill(onboardingTheme.primaryText.opacity(0.08))
-                                        )
-                                        .overlay(
-                                            Capsule()
-                                                .stroke(onboardingTheme.primaryText.opacity(0.10), lineWidth: 0.5)
-                                        )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .padding(.horizontal, 24)
-                    }
-
-                    // Search other cities
-                    Button {
-                        if !vm.isResolvingLocation {
-                            showCityPicker = true
-                        }
-                    } label: {
-                        Text("Search other cities")
-                            .scaledFont(size: 14, weight: .medium)
-                            .foregroundColor(onboardingTheme.accentColor.opacity(0.7))
-                    }
-                    .padding(.bottom, 32)
-                }
-            }
-        }
-    }
-
-    // MARK: - Page 2: Notifications + Begin
-
-    private var notificationPage: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 24) {
-                    VStack(spacing: 12) {
-                        Image(systemName: "bell.badge")
-                            .font(.system(size: 40, weight: .light))
-                            .foregroundColor(onboardingTheme.accentColor)
-
-                        Text("Stay Attuned")
-                            .scaledFont(size: 26, weight: .semibold, design: .serif)
-                            .foregroundColor(onboardingTheme.primaryText)
-
-                        Text("Get notified for important daily times")
-                            .scaledFont(size: 15)
-                            .foregroundColor(onboardingTheme.secondaryText)
-                    }
-                    .padding(.top, 48)
-
-                    // Notification toggles
-                    VStack(spacing: 0) {
-                        notifToggle("Sunrise", icon: "sunrise.fill", isOn: $notifSunrise)
-                        Divider().background(onboardingTheme.primaryText.opacity(0.08))
-                        notifToggle("Sunset", icon: "sunset.fill", isOn: $notifSunset)
-                        Divider().background(onboardingTheme.primaryText.opacity(0.08))
-                        notifToggle("Rahu Kalam Warning", icon: "exclamationmark.circle", isOn: $notifRahuKalam)
-                        Divider().background(onboardingTheme.primaryText.opacity(0.08))
-                        notifToggle("Abhijit Muhurta", icon: "checkmark.circle", isOn: $notifAbhijit)
-                        Divider().background(onboardingTheme.primaryText.opacity(0.08))
-                        notifToggle("Brahma Muhurta", icon: "moon.stars", isOn: $notifBrahma)
-                    }
-                    .deviCard(theme: onboardingTheme, elevation: .raised)
-                    .padding(.horizontal, 24)
-
-                    Text("You can change these anytime in settings")
-                        .scaledFont(size: 13)
-                        .foregroundColor(onboardingTheme.secondaryText.opacity(0.6))
                 }
             }
             .scrollBounceBehavior(.basedOnSize)
 
+            // Continue button (visible only after city selected)
+            if citySelected {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        currentPage = 2
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        notifPageAppeared = true
+                    }
+                } label: {
+                    Text("Continue")
+                }
+                .deviButton(.primary)
+                .padding(.horizontal, 32)
+                .padding(.bottom, 48)
+                .opacity(previewAppeared ? 1 : 0)
+                .offset(y: previewAppeared ? 0 : 12)
+                .animation(.easeOut(duration: 0.4).delay(0.7), value: previewAppeared)
+            }
+        }
+    }
+
+    // State A: City selection UI
+    private var citySelectionContent: some View {
+        VStack(spacing: 24) {
+            // Title
+            Text("Where will you observe?")
+                .scaledFont(size: 22, weight: .regular, design: .serif)
+                .foregroundColor(theme.primaryText)
+                .opacity(cityPageAppeared ? 1 : 0)
+                .offset(y: cityPageAppeared ? 0 : 12)
+                .animation(.easeOut(duration: 0.5).delay(0.1), value: cityPageAppeared)
+
+            Text("Panchang times are calculated for your city")
+                .scaledFont(size: 14, weight: .regular)
+                .foregroundColor(theme.secondaryText)
+                .opacity(cityPageAppeared ? 1 : 0)
+                .offset(y: cityPageAppeared ? 0 : 12)
+                .animation(.easeOut(duration: 0.5).delay(0.2), value: cityPageAppeared)
+
+            // Use My Location
             Button {
-                Task {
-                    // Request notification permission before saving prefs
-                    let _ = await vm.notificationService.requestAuthorization()
-                    vm.saveOnboardingNotificationPreferences(
-                        sunrise: notifSunrise,
-                        sunset: notifSunset,
-                        rahuKalam: notifRahuKalam,
-                        abhijit: notifAbhijit,
-                        brahma: notifBrahma
-                    )
-                    vm.completeOnboarding()
-                    vm.loadData()
-                    await vm.checkNotificationAuthorization()
-                    await vm.rescheduleNotifications()
+                vm.requestLocation()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 14))
+                    Text("Use My Location")
+                }
+            }
+            .deviButton(.primary)
+            .padding(.horizontal, 32)
+            .disabled(vm.isResolvingLocation)
+            .opacity(cityPageAppeared ? 1 : 0)
+            .offset(y: cityPageAppeared ? 0 : 12)
+            .animation(.easeOut(duration: 0.5).delay(0.3), value: cityPageAppeared)
+
+            // Separator
+            Text("or choose your city")
+                .scaledFont(size: 14, weight: .regular)
+                .foregroundColor(theme.secondaryText.opacity(0.6))
+                .opacity(cityPageAppeared ? 1 : 0)
+                .animation(.easeOut(duration: 0.5).delay(0.4), value: cityPageAppeared)
+
+            // City chips
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(Array(UserCity.popularCities.prefix(12))) { city in
+                        Button {
+                            vm.selectCity(city)
+                            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                                citySelected = true
+                            }
+                            triggerPreviewAnimation()
+                        } label: {
+                            Text(city.name)
+                                .scaledFont(size: 14, weight: .medium)
+                                .foregroundColor(theme.primaryText)
+                                .lineLimit(1)
+                                .fixedSize()
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .background(
+                                    Capsule()
+                                        .fill(theme.primaryText.opacity(0.08))
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(theme.primaryText.opacity(0.10), lineWidth: 0.5)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 24)
+            }
+            .opacity(cityPageAppeared ? 1 : 0)
+            .animation(.easeOut(duration: 0.5).delay(0.45), value: cityPageAppeared)
+
+            // Search link
+            Button {
+                if !vm.isResolvingLocation {
+                    showCityPicker = true
                 }
             } label: {
-                Text("Begin")
+                Text("Search all cities")
+                    .scaledFont(size: 14, weight: .medium)
+                    .foregroundColor(theme.accentColor.opacity(0.7))
+            }
+            .opacity(cityPageAppeared ? 1 : 0)
+            .animation(.easeOut(duration: 0.5).delay(0.5), value: cityPageAppeared)
+
+            Spacer().frame(height: 32)
+        }
+    }
+
+    // State B: Live tithi preview after city selection
+    private var cityPreviewContent: some View {
+        VStack(spacing: 20) {
+            Spacer().frame(height: 24)
+
+            // City name with checkmark
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(theme.auspiciousColor)
+
+                Text(vm.currentCity.name)
+                    .scaledFont(size: 17, weight: .semibold)
+                    .foregroundColor(theme.primaryText)
+            }
+            .opacity(previewAppeared ? 1 : 0)
+            .animation(.easeOut(duration: 0.4), value: previewAppeared)
+
+            // Moon medallion — actual phase for user's city
+            if let panchang = vm.todayPanchang {
+                let illum = moonIllumination(
+                    number: panchang.tithi.number,
+                    paksha: panchang.tithi.paksha
+                )
+                let isWaxing = panchang.tithi.paksha == .shukla
+
+                ZStack {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    Color(hex: "B8C4D8").opacity(glowPhase ? 0.25 : 0.12),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 25,
+                                endRadius: 50
+                            )
+                        )
+                        .frame(width: 100, height: 100)
+
+                    Canvas { context, size in
+                        drawMoon(
+                            context: context,
+                            size: size,
+                            illumination: illum,
+                            isWaxing: isWaxing
+                        )
+                    }
+                    .frame(width: 70, height: 70)
+                    .clipShape(Circle())
+                }
+                .scaleEffect(previewAppeared ? 1 : 0.5)
+                .opacity(previewAppeared ? 1 : 0)
+                .animation(.spring(response: 0.5, dampingFraction: 0.65).delay(0.1), value: previewAppeared)
+
+                // Tithi name
+                Text(panchang.tithi.name.uppercased())
+                    .scaledFont(size: 24, weight: .regular, design: .serif)
+                    .tracking(3)
+                    .foregroundColor(theme.primaryText)
+                    .opacity(previewAppeared ? 1 : 0)
+                    .offset(y: previewAppeared ? 0 : 8)
+                    .animation(.easeOut(duration: 0.4).delay(0.3), value: previewAppeared)
+
+                // Paksha + Nakshatra
+                Text("\(panchang.tithi.paksha == .shukla ? "Shukla" : "Krishna") Paksha · \(panchang.nakshatra.name)")
+                    .scaledFont(size: 13, weight: .regular)
+                    .foregroundColor(theme.secondaryText)
+                    .opacity(previewAppeared ? 1 : 0)
+                    .offset(y: previewAppeared ? 0 : 8)
+                    .animation(.easeOut(duration: 0.4).delay(0.45), value: previewAppeared)
+
+                // "Your panchang awaits"
+                HStack(spacing: 4) {
+                    Text("Your panchang awaits")
+                        .scaledFont(size: 13, weight: .medium)
+                        .foregroundColor(theme.accentColor)
+                    Text("✦")
+                        .font(.system(size: 10))
+                        .foregroundColor(theme.accentColor)
+                }
+                .opacity(previewAppeared ? 1 : 0)
+                .animation(.easeOut(duration: 0.4).delay(0.6), value: previewAppeared)
+            } else {
+                // Fallback if panchang hasn't loaded yet
+                ProgressView()
+                    .tint(theme.accentColor)
+                    .padding(.top, 24)
+            }
+
+            Spacer().frame(height: 16)
+        }
+    }
+
+    // MARK: - Page 3: Notification Presets
+
+    private var notificationPage: some View {
+        VStack(spacing: 0) {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    Spacer().frame(height: 48)
+
+                    // Header
+                    VStack(spacing: 12) {
+                        Image(systemName: "bell.badge")
+                            .font(.system(size: 36, weight: .light))
+                            .foregroundColor(theme.accentColor)
+                            .opacity(notifPageAppeared ? 1 : 0)
+                            .animation(.easeOut(duration: 0.5).delay(0.1), value: notifPageAppeared)
+
+                        Text("Stay Connected")
+                            .scaledFont(size: 24, weight: .regular, design: .serif)
+                            .foregroundColor(theme.primaryText)
+                            .opacity(notifPageAppeared ? 1 : 0)
+                            .offset(y: notifPageAppeared ? 0 : 8)
+                            .animation(.easeOut(duration: 0.5).delay(0.2), value: notifPageAppeared)
+
+                        Text("Choose how Devi keeps you in rhythm")
+                            .scaledFont(size: 15, weight: .regular)
+                            .foregroundColor(theme.secondaryText)
+                            .opacity(notifPageAppeared ? 1 : 0)
+                            .offset(y: notifPageAppeared ? 0 : 8)
+                            .animation(.easeOut(duration: 0.5).delay(0.3), value: notifPageAppeared)
+                    }
+
+                    // Preset cards
+                    VStack(spacing: 12) {
+                        ForEach(Array(NotificationPreset.allCases.enumerated()), id: \.element) { index, preset in
+                            presetCard(preset, delay: 0.4 + Double(index) * 0.1)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+
+                    // Reassurance
+                    Text("You can change these anytime in Settings")
+                        .scaledFont(size: 12, weight: .regular)
+                        .foregroundColor(theme.secondaryText.opacity(0.6))
+                        .opacity(notifPageAppeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.5).delay(0.75), value: notifPageAppeared)
+                }
+            }
+            .scrollBounceBehavior(.basedOnSize)
+
+            // Begin Your Journey button
+            Button {
+                completeOnboardingFlow()
+            } label: {
+                Text("Begin Your Journey")
             }
             .deviButton(.primary)
             .padding(.horizontal, 32)
             .padding(.bottom, 48)
+            .opacity(notifPageAppeared ? 1 : 0)
+            .offset(y: notifPageAppeared ? 0 : 12)
+            .animation(.easeOut(duration: 0.5).delay(0.85), value: notifPageAppeared)
         }
     }
 
-    private func notifToggle(_ label: String, icon: String, isOn: Binding<Bool>) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(onboardingTheme.accentColor)
-                .frame(width: 24)
+    // MARK: - Subviews
 
-            Text(label)
-                .scaledFont(size: 15, weight: .regular)
-                .foregroundColor(onboardingTheme.primaryText)
+    private func featurePillar(icon: String, title: String, subtitle: String, delay: Double) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 20))
+                .foregroundColor(theme.accentColor)
+                .frame(width: 28)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .scaledFont(size: 14, weight: .medium)
+                    .foregroundColor(theme.primaryText)
+
+                Text(subtitle)
+                    .scaledFont(size: 12, weight: .regular)
+                    .foregroundColor(theme.secondaryText)
+            }
 
             Spacer()
-
-            Toggle("", isOn: isOn)
-                .tint(onboardingTheme.accentColor)
-                .labelsHidden()
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 6)
+        .opacity(welcomeAppeared ? 1 : 0)
+        .offset(y: welcomeAppeared ? 0 : 12)
+        .animation(.easeOut(duration: 0.5).delay(delay), value: welcomeAppeared)
+    }
+
+    private func presetCard(_ preset: NotificationPreset, delay: Double) -> some View {
+        let isSelected = selectedPreset == preset
+
+        return Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                selectedPreset = preset
+            }
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: preset.icon)
+                    .font(.system(size: 20))
+                    .foregroundColor(theme.accentColor)
+                    .frame(width: 28)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(preset.title)
+                        .scaledFont(size: 16, weight: .semibold)
+                        .foregroundColor(theme.primaryText)
+
+                    Text(preset.description)
+                        .scaledFont(size: 13, weight: .regular)
+                        .foregroundColor(theme.secondaryText)
+                }
+
+                Spacer()
+
+                // Selection indicator
+                ZStack {
+                    Circle()
+                        .stroke(isSelected ? theme.accentColor : theme.secondaryText.opacity(0.3), lineWidth: 1.5)
+                        .frame(width: 22, height: 22)
+
+                    if isSelected {
+                        Circle()
+                            .fill(theme.accentColor)
+                            .frame(width: 14, height: 14)
+                    }
+                }
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(theme.primaryText.opacity(theme.isLight ? 0.04 : 0.06))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(
+                        isSelected ? theme.accentColor.opacity(0.6) : theme.primaryText.opacity(0.08),
+                        lineWidth: isSelected ? 1.5 : 0.5
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .opacity(notifPageAppeared ? 1 : 0)
+        .offset(y: notifPageAppeared ? 0 : 12)
+        .animation(.easeOut(duration: 0.5).delay(delay), value: notifPageAppeared)
+    }
+
+    // MARK: - Moon Drawing
+
+    private func drawMoon(
+        context: GraphicsContext,
+        size: CGSize,
+        illumination: CGFloat,
+        isWaxing: Bool
+    ) {
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        let radius = min(size.width, size.height) / 2
+
+        // Full silver disc
+        let moonPath = Path(ellipseIn: CGRect(
+            x: center.x - radius,
+            y: center.y - radius,
+            width: radius * 2,
+            height: radius * 2
+        ))
+        context.fill(moonPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+
+        let darkColor = Color(hex: "0B1026").opacity(0.92)
+
+        // Dark half
+        var darkHalf = Path()
+        if isWaxing {
+            darkHalf.addArc(center: center, radius: radius, startAngle: .degrees(90), endAngle: .degrees(270), clockwise: false)
+            darkHalf.closeSubpath()
+        } else {
+            darkHalf.addArc(center: center, radius: radius, startAngle: .degrees(270), endAngle: .degrees(90), clockwise: false)
+            darkHalf.closeSubpath()
+        }
+        context.fill(darkHalf, with: .color(darkColor))
+
+        // Terminator ellipse
+        let terminatorWidth = radius * 2 * abs(illumination * 2 - 1)
+        let terminatorRect = CGRect(
+            x: center.x - terminatorWidth / 2,
+            y: center.y - radius,
+            width: terminatorWidth,
+            height: radius * 2
+        )
+        let terminatorPath = Path(ellipseIn: terminatorRect)
+
+        if illumination > 0.5 {
+            context.fill(terminatorPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+        } else {
+            context.fill(terminatorPath, with: .color(darkColor))
+        }
+    }
+
+    private func moonIllumination(number: Int, paksha: Paksha) -> CGFloat {
+        let num = CGFloat(number)
+        if paksha == .shukla {
+            return num / 15.0
+        } else {
+            return 1.0 - (num / 15.0)
+        }
+    }
+
+    // MARK: - Actions
+
+    private func triggerPreviewAnimation() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation {
+                previewAppeared = true
+            }
+        }
+    }
+
+    private func completeOnboardingFlow() {
+        let preset = selectedPreset
+        Task {
+            // Request notification authorization
+            let _ = await vm.notificationService.requestAuthorization()
+
+            // Map preset to individual booleans
+            vm.saveOnboardingNotificationPreferences(
+                sunrise: preset.sunrise,
+                sunset: preset.sunset,
+                rahuKalam: preset.rahuKalam,
+                abhijit: preset.abhijit,
+                brahma: preset.brahma
+            )
+
+            // Set remaining notification prefs directly
+            vm.notifDailySummary = preset.dailySummary
+            vm.notifNavratriMorning = preset.navratri
+            vm.notifEclipseAlert = preset.eclipse
+
+            vm.completeOnboarding()
+            vm.loadData()
+            await vm.checkNotificationAuthorization()
+            await vm.rescheduleNotifications()
+        }
     }
 }
 

@@ -122,11 +122,7 @@ struct NavratriCard: View {
                 )
             }
         )
-        .deviCard(theme: theme, elevation: .prominent, cornerRadius: 24)
-        .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(dayColor.opacity(0.2), lineWidth: 1)
-        )
+        .deviCard(theme: theme, elevation: .prominent, cornerRadius: 18)
         .deviEntrance()
     }
 }

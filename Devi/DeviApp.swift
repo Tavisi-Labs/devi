@@ -7,6 +7,7 @@ import SwiftUI
 struct DeviApp: App {
     @StateObject private var vm = PanchangViewModel()
     @Environment(\.scenePhase) private var scenePhase
+    @State private var splashFinished = false
 
     init() {
         // Initialize Swiss Ephemeris singleton — sets Lahiri ayanamsa and ephemeris path.
@@ -16,16 +17,26 @@ struct DeviApp: App {
     }
 
     var body: some Scene {
-        WindowGroup {  
-            Group {
-                if vm.hasCompletedOnboarding {
-                    HomeView(vm: vm)
-                } else {
-                    OnboardingView(vm: vm)
+        WindowGroup {
+            ZStack {
+                // Real content loads immediately behind splash
+                Group {
+                    if vm.hasCompletedOnboarding {
+                        HomeView(vm: vm)
+                    } else {
+                        OnboardingView(vm: vm)
+                    }
+                }
+                .environment(\.deviFontScale, vm.fontScale)
+                .preferredColorScheme(vm.isLightMode ? .light : .dark)
+
+                // Splash overlay — always dark, dissolves after ~1.8s
+                if !splashFinished {
+                    SplashView(isFinished: $splashFinished)
+                        .ignoresSafeArea()
+                        .zIndex(999)
                 }
             }
-            .environment(\.deviFontScale, vm.fontScale)
-            .preferredColorScheme(.dark) // Always dark — the gradients ARE the theme
             .task {
                 // One-time setup on first appearance
                 vm.notificationService.registerCategories()

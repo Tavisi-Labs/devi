@@ -9,13 +9,17 @@ struct PanchangDetailSheet: View {
     let timezoneIdentifier: String
     let cityName: String
     var panchangContext: DailyPanchang?  // Optional — used for fasting day enrichment
+    @State private var glowPhase: Bool = false
+    @State private var heroAppeared: Bool = false
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 16) {
                 // Category label
                 Text(element.categoryLabel)
-                    .deviLabel(.section, theme: theme)
+                    .scaledFont(size: 11, weight: .semibold, design: .serif)
+                    .foregroundColor(theme.secondaryText)
+                    .tracking(2.0)
                     .padding(.top, 8)
 
                 // Element name
@@ -51,44 +55,57 @@ struct PanchangDetailSheet: View {
                         .foregroundColor(theme.secondaryText)
                 }
 
+
+                // Type-specific hero visual
+                heroVisual
+                    .scaleEffect(heroAppeared ? 1 : 0.7)
+                    .opacity(heroAppeared ? 1 : 0.3)
+
                 // Timing bar (if applicable)
                 timingSection
+                    .deviReveal(delay: 0.1, direction: .fadeUp)
 
                 // Description card
                 if let desc = descriptionText {
                     VStack(alignment: .leading, spacing: 8) {
                         Text(desc)
-                            .deviLabel(.body, theme: theme)
+                            .deviLabel(.sacredBody, theme: theme)
                             .lineSpacing(4)
                     }
                     .padding(16)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+                    .deviReveal(delay: 0.15, direction: .fadeUp)
                 }
 
                 // Eclipse mythology card (separate from description)
                 if case .eclipse = element {
                     mythologySection
+                        .deviReveal(delay: 0.2, direction: .fadeUp)
                 }
 
                 // Key attributes grid
                 if !attributes.isEmpty {
                     attributesGrid
+                        .deviReveal(delay: 0.2, direction: .fadeUp)
                 }
 
                 // Good for / Avoid section
                 if !goodForItems.isEmpty || !avoidItems.isEmpty {
                     recommendationsSection
+                        .deviReveal(delay: 0.25, direction: .fadeUp)
                 }
 
                 // Eclipse mantras section
                 if case .eclipse = element {
                     mantrasSection
+                        .deviReveal(delay: 0.3, direction: .fadeUp)
                 }
 
                 // Navratri mantra section
                 if case .navratriDay(let day) = element {
                     navratriMantraSection(day: day)
+                        .deviReveal(delay: 0.3, direction: .fadeUp)
                 }
 
                 // Fasting day mantra section
@@ -96,6 +113,7 @@ struct PanchangDetailSheet: View {
                    let info = PanchangDescriptions.fastingDayInfo(for: name),
                    let mantra = info.mantra {
                     fastingMantraSection(mantra: mantra, deity: info.associatedDeity)
+                        .deviReveal(delay: 0.3, direction: .fadeUp)
                 }
             }
             .padding(.horizontal, 20)
@@ -104,6 +122,165 @@ struct PanchangDetailSheet: View {
         .background(theme.backgroundGradient.ignoresSafeArea())
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
+                glowPhase = true
+            }
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
+                heroAppeared = true
+            }
+        }
+    }
+
+    // MARK: - Hero Visual
+
+    @ViewBuilder
+    private var heroVisual: some View {
+        switch element {
+        case .choghadiya(let c):
+            // Quality-colored accent bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(choghadiyaQualityColor(c.quality))
+                .frame(height: 4)
+                .frame(maxWidth: .infinity)
+                .deviReveal(delay: 0.05, direction: .scale)
+
+        case .timeWindow(let tw):
+            // Status-colored accent bar
+            RoundedRectangle(cornerRadius: 2)
+                .fill(windowStatusColor(tw))
+                .frame(height: 4)
+                .frame(maxWidth: .infinity)
+                .deviReveal(delay: 0.05, direction: .scale)
+
+        case .yoga:
+            // Quality badge (centered)
+            if let info = PanchangDescriptions.yogaInfo(for: {
+                if case .yoga(let y) = element { return y.number } else { return 0 }
+            }()) {
+                Text(info.quality)
+                    .scaledFont(size: 14, weight: .semibold)
+                    .foregroundColor(yogaQualityColor(info.quality))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(yogaQualityColor(info.quality).opacity(0.15))
+                    .clipShape(Capsule())
+                    .frame(maxWidth: .infinity)
+                    .deviReveal(delay: 0.05, direction: .scale)
+            }
+
+        case .karana(let ks):
+            // Type badge
+            if let k = ks.first, let info = PanchangDescriptions.karanaInfo(for: k.name) {
+                Text(info.type)
+                    .scaledFont(size: 14, weight: .semibold)
+                    .foregroundColor(theme.cautionColor)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(theme.cautionColor.opacity(0.15))
+                    .clipShape(Capsule())
+                    .frame(maxWidth: .infinity)
+                    .deviReveal(delay: 0.05, direction: .scale)
+            }
+
+        case .vara:
+            // Planet-colored dot with glow
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [varaColor.opacity(glowPhase ? 0.4 : 0.15), .clear],
+                            center: .center, startRadius: 4, endRadius: 24
+                        )
+                    )
+                    .frame(width: 48, height: 48)
+                Circle()
+                    .fill(varaColor)
+                    .frame(width: 20, height: 20)
+            }
+            .frame(maxWidth: .infinity)
+            .deviReveal(delay: 0.05, direction: .scale)
+
+        case .festival:
+            // Sparkles icon with glow
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color(hex: "d4a857").opacity(glowPhase ? 0.3 : 0.1), .clear],
+                            center: .center, startRadius: 4, endRadius: 24
+                        )
+                    )
+                    .frame(width: 56, height: 56)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 28))
+                    .foregroundColor(Color(hex: "d4a857"))
+            }
+            .frame(maxWidth: .infinity)
+            .deviReveal(delay: 0.05, direction: .scale)
+
+        case .fastingDay:
+            // Flame icon with saffron glow
+            ZStack {
+                Circle()
+                    .fill(
+                        RadialGradient(
+                            colors: [Color(hex: "c54b2a").opacity(glowPhase ? 0.3 : 0.1), .clear],
+                            center: .center, startRadius: 4, endRadius: 24
+                        )
+                    )
+                    .frame(width: 56, height: 56)
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 28))
+                    .foregroundColor(Color(hex: "c54b2a"))
+            }
+            .frame(maxWidth: .infinity)
+            .deviReveal(delay: 0.05, direction: .scale)
+
+        default:
+            EmptyView()
+        }
+    }
+
+    // Hero helper colors
+    private var varaColor: Color {
+        if case .vara(let v) = element {
+            let deity = v.components(separatedBy: " (").first ?? v
+            switch deity {
+            case "Surya":   return Color(hex: "D4A040")
+            case "Chandra": return Color(hex: "B8C4D8")
+            case "Mangala": return Color(hex: "C45050")
+            case "Budha":   return Color(hex: "4AAD6E")
+            case "Guru":    return Color(hex: "C9A96E")
+            case "Shukra":  return Color(hex: "D47AAD")
+            case "Shani":   return Color(hex: "7B8EC4")
+            default:        return theme.accentColor
+            }
+        }
+        return theme.accentColor
+    }
+
+    private func choghadiyaQualityColor(_ quality: ChoghadiyaQuality) -> Color {
+        switch quality {
+        case .auspicious:   return theme.auspiciousColor
+        case .inauspicious: return theme.inauspiciousColor
+        case .neutral:      return theme.cautionColor
+        }
+    }
+
+    private func windowStatusColor(_ tw: TimeWindow) -> Color {
+        switch tw.statusColor {
+        case .auspicious:   return theme.auspiciousColor
+        case .inauspicious: return theme.inauspiciousColor
+        case .caution:      return theme.cautionColor
+        }
+    }
+
+    private func yogaQualityColor(_ quality: String) -> Color {
+        let q = quality.lowercased()
+        if q.contains("inauspicious") || q.contains("malefic") { return theme.inauspiciousColor }
+        if q.contains("auspicious") || q.contains("benefic") { return theme.auspiciousColor }
+        return theme.cautionColor
     }
 
     // MARK: - Subtitle
@@ -332,13 +509,13 @@ struct PanchangDetailSheet: View {
         case .mantra(let m):
             VStack(spacing: 12) {
                 Text(m.devanagari)
-                    .scaledFont(size: 22, weight: .regular)
+                    .scaledFont(size: 24, weight: .regular)
                     .foregroundColor(theme.primaryText)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
 
                 Text(m.transliteration)
-                    .scaledFont(size: 14, weight: .regular, design: .serif)
+                    .scaledFont(size: 16, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }
@@ -524,7 +701,7 @@ struct PanchangDetailSheet: View {
                     Text(attr.0.uppercased())
                         .deviLabel(.caption, theme: theme)
                     Text(attr.1)
-                        .scaledFont(size: 14, weight: .medium)
+                        .scaledFont(size: 14, weight: .medium, design: .serif)
                         .foregroundColor(theme.primaryText)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -597,7 +774,7 @@ struct PanchangDetailSheet: View {
                             .font(.system(size: 12))
                             .foregroundColor(theme.auspiciousColor)
                         Text("Good for")
-                            .scaledFont(size: 14, weight: .semibold)
+                            .scaledFont(size: 14, weight: .semibold, design: .serif)
                             .foregroundColor(theme.primaryText)
                     }
 
@@ -619,7 +796,7 @@ struct PanchangDetailSheet: View {
                             .font(.system(size: 12))
                             .foregroundColor(theme.inauspiciousColor)
                         Text("Avoid")
-                            .scaledFont(size: 14, weight: .semibold)
+                            .scaledFont(size: 14, weight: .semibold, design: .serif)
                             .foregroundColor(theme.primaryText)
                     }
 
@@ -650,7 +827,7 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Samudra Manthan")
-                    .scaledFont(size: 14, weight: .semibold)
+                    .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
             }
 
@@ -668,7 +845,7 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Spiritual Significance")
-                    .scaledFont(size: 14, weight: .semibold)
+                    .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
             }
 
@@ -692,19 +869,19 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "7B8EC4"))
                 Text("Mantras for Eclipse")
-                    .scaledFont(size: 14, weight: .semibold)
+                    .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
             }
 
             ForEach(info.mantras, id: \.transliteration) { mantra in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(mantra.devanagari)
-                        .scaledFont(size: 17, weight: .regular)
+                        .scaledFont(size: 20, weight: .regular)
                         .foregroundColor(theme.primaryText.opacity(0.9))
                         .lineSpacing(4)
 
                     Text(mantra.transliteration)
-                        .scaledFont(size: 13, weight: .regular, design: .serif)
+                        .scaledFont(size: 15, weight: .regular, design: .serif)
                         .foregroundColor(theme.secondaryText)
                         .italic()
 
@@ -731,18 +908,18 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(theme.accentColor)
                 Text("Mantra for \(day.goddessName)")
-                    .scaledFont(size: 14, weight: .semibold)
+                    .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(day.mantra)
-                    .scaledFont(size: 17, weight: .regular)
+                    .scaledFont(size: 20, weight: .regular)
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
 
                 Text(day.mantraTranslit)
-                    .scaledFont(size: 13, weight: .regular, design: .serif)
+                    .scaledFont(size: 15, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }
@@ -764,18 +941,18 @@ struct PanchangDetailSheet: View {
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: "c54b2a"))
                 Text("Mantra for \(deity)")
-                    .scaledFont(size: 14, weight: .semibold)
+                    .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(mantra.devanagari)
-                    .scaledFont(size: 17, weight: .regular)
+                    .scaledFont(size: 20, weight: .regular)
                     .foregroundColor(theme.primaryText.opacity(0.9))
                     .lineSpacing(4)
 
                 Text(mantra.transliteration)
-                    .scaledFont(size: 13, weight: .regular, design: .serif)
+                    .scaledFont(size: 15, weight: .regular, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
             }

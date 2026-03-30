@@ -33,6 +33,9 @@ class PanchangViewModel: ObservableObject {
     @Published var themeStyle: DeviThemeStyle = .classic {
         didSet { UserDefaults.standard.set(themeStyle.rawValue, forKey: "themeStyle") }
     }
+    @Published var appearanceMode: DeviAppearanceMode = .auto {
+        didSet { UserDefaults.standard.set(appearanceMode.rawValue, forKey: "appearanceMode") }
+    }
     @Published var samvathsaraName: String = ""
     @Published var todayFestivals: [String] = []
 
@@ -115,6 +118,10 @@ class PanchangViewModel: ObservableObject {
 
     var isDaytime: Bool {
         todayPanchang?.solar.isDaytime(at: effectiveNow) ?? true
+    }
+
+    var isLightMode: Bool {
+        appearanceMode.isLight(for: timePeriod)
     }
 
     var activeTimeWindows: [TimeWindow] {
@@ -290,6 +297,12 @@ class PanchangViewModel: ObservableObject {
             themeStyle = style
         }
 
+        // Load persisted appearance mode
+        if let appearStr = ud.string(forKey: "appearanceMode"),
+           let mode = DeviAppearanceMode(rawValue: appearStr) {
+            appearanceMode = mode
+        }
+
         // Load persisted city (if user previously selected one)
         if let cityName = ud.string(forKey: "city.name"),
            let country = ud.string(forKey: "city.country"),
@@ -303,6 +316,11 @@ class PanchangViewModel: ObservableObject {
         }
 
         didFinishInit = true
+
+        // Load data eagerly so todayPanchang is non-nil on the first render.
+        // VedicCalculator is already initialized in DeviApp.init() and currentCity
+        // is loaded from UserDefaults above, so this is safe and synchronous.
+        loadData()
     }
 
     // MARK: - Timer (updates every second)
@@ -377,7 +395,7 @@ class PanchangViewModel: ObservableObject {
         if newPeriod != timePeriod {
             withAnimation(.easeInOut(duration: 8)) { // 8s gradient transition
                 timePeriod = newPeriod
-                theme = DeviTheme.forPeriod(newPeriod, style: themeStyle)
+                theme = DeviTheme.forPeriod(newPeriod, style: themeStyle, appearance: appearanceMode)
             }
         }
     }
@@ -386,7 +404,15 @@ class PanchangViewModel: ObservableObject {
     func setThemeStyle(_ style: DeviThemeStyle) {
         themeStyle = style
         withAnimation(.easeInOut(duration: 0.5)) {
-            theme = DeviTheme.forPeriod(timePeriod, style: style)
+            theme = DeviTheme.forPeriod(timePeriod, style: style, appearance: appearanceMode)
+        }
+    }
+
+    /// Call this from UI to switch appearance mode
+    func setAppearanceMode(_ mode: DeviAppearanceMode) {
+        appearanceMode = mode
+        withAnimation(.easeInOut(duration: 0.5)) {
+            theme = DeviTheme.forPeriod(timePeriod, style: themeStyle, appearance: mode)
         }
     }
 
@@ -437,7 +463,7 @@ class PanchangViewModel: ObservableObject {
         // Set initial theme (always based on real time, not day offset)
         if let solar = todayPanchang?.solar, isViewingToday {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
-            theme = DeviTheme.forPeriod(timePeriod, style: themeStyle)
+            theme = DeviTheme.forPeriod(timePeriod, style: themeStyle, appearance: appearanceMode)
         }
 
         // Fetch cosmic signature (async, non-blocking)
@@ -552,6 +578,46 @@ class PanchangViewModel: ObservableObject {
                             name: "Satya Narayana Pooja", dateString: ds, daysAway: offset, type: .festival
                         ))
                     }
+                }
+            }
+
+            // Monthly recurring observances (every lunar month)
+            let tithiPaksha = panchang.tithi.paksha
+            let tithiNumber = panchang.tithi.number
+
+            // Sankashti Chaturthi: Every Krishna paksha, tithi 4 — Ganesha fasting
+            // Skip if an annual festival (e.g., Karva Chauth) already covers this day
+            if tithiPaksha == .krishna && tithiNumber == 4 && !festivals.contains("Karva Chauth") {
+                let key = "Sankashti Chaturthi-\(ds)"
+                if !seenNames.contains(key) {
+                    seenNames.insert(key)
+                    events.append(UpcomingEvent(
+                        name: "Sankashti Chaturthi", dateString: ds, daysAway: offset, type: .fasting
+                    ))
+                }
+            }
+
+            // Vinayaka Chaturthi: Every Shukla paksha, tithi 4 — Ganesha worship
+            // Skip if Ganesh Chaturthi (annual) already covers this day
+            if tithiPaksha == .shukla && tithiNumber == 4 && !festivals.contains("Ganesh Chaturthi") {
+                let key = "Vinayaka Chaturthi-\(ds)"
+                if !seenNames.contains(key) {
+                    seenNames.insert(key)
+                    events.append(UpcomingEvent(
+                        name: "Vinayaka Chaturthi", dateString: ds, daysAway: offset, type: .festival
+                    ))
+                }
+            }
+
+            // Masik Shivaratri: Every Krishna paksha, tithi 14 (Chaturdashi) — Shiva fasting
+            // Skip if Maha Shivaratri (annual) already covers this day
+            if tithiPaksha == .krishna && tithiNumber == 14 && !festivals.contains("Maha Shivaratri") {
+                let key = "Masik Shivaratri-\(ds)"
+                if !seenNames.contains(key) {
+                    seenNames.insert(key)
+                    events.append(UpcomingEvent(
+                        name: "Masik Shivaratri", dateString: ds, daysAway: offset, type: .fasting
+                    ))
                 }
             }
         }

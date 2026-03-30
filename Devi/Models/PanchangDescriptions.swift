@@ -1153,8 +1153,8 @@ enum PanchangDescriptions {
             associatedDeity: "Surya (Sun God) / Indra"
         ),
         "Vasant Panchami": FestivalInfo(
-            name: "Vasant Panchami",
-            meaning: "Fifth day (Panchami) of Spring (Vasant)",
+            name: "Vasant Panchami (Saraswati Puja)",
+            meaning: "Fifth day (Panchami) of Spring (Vasant) — also called Saraswati Puja",
             description: "Vasant Panchami heralds the arrival of spring and is dedicated to Goddess Saraswati, the embodiment of knowledge, music, and arts. People wear yellow to symbolize the mustard fields in bloom. Children are often introduced to writing on this day in a ceremony called Akshar Abhyas.",
             significance: "This day marks the seasonal shift when nature begins its renewal. Saraswati is worshipped as the source of all knowledge and creative inspiration. It is considered the most auspicious day to begin formal education.",
             observances: [
@@ -1559,9 +1559,9 @@ enum PanchangDescriptions {
             associatedDeity: "Lakshmi / Ganesh / Saraswati"
         ),
         "Govardhan Puja": FestivalInfo(
-            name: "Govardhan Puja",
-            meaning: "Worship of Govardhan Hill — Krishna's mountain",
-            description: "Govardhan Puja (Annakut) celebrates Krishna lifting the Govardhan Hill on his little finger to shelter the people of Vrindavan from Indra's devastating rainstorm. Devotees prepare a mountain of food offerings (Annakut — 'mountain of grain') and offer it to Krishna.",
+            name: "Govardhan Puja (Annakut / Bestu Varas)",
+            meaning: "Worship of Govardhan Hill — also known as Annakut (mountain of food) and Bestu Varas (Gujarati New Year)",
+            description: "Govardhan Puja (Annakut) celebrates Krishna lifting the Govardhan Hill on his little finger to shelter the people of Vrindavan from Indra's devastating rainstorm. Devotees prepare a mountain of food offerings (Annakut — 'mountain of grain') and offer it to Krishna. In Gujarat, this day is celebrated as Bestu Varas, the Gujarati New Year.",
             significance: "The festival teaches that true worship is in serving and protecting people, not empty rituals to appease gods out of fear. Krishna redirected worship from Indra to Govardhan (nature and community), establishing dharma rooted in compassion.",
             observances: [
                 "Prepare an Annakut — a mountain of 56 or 108 food dishes",
@@ -1798,6 +1798,498 @@ enum PanchangDescriptions {
                 "Perform on Purnima or after auspicious events (housewarming, new job, etc.)"
             ],
             associatedDeity: "Vishnu (Satya Narayana)"
+        ),
+
+        // ── Pan-Indian festivals ──
+
+        "Sharad Purnima": FestivalInfo(
+            name: "Sharad Purnima (Kojagari Purnima)",
+            meaning: "Autumn Full Moon — the brightest Purnima of the year",
+            description: "Sharad Purnima falls on Ashwin Purnima and is considered the only night when the moon shines with all sixteen kalas (phases of divine radiance). Lakshmi is believed to roam the earth on this night, blessing those who are awake. In Mathura-Vrindavan, it is celebrated as the night of Krishna's Maha Raas Leela with the gopis.",
+            significance: "This Purnima is considered the most spiritually potent full moon of the year. Moonlight on this night is believed to possess healing properties — kheer left in the moonlight is consumed as divine medicine. Lakshmi blesses those who stay vigilant in devotion.",
+            observances: [
+                "Prepare kheer (rice pudding) and leave it under the open moonlight overnight",
+                "Stay awake through the night in devotion (Kojagari Jagran)",
+                "Worship Lakshmi with lotus flowers and white sweets",
+                "Consume the moonlight-infused kheer the next morning as prasad",
+                "Light lamps and diyas on the terrace under the full moon"
+            ],
+            associatedDeity: "Lakshmi / Krishna"
+        ),
+        "Mahalaya Amavasya": FestivalInfo(
+            name: "Mahalaya Amavasya",
+            meaning: "The Great New Moon of Ancestral Offerings",
+            description: "Mahalaya Amavasya is the final day of Pitru Paksha, the 16-day fortnight dedicated to honoring departed ancestors. It is the most important day for performing Shradh and Tarpanam rituals. Even those who cannot perform ancestor rites during the full Pitru Paksha are advised to observe this day at minimum.",
+            significance: "Hindu tradition holds that the gates between the ancestral realm and the earthly realm are open during Pitru Paksha. On Mahalaya Amavasya, the spiritual merit of offerings reaches all ancestors regardless of their specific tithi. It is the universal day of ancestral remembrance.",
+            observances: [
+                "Perform Tarpanam (water offerings with sesame) for departed ancestors",
+                "Cook the favorite foods of deceased family members and offer them",
+                "Donate food, clothes, and money to Brahmins or the needy in ancestors' names",
+                "Visit Gaya, Varanasi, or a sacred river for Pinda Daan",
+                "Observe a sattvic diet and avoid starting new ventures"
+            ],
+            associatedDeity: "Pitrus (Ancestors) / Yama"
+        ),
+
+        // ── North Indian festivals ──
+
+        "Hariyali Teej": FestivalInfo(
+            name: "Hariyali Teej",
+            meaning: "Green Teej — celebrating the monsoon's verdant arrival",
+            description: "Hariyali Teej falls on Shravana Shukla Tritiya, marking the onset of the monsoon season. Married women dress in green, apply mehndi, swing on decorated jhulas (swings), and celebrate the reunion of Parvati and Shiva. The festival is especially grand in Rajasthan and UP, where processions carry the Teej Mata idol through streets.",
+            significance: "The festival celebrates Parvati's devotion through 108 lifetimes of penance before winning Shiva as her husband. The green color symbolizes nature's renewal, marital bliss, and fertility. Swinging is believed to invoke the monsoon rains and joyous abundance.",
+            observances: [
+                "Wear green bangles, clothes, and apply elaborate mehndi",
+                "Swing on decorated jhulas (swings) with songs",
+                "Fast for the well-being of one's husband",
+                "Offer ghewar, malpua, and seasonal sweets to family",
+                "Worship Goddess Parvati and Lord Shiva together"
+            ],
+            associatedDeity: "Parvati"
+        ),
+        "Hartalika Teej": FestivalInfo(
+            name: "Hartalika Teej",
+            meaning: "Teej of the Abduction — where Parvati's friend hid her from an unwanted match",
+            description: "Hartalika Teej falls on Bhadrapada Shukla Tritiya, three days before Ganesh Chaturthi. It celebrates the legend of Parvati's friend (sakhi) who abducted her to prevent a marriage arranged by her father to Vishnu, allowing Parvati to continue her penance for Shiva. Women observe a strict nirjal fast and create clay Shiva-Parvati idols.",
+            significance: "Hartalika Teej represents the power of feminine devotion and friendship. Parvati's unwavering determination to marry only Shiva — aided by her loyal friend — makes this a celebration of both marital devotion and the sacred bond between women.",
+            observances: [
+                "Observe a strict nirjal (waterless) fast from sunrise to next morning",
+                "Make clay idols of Shiva and Parvati and worship them",
+                "Listen to the Hartalika Teej Katha",
+                "Dress in bridal finery with green bangles and sindoor",
+                "Immerse the clay idols in water the next morning"
+            ],
+            associatedDeity: "Parvati"
+        ),
+        "Ganga Dussehra": FestivalInfo(
+            name: "Ganga Dussehra",
+            meaning: "Ten-day Descent of the Ganga — celebrating her arrival on Earth",
+            description: "Ganga Dussehra commemorates the descent of the holy river Ganga from heaven to earth on Jyeshtha Shukla Dashami. According to the Ramayana, King Bhagiratha performed intense penance to bring Ganga down to liberate his ancestors' souls. Shiva caught her in his matted locks to prevent the earth from shattering under her force.",
+            significance: "The Ganga's descent represents divine grace flowing into the mortal world. Bathing in the Ganga on this day is believed to wash away the ten sins (dasha-papa). The festival honors water as the most sacred element in Hindu worship.",
+            observances: [
+                "Bathe in the Ganga or any sacred river at sunrise",
+                "Offer ten items — flowers, fruits, sesame, barley, and more — to the river",
+                "Float lit diyas on the Ganga in the evening",
+                "Donate food, clothes, and gold near riverbanks",
+                "Chant the Ganga Stotra or Ganga Aarti"
+            ],
+            associatedDeity: "Ganga"
+        ),
+        "Nirjala Ekadashi": FestivalInfo(
+            name: "Nirjala Ekadashi",
+            meaning: "Waterless Eleventh — the strictest Ekadashi fast",
+            description: "Nirjala Ekadashi, also called Bhimseni Ekadashi, falls on Jyeshtha Shukla Ekadashi. It is the most austere of all 24 Ekadashis — devotees abstain from both food and water for the entire day and night. Legend says Bhima, who could not fast on other Ekadashis due to his immense appetite, was given this single Ekadashi that equals the merit of all others.",
+            significance: "Observing just this one Ekadashi is said to grant the cumulative spiritual merit of all 24 Ekadashis in the year. It falls during the peak of summer, making the waterless fast especially challenging and spiritually meritorious.",
+            observances: [
+                "Observe complete nirjal (waterless) fast from sunrise to next sunrise",
+                "Chant Om Namo Narayanaya throughout the day",
+                "Read or listen to the Nirjala Ekadashi Katha",
+                "Donate water, buttermilk, and fruits to the needy",
+                "Break the fast during the parana window on Dwadashi morning"
+            ],
+            associatedDeity: "Vishnu"
+        ),
+        "Ahoi Ashtami": FestivalInfo(
+            name: "Ahoi Ashtami",
+            meaning: "Ahoi (a cry for help) on the Eighth day — mothers' protective fast",
+            description: "Ahoi Ashtami falls on Kartik Krishna Ashtami, eight days before Diwali. Mothers observe a day-long fast for the health, safety, and long life of their children. The festival originated from the legend of a woman who accidentally killed a baby porcupine while digging earth, bringing misfortune to her children until she prayed to Ahoi Mata.",
+            significance: "Ahoi Ashtami celebrates the fierce protective love of mothers. The fast channels maternal tapas into a shield of divine protection around the children. It reinforces the Hindu belief that a mother's prayers are the most powerful force in a child's life.",
+            observances: [
+                "Observe a nirjal or phalahar fast until stars appear in the evening",
+                "Draw or paint an image of Ahoi Mata (often depicted with her children)",
+                "Listen to the Ahoi Ashtami Katha in the evening",
+                "Offer wheat sprouts, puri, and halwa to Ahoi Mata",
+                "Break the fast after sighting the stars and offering water"
+            ],
+            associatedDeity: "Ahoi Mata"
+        ),
+        "Annakut": FestivalInfo(
+            name: "Annakut (Govardhan Puja)",
+            meaning: "Mountain of Food — the grand offering to Krishna",
+            description: "Annakut is the festival of offering a mountain of food to Lord Krishna, celebrated the day after Diwali. Temples prepare elaborate displays of 56 or 108 food items (Chhappan Bhog) arranged in a mountain shape. The festival commemorates Krishna's instruction to the people of Vrindavan to worship Govardhan Hill instead of Indra.",
+            significance: "Annakut teaches that true devotion is expressed through gratitude to nature and community rather than fear of celestial power. The mountain of food symbolizes abundance shared collectively — no one goes hungry on Annakut day.",
+            observances: [
+                "Prepare 56 (Chhappan Bhog) or 108 food dishes as offerings",
+                "Visit temples to view the elaborate Annakut display",
+                "Create a small Govardhan hill from cow dung and circumambulate it",
+                "Feed cattle and perform Go Puja (cow worship)",
+                "Distribute prasad generously to the entire community"
+            ],
+            associatedDeity: "Krishna"
+        ),
+
+        // ── Bengali festivals ──
+
+        "Durga Puja Saptami": FestivalInfo(
+            name: "Durga Puja Saptami",
+            meaning: "Seventh Day — Durga's arrival and the beginning of the great worship",
+            description: "Durga Puja Saptami marks the first major day of the Bengali Durga Puja festival. The goddess is believed to arrive on Earth with her children — Lakshmi, Saraswati, Ganesha, and Kartikeya. The day begins with the Nabapatrika Snan (bathing of nine plants representing Durga) and the Prana Pratishtha ceremony to infuse life into the idol.",
+            significance: "Saptami is the awakening day — the moment the clay idol transforms from art into divinity. The Nabapatrika (nine plants tied together and draped in a sari) represents Durga's connection to the plant kingdom and the life force of nature.",
+            observances: [
+                "Perform Nabapatrika Snan (bathing of the nine-plant bundle) at dawn",
+                "Conduct Prana Pratishtha to invoke the goddess into the idol",
+                "Begin the Saptami Puja with chanting of Durga Saptashati",
+                "Visit pandals (temporary temples) to view the artistic Durga idols",
+                "Offer Bhog (prasad) of khichuri, labra, and payesh"
+            ],
+            associatedDeity: "Durga"
+        ),
+        "Durga Puja Ashtami": FestivalInfo(
+            name: "Durga Puja Ashtami",
+            meaning: "Eighth Day — Maha Ashtami, the pinnacle of Durga Puja",
+            description: "Durga Puja Ashtami is the most intense day of the Bengali Durga Puja. It features the dramatic Sandhi Puja at the exact junction of Ashtami and Navami — when 108 lotus lamps are lit and 108 lotuses offered in the span of 48 minutes. Kumari Puja, where a young girl is worshipped as the living goddess, is a highlight.",
+            significance: "Ashtami is when Durga's shakti reaches its cosmic peak. The Sandhi Puja commemorates the exact moment Chamunda emerged from Durga to slay the demons Chanda and Munda. It is the most spiritually charged moment of the entire five-day festival.",
+            observances: [
+                "Attend the Sandhi Puja at the Ashtami-Navami junction",
+                "Witness or participate in Kumari Puja (worship of a young girl as Durga)",
+                "Offer Anjali (handfuls of flowers) with Durga mantras",
+                "Perform Pushpanjali at the pandal during morning puja",
+                "Feast on the elaborate Ashtami Bhog prasad"
+            ],
+            associatedDeity: "Durga"
+        ),
+        "Kali Puja": FestivalInfo(
+            name: "Kali Puja",
+            meaning: "Worship of Kali — the Dark Mother who destroys evil",
+            description: "Kali Puja is a Bengali festival observed on Kartik Amavasya (Diwali night). While most of India celebrates Diwali with Lakshmi Puja, Bengal worships Goddess Kali — the fierce, dark aspect of the Divine Mother. Elaborate pandals display stunning Kali idols, and tantric rituals are performed through the night.",
+            significance: "Kali represents the raw, untamed power of the divine feminine — the force that destroys ego, ignorance, and evil. Worshipping Kali on the darkest night of the year symbolizes finding the divine light within absolute darkness. She is the Mother who liberates by destroying illusions.",
+            observances: [
+                "Install and worship Kali idols in homes and pandals",
+                "Perform the puja at midnight — Kali's most powerful hour",
+                "Offer red hibiscus flowers, sweets, and rice to the goddess",
+                "Stay awake through the night in devotion and chanting",
+                "Immerse the Kali idol in water the following day"
+            ],
+            associatedDeity: "Kali"
+        ),
+        "Saraswati Puja": FestivalInfo(
+            name: "Saraswati Puja (Vasant Panchami)",
+            meaning: "Worship of the Goddess of Knowledge, Music, and Arts",
+            description: "Saraswati Puja is the Bengali celebration of Goddess Saraswati on Magha Shukla Panchami, coinciding with Vasant Panchami across India. Students and artists place their books, instruments, and tools before the goddess, refraining from study on this day as Saraswati herself blesses the instruments of learning. Grand pandals with Saraswati idols are set up across Bengal.",
+            significance: "For Bengalis, Saraswati Puja is as culturally significant as Durga Puja. It is the day when the goddess who sits on a white lotus, clad in white, playing the veena, bestows the gift of vidya (knowledge) upon her devotees. Children write their first letters on this day.",
+            observances: [
+                "Install a Saraswati idol dressed in white with a veena",
+                "Place books, pens, and instruments before the goddess — do not use them today",
+                "Wear yellow or white clothes and offer yellow flowers",
+                "Perform Akshar Abhyas — children write their first letters",
+                "Immerse the idol on Shri Panchami the following day"
+            ],
+            associatedDeity: "Saraswati"
+        ),
+        "Jamai Shashti": FestivalInfo(
+            name: "Jamai Shashti",
+            meaning: "Son-in-Law's Sixth — honoring the daughter's husband",
+            description: "Jamai Shashti is a uniquely Bengali festival observed on Jyeshtha Shukla Shashthi where mothers-in-law honor their sons-in-law (jamai) with an elaborate feast. The tradition reflects the deep value placed on the relationship between a mother and her daughter's husband in Bengali culture.",
+            significance: "Jamai Shashti strengthens family bonds across the marriage alliance. It celebrates the idea that a son-in-law is not an outsider but a cherished member of the family. The elaborate feast symbolizes the mother-in-law's love and the family's gratitude.",
+            observances: [
+                "Mother-in-law invites son-in-law for a grand feast",
+                "Prepare elaborate Bengali dishes — shukto, chingri malaikari, mishti doi",
+                "Apply a sandalwood tilak on the son-in-law's forehead",
+                "Gift new clothes and sweets to the jamai",
+                "Gather the extended family for a festive celebration"
+            ],
+            associatedDeity: "Family"
+        ),
+        "Poush Parbon": FestivalInfo(
+            name: "Poush Parbon",
+            meaning: "Festival of Poush — the Bengali winter harvest celebration",
+            description: "Poush Parbon is a Bengali harvest festival celebrated on the last day of the Bengali month of Poush (mid-January). It marks the harvest of the new rice crop and the preparation of pithe-puli — a vast array of traditional rice-flour and date-palm-jaggery sweets that define Bengali winter cuisine.",
+            significance: "Poush Parbon celebrates the bounty of the Bengali winter harvest and the sweetness of community life. The festival keeps alive centuries-old culinary traditions — each family's pithe recipes are handed down through generations. It is a celebration of food as culture.",
+            observances: [
+                "Prepare pithe-puli — patishapta, dudh puli, gokul pithe, and more",
+                "Harvest new rice (nababarsha dhaan) and use it for the first time",
+                "Collect notun gur (fresh date-palm jaggery) for the sweets",
+                "Invite neighbors and relatives for pithe-sharing",
+                "Worship Lakshmi and offer the first pithe as prasad"
+            ],
+            associatedDeity: "Lakshmi"
+        ),
+
+        // ── Telugu/Andhra festivals ──
+
+        "Bathukamma": FestivalInfo(
+            name: "Bathukamma",
+            meaning: "Mother Goddess, Come Alive — 'Bathuku' (life) + 'Amma' (mother)",
+            description: "Bathukamma is Telangana's iconic nine-day flower festival, celebrated during Sharad Navratri. Women create stunning conical flower arrangements using seasonal wildflowers like gunuka, tangedu, and banti. They dance in concentric circles around the Bathukamma, singing traditional songs, and on the final day immerse the flower stacks in water.",
+            significance: "Bathukamma celebrates the feminine life force through flowers that bloom after the monsoon. The circular dance represents the cycle of creation, the flowers honor Gauri (Parvati), and the immersion returns the offerings to the water that sustains all life. It is Telangana's most beloved cultural identity.",
+            observances: [
+                "Build a conical Bathukamma stack with layers of seasonal flowers",
+                "Dress in traditional Telangana attire and gather with other women",
+                "Dance in circles around the Bathukamma singing folk songs",
+                "Prepare special Bathukamma rice dishes (Sakinalu, Malida)",
+                "Immerse the Bathukamma in a lake or river on the final day"
+            ],
+            associatedDeity: "Gauri (Parvati)"
+        ),
+        "Bonalu": FestivalInfo(
+            name: "Bonalu",
+            meaning: "Offerings (Bhojanalu) — food offered to the Mother Goddess",
+            description: "Bonalu is a Telangana goddess festival celebrated during Ashada month (July-August). Women carry decorated pots (bonam) of cooked rice, jaggery, and curd on their heads to the local Ammavari (Mother Goddess) temple. The festival features dramatic Potharaju (the goddess's brother) dances, Rangam prophecies, and processions.",
+            significance: "Bonalu is a thanksgiving to the Mother Goddess for protecting the community from epidemics and misfortune. Rooted in Telangana's folk traditions, it honors the fierce protective goddesses — Mahakali, Yellamma, Pochamma — who guard villages and cities.",
+            observances: [
+                "Prepare bonam (cooked rice with jaggery and curd) in a decorated pot",
+                "Carry the bonam on the head in procession to the goddess temple",
+                "Watch the Potharaju dance and Rangam prophecy ceremony",
+                "Offer turmeric, kumkum, and bangles to the goddess",
+                "Sacrifice a goat or offer a coconut as a substitute at the temple"
+            ],
+            associatedDeity: "Mahakali / Yellamma"
+        ),
+
+        // ── Maharashtrian festivals ──
+
+        "Vat Savitri": FestivalInfo(
+            name: "Vat Savitri (Vat Purnima)",
+            meaning: "Banyan Tree Vow of Savitri — honoring wifely devotion",
+            description: "Vat Savitri is observed by married women who fast and tie sacred threads around a banyan (vat) tree, praying for their husband's longevity. The festival celebrates the legendary Savitri who outwitted Yama (god of death) through her wit and devotion, winning back her husband Satyavan's life.",
+            significance: "Savitri's story is the ultimate testament to the power of a devoted wife's determination. She followed Yama himself, debating him through three boons until he had no choice but to return Satyavan's soul. The banyan tree, with its immortal aerial roots, symbolizes the eternal marital bond.",
+            observances: [
+                "Observe a day-long fast (nirjal or phalahar) for husband's longevity",
+                "Tie sacred threads (moli) around a banyan tree trunk",
+                "Circumambulate the banyan tree seven times with prayers",
+                "Listen to the Savitri-Satyavan Katha under the tree",
+                "Offer water, flowers, and vermilion to the banyan tree roots"
+            ],
+            associatedDeity: "Savitri / Satyavan"
+        ),
+        "Bail Pola": FestivalInfo(
+            name: "Bail Pola",
+            meaning: "Bull Festival — honoring the agricultural bulls",
+            description: "Bail Pola is a Maharashtrian festival honoring bulls and cattle, observed on Shravan Amavasya. Farmers bathe, decorate, and worship their bulls with garlands, paint, and ornaments. The bulls are given a day of complete rest and fed special treats — puran poli, sugarcane, and jaggery. Bull processions pass through villages with drumming and celebration.",
+            significance: "Bail Pola recognizes the indispensable role of bulls in Indian agriculture. Before mechanization, the bull was a farmer's most valuable partner. The festival teaches gratitude toward the animals who share human labor and sustain the food supply.",
+            observances: [
+                "Bathe and decorate bulls with colorful paint, garlands, and ornaments",
+                "Feed bulls special treats — puran poli, jaggery, and sugarcane",
+                "Give bulls a complete day of rest from all fieldwork",
+                "Take decorated bulls in a procession through the village",
+                "Worship Nandi and perform puja to the bull with turmeric and kumkum"
+            ],
+            associatedDeity: "Nandi / Agricultural"
+        ),
+
+        // ── Odia festivals ──
+
+        "Jagannath Rath Yatra": FestivalInfo(
+            name: "Jagannath Rath Yatra",
+            meaning: "The Grand Chariot Journey of Lord Jagannath",
+            description: "Jagannath Rath Yatra is the annual chariot festival in Puri, Odisha — among the grandest spectacles in Hinduism. Three colossal wooden chariots carrying Lord Jagannath, Balabhadra, and Subhadra are pulled by hundreds of thousands of devotees from the Jagannath Temple to Gundicha Temple, a journey of three kilometers. The festival has continued unbroken for over 800 years.",
+            significance: "The Rath Yatra embodies the Lord's accessibility — Jagannath leaves his sanctum to be among all people, regardless of caste, creed, or status. Pulling the chariot rope grants the merit of a thousand Ashwamedha yagnas. The English word 'juggernaut' derives from this festival's overwhelming scale.",
+            observances: [
+                "Pull the chariot ropes during the procession (even touching them brings merit)",
+                "Visit Puri or participate in local Rath Yatra processions",
+                "Offer Mahaprasad — the sacred 56-dish offering of Lord Jagannath",
+                "Chant 'Jai Jagannath' and sing bhajans during the procession",
+                "Observe fast and perform Vishnu puja throughout the nine-day festival"
+            ],
+            associatedDeity: "Jagannath (Vishnu)"
+        ),
+        "Nuakhai": FestivalInfo(
+            name: "Nuakhai",
+            meaning: "New Rice — 'nua' (new) + 'khai' (food/eating)",
+            description: "Nuakhai is Western Odisha's most important harvest festival, celebrated the day after Ganesh Chaturthi. Families gather to eat the first rice of the new harvest season after offering it to the presiding deity Maa Samaleswari. The eldest member of the family feeds the new rice to each family member in order of age, called 'Nuakhai Bhetghat'.",
+            significance: "Nuakhai is a celebration of gratitude to the earth and the divine for the harvest. The ritual of the eldest feeding the youngest binds generations together. It is the single most important day for the people of Western Odisha — diaspora members travel hundreds of miles to be home.",
+            observances: [
+                "Offer the first grains of new rice (nabanna) to the family deity",
+                "Eldest family member feeds new rice to each person in age order",
+                "Wear new clothes and gather the entire extended family",
+                "Prepare festive dishes with the new harvest rice",
+                "Seek blessings from elders with the Nuakhai Bhetghat greeting"
+            ],
+            associatedDeity: "Lakshmi"
+        ),
+        "Raja Parba": FestivalInfo(
+            name: "Raja Parba",
+            meaning: "Festival of the Earth's Menstruation — celebrating Bhudevi's fertility",
+            description: "Raja Parba is a unique three-day Odia festival celebrating the earth's menstruation and fertility, observed around the solar transit into Mithuna (Gemini). Women and girls rest, swing on rope swings, play games, and eat special poda pitha (baked cakes). No plowing, digging, or cutting of trees is allowed — the earth is given rest.",
+            significance: "Raja Parba is one of the rare festivals that honor menstruation as sacred and the earth as a living, fertile being. It celebrates womanhood, fertility, and the earth's regenerative power. The three days symbolize the earth's menstrual cycle before the monsoon rains bring new growth.",
+            observances: [
+                "Give the earth complete rest — no plowing, digging, or cutting trees",
+                "Women and girls swing on decorated rope swings",
+                "Prepare poda pitha (baked rice cake) and other Odia sweets",
+                "Play traditional outdoor games and visit friends",
+                "On the third day (Basi Raja), bathe and resume normal activities"
+            ],
+            associatedDeity: "Bhudevi (Earth Goddess)"
+        ),
+
+        // ── Tamil/South Indian festivals ──
+
+        "Skanda Sashti": FestivalInfo(
+            name: "Skanda Sashti",
+            meaning: "Sixth Day of Skanda (Murugan) — celebrating his victory over Surapadman",
+            description: "Skanda Sashti is a six-day festival in the Tamil month of Aippasi dedicated to Lord Murugan (Kartikeya). It culminates on Sashti tithi with the Soorasamharam — the dramatic reenactment of Murugan's victory over the demon Surapadman. Tiruchendur temple on the Bay of Bengal is the epicenter of celebrations.",
+            significance: "Skanda Sashti celebrates the triumph of divine youth and valor over the forces of darkness. Murugan, born from Shiva's third eye, represents the focused power of spiritual discipline. His victory teaches that even the mightiest evil falls before righteous determination.",
+            observances: [
+                "Observe a six-day fast (many observe complete nirjal on the final day)",
+                "Recite the Kanda Sashti Kavacham daily during the six days",
+                "Watch the Soorasamharam (demon-slaying) reenactment at a Murugan temple",
+                "Visit one of the six abodes (Arupadaiveedu) of Murugan",
+                "Offer vel (spear) shaped decorations and vibhuti to Murugan"
+            ],
+            associatedDeity: "Murugan (Kartikeya)"
+        ),
+        "Aadi Amavasai": FestivalInfo(
+            name: "Aadi Amavasai",
+            meaning: "New Moon of Aadi — Tamil month's sacred ancestor day",
+            description: "Aadi Amavasai falls on the new moon of the Tamil month Aadi (July-August) and is the most important day for ancestor worship in Tamil Nadu. Families travel to sacred rivers and the seashore — especially Rameswaram — to perform Tarpanam and Pinda Daan for departed ancestors.",
+            significance: "Tamil tradition holds that the Aadi month is when the veil between the living and the dead is thinnest. Performing Tarpanam on Aadi Amavasai reaches ancestors across all generations. It is considered especially potent for resolving Pitru Dosha (ancestral debts).",
+            observances: [
+                "Perform Tarpanam (water and sesame offerings) at a river or seashore",
+                "Offer Pinda Daan (rice balls) to departed ancestors",
+                "Visit Rameswaram, Kasi, or a sacred river for the rituals",
+                "Cook the favorite foods of deceased family members as offerings",
+                "Donate food, clothes, and money to Brahmins in ancestors' names"
+            ],
+            associatedDeity: "Pitrus (Ancestors)"
+        ),
+
+        // ── Solar ingress regional additions ──
+
+        "Uttarayan": FestivalInfo(
+            name: "Uttarayan",
+            meaning: "Northward Journey — the Sun's transit toward the north",
+            description: "Uttarayan marks the Sun's northward journey beginning on Makar Sankranti, transitioning from Dakshinayana to Uttarayana. This six-month period from January to July is considered the most auspicious half of the year. In Gujarat, Uttarayan is synonymous with the International Kite Festival — millions of kites fill the sky.",
+            significance: "Uttarayan is the gateway period of light and spiritual advancement. Bhishma Pitamah chose to die during Uttarayan to ensure his soul's liberation. The Bhagavad Gita declares that those who depart during Uttarayan attain the path of no return (Brahman).",
+            observances: [
+                "Fly kites from rooftops — a tradition especially grand in Gujarat",
+                "Take a holy bath at dawn in a sacred river",
+                "Offer sesame-jaggery (til-gur) sweets to family and friends",
+                "Donate warm clothes, blankets, and food to the needy",
+                "Begin new spiritual practices or deepen existing sadhana"
+            ],
+            associatedDeity: "Surya (Sun God)"
+        ),
+        "Magh Bihu": FestivalInfo(
+            name: "Magh Bihu",
+            meaning: "Bihu of the month Magh — Assamese harvest festival",
+            description: "Magh Bihu (Bhogali Bihu) is the Assamese harvest festival celebrated in mid-January, coinciding with Makar Sankranti. The centerpiece is the Meji — a towering bonfire built from bamboo, thatch, and hay that is lit at dawn. Communities gather around Bhela Ghar (temporary feasting huts) for all-night celebrations with traditional Assamese cuisine.",
+            significance: "Magh Bihu celebrates the end of the harvesting season and the abundance of the granary. The Meji bonfire symbolizes warmth, community, and the offering of the old to welcome the new. It is a festival of feasting, togetherness, and gratitude to the fire god.",
+            observances: [
+                "Build and light the Meji (ceremonial bonfire) at dawn",
+                "Construct a Bhela Ghar (community feast hut) from bamboo and thatch",
+                "Prepare pitha, laru, and jolpan (traditional Assamese rice cakes and sweets)",
+                "Feast together through the night in the Bhela Ghar",
+                "Offer the first harvest rice to Agni through the Meji fire"
+            ],
+            associatedDeity: "Agni (Fire God)"
+        ),
+        "Bohag Bihu": FestivalInfo(
+            name: "Bohag Bihu (Rongali Bihu)",
+            meaning: "Bihu of Bohag month — Assamese New Year celebration",
+            description: "Bohag Bihu (Rongali Bihu) is the Assamese New Year festival celebrated in mid-April, marking the onset of the sowing season. It is a week-long celebration of music, dance, and youthful energy. The Bihu dance, performed by young men and women in traditional attire, is Assam's most iconic cultural expression. Cattle are bathed and honored on the first day (Goru Bihu).",
+            significance: "Bohag Bihu celebrates new beginnings, fertility, and the joy of spring. Unlike temple-centric festivals, it is rooted in the agrarian rhythms of the Brahmaputra valley. The Bihu dance tradition preserves ancient fertility rites through one of India's most vibrant folk art forms.",
+            observances: [
+                "Bathe and worship cattle on Goru Bihu (the first day)",
+                "Exchange Gamosa (traditional Assamese towels) with loved ones",
+                "Perform and enjoy the Bihu dance with dhol and pepa music",
+                "Prepare traditional Assamese New Year feast with pitha and doi",
+                "Wear traditional Mekhela Chador (women) and Dhoti-Gamosa (men)"
+            ],
+            associatedDeity: "Agricultural / Cultural"
+        ),
+        "Poila Boishakh": FestivalInfo(
+            name: "Poila Boishakh",
+            meaning: "First of Boishakh — Bengali New Year",
+            description: "Poila Boishakh is the Bengali New Year, celebrated on the first day of the Bengali month Boishakh (mid-April). Businesses open new account books (Hal Khata) and offer sweets to customers. In Kolkata, grand processions with Mangal Shobhajatra (festive parades featuring masks and floats) fill the streets. Families wear new clothes and feast on traditional Bengali food.",
+            significance: "Poila Boishakh represents fresh beginnings in the Bengali calendar. The Hal Khata tradition connects spiritual renewal with economic activity — starting the year with clean accounts and honest dealings. It is Bengali culture's most universal celebration, transcending religion.",
+            observances: [
+                "Open new account books (Hal Khata) for businesses with sweets for customers",
+                "Wear new clothes — white and red for women, fresh dhoti-kurta for men",
+                "Attend Mangal Shobhajatra processions and cultural programs",
+                "Prepare a festive Bengali meal — ilish maach, cholar dal, payesh",
+                "Seek blessings from elders and visit Kalighat or other temples"
+            ],
+            associatedDeity: "Ganesha / Lakshmi"
+        ),
+        "Kati Bihu": FestivalInfo(
+            name: "Kati Bihu (Kongali Bihu)",
+            meaning: "Bihu of Kati month — Assamese festival of lights and prayers for the crop",
+            description: "Kati Bihu (Kongali Bihu) is the most somber of the three Assamese Bihu festivals, observed in mid-October when the paddy is growing but the granary is nearly empty. Farmers light earthen lamps (saki) at the foot of tulsi plants and in the paddy fields, praying for a good harvest. It is a time of austerity, hope, and devotion.",
+            significance: "Kati Bihu reflects the anxiety and faith of the agricultural cycle's most uncertain phase. The lit saki in the fields guide departed souls and protect the growing crop from evil. The festival teaches patience, frugality, and trust in the divine during lean times.",
+            observances: [
+                "Light earthen lamps (saki) at the base of the tulsi plant at dusk",
+                "Place saki lamps in the paddy fields and granary",
+                "Pray for a bountiful harvest and protection of crops",
+                "Observe simple meals — this is a lean season festival",
+                "Tie Akash Banti (sky lamps) on tall bamboo poles"
+            ],
+            associatedDeity: "Tulsi / Agricultural"
+        ),
+
+        // ── Nakshatra-based festivals ──
+
+        "Thaipusam": FestivalInfo(
+            name: "Thaipusam",
+            meaning: "Thai (Tamil month) + Pusam (Pushya nakshatra) — festival of penance",
+            description: "Thaipusam is a Tamil festival of penance and devotion to Lord Murugan, observed on the full moon of the Tamil month Thai when the moon aligns with Pushya nakshatra. Devotees undertake extraordinary acts of devotion — carrying kavadi (elaborate decorated structures on their shoulders), piercing their skin with vel (spears), and walking on burning coals.",
+            significance: "Thaipusam celebrates the day Parvati gave Murugan the divine Vel (spear) to vanquish evil. The kavadi and piercing rituals represent the mortification of the flesh as a path to spiritual transcendence. Devotees enter trance states through intense prayer, enduring no pain and showing no wounds.",
+            observances: [
+                "Carry the kavadi — an ornate structure on the shoulders — to the Murugan temple",
+                "Observe strict vegetarian fast and abstinence for days before the festival",
+                "Pierce the body with vel skewers as acts of devotion and penance",
+                "Walk barefoot in procession chanting 'Vel Vel Vetri Vel'",
+                "Offer milk pots (paal kudam) to Murugan at the temple"
+            ],
+            associatedDeity: "Murugan (Kartikeya)"
+        ),
+        "Karthigai Deepam": FestivalInfo(
+            name: "Karthigai Deepam",
+            meaning: "Lamps of the Krittika Star — Tamil festival of lights",
+            description: "Karthigai Deepam is an ancient Tamil festival of lights observed on the full moon of the Tamil month Karthigai when the moon is in Krittika nakshatra. The highlight is the Maha Deepam — a colossal fire lit atop Tiruvannamalai's Arunachala Hill, visible for kilometers. Every home is illuminated with rows of oil lamps (agal vilakku).",
+            significance: "Karthigai Deepam predates Diwali as Tamil Nadu's original festival of lights. The Maha Deepam on Arunachala represents Shiva's appearance as an infinite column of fire (Jyotirlinga) to prove his supremacy to Brahma and Vishnu. The festival celebrates light as the manifestation of the divine.",
+            observances: [
+                "Light rows of agal vilakku (clay oil lamps) in every room and the entrance",
+                "Watch or pilgrimage to the Maha Deepam lighting on Arunachala Hill",
+                "Perform Girivalam — circumambulation of Arunachala Hill on foot",
+                "Prepare sweet pongal, appam, and other festive offerings",
+                "Chant the Tiruvannamalai Deepa Darshana mantras"
+            ],
+            associatedDeity: "Shiva"
+        ),
+
+        // ── Monthly recurring observances ──
+
+        "Sankashti Chaturthi": FestivalInfo(
+            name: "Sankashti Chaturthi",
+            meaning: "Chaturthi that Removes Difficulties — monthly Ganesha fasting day",
+            description: "Sankashti Chaturthi falls on the Krishna Paksha Chaturthi (fourth day of the waning moon) every month. Devotees observe a day-long fast and break it only after sighting the moon at night. Each month's Sankashti is associated with a different form of Ganesha and a specific temple. Magha Sankashti (Sakat Chauth) is considered the most powerful.",
+            significance: "The word 'Sankashti' means deliverance from troubles. Monthly observance of this vrata is believed to systematically remove all obstacles from life. Ganesha, as Vighnaharta (remover of obstacles), is most accessible on this tithi.",
+            observances: [
+                "Observe a day-long fast (phalahar or nirjal) until moonrise",
+                "Worship Ganesha with durva grass, modak, and red flowers",
+                "Recite the Sankashti Chaturthi Katha specific to the month",
+                "Sight the moon at night and break the fast with prasad",
+                "Chant Om Gan Ganapataye Namaha 108 times"
+            ],
+            associatedDeity: "Ganesha"
+        ),
+        "Vinayaka Chaturthi": FestivalInfo(
+            name: "Vinayaka Chaturthi",
+            meaning: "Monthly Shukla Chaturthi — auspicious Ganesha worship day",
+            description: "Vinayaka Chaturthi falls on the Shukla Paksha Chaturthi (fourth day of the waxing moon) every month. While the Bhadrapada occurrence is Ganesh Chaturthi (the grand annual festival), every month's Shukla Chaturthi is auspicious for Ganesha worship. Devotees perform puja, offer modak, and seek blessings for new beginnings.",
+            significance: "As the lord of beginnings, Ganesha's monthly Shukla Chaturthi provides a regular opportunity to remove obstacles and seek blessings for ongoing endeavors. The waxing moon energy combined with Ganesha's grace makes this an ideal day for launching new projects.",
+            observances: [
+                "Perform Ganesha puja with fresh flowers and modak",
+                "Offer 21 blades of durva grass and red hibiscus",
+                "Recite Ganapati Atharvashirsha or Ganesha Stotram",
+                "Begin new ventures or important tasks on this day",
+                "Visit a Ganesha temple and circumambulate three times"
+            ],
+            associatedDeity: "Ganesha"
+        ),
+        "Masik Shivaratri": FestivalInfo(
+            name: "Masik Shivaratri",
+            meaning: "Monthly Night of Shiva — Krishna Chaturdashi observance",
+            description: "Masik Shivaratri falls on the Krishna Paksha Chaturdashi (14th day of the waning moon) every month, the same tithi as the grand Maha Shivaratri. While Maha Shivaratri in Phalguna is the grandest, every month's Shivaratri is sacred for Shiva devotees. The puja is performed during the Nishita Kaal (midnight hour) when Shiva's energy is believed to be most potent.",
+            significance: "Each monthly Shivaratri is a doorway to Shiva's grace. The dark fortnight's Chaturdashi, just before Amavasya, represents the dissolution of the ego before spiritual rebirth. Regular observance builds a cumulative spiritual charge that leads to liberation.",
+            observances: [
+                "Observe a fast and perform Shiva puja during the four prahar of the night",
+                "Bathe the Shiva Linga with milk, honey, water, and bel leaves",
+                "Chant Om Namah Shivaya or Maha Mrityunjaya Mantra 108 times",
+                "Stay awake through the night in meditation (jagran)",
+                "Break the fast the next morning after the morning puja"
+            ],
+            associatedDeity: "Shiva"
         ),
     ]
 

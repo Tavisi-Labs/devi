@@ -14,6 +14,9 @@ struct HomeView: View {
     @State private var settingsRotation = false
     @State private var dayNavDragOffset: CGFloat = 0
     @State private var cardTapCount: Int = 0
+    @State private var immersiveElement: PanchangElement?
+    @State private var sheetElement: PanchangElement?
+    @State private var isTransitioning = false
 
     var body: some View {
         ZStack {
@@ -179,9 +182,14 @@ struct HomeView: View {
 
                     // MARK: - 11. Navratri Card (conditional)
                     if let navDay = vm.currentNavratriDay {
-                        NavratriCard(day: navDay, theme: vm.theme)
-                            .padding(.horizontal)
-                            .padding(.top, 32)
+                        Button {
+                            selectedElement = .navratriDay(navDay)
+                        } label: {
+                            NavratriCard(day: navDay, theme: vm.theme)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal)
+                        .padding(.top, 32)
                     }
 
                     // MARK: - 12. Upcoming (capped + "Show All")
@@ -203,7 +211,7 @@ struct HomeView: View {
             SettingsView(vm: vm)
                 .presentationBackground(.background)
         }
-        .sheet(item: $selectedElement) { element in
+        .sheet(item: $sheetElement) { element in
             PanchangDetailSheet(
                 element: element,
                 theme: vm.theme,
@@ -228,9 +236,32 @@ struct HomeView: View {
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: vm.timePeriod)
         .sensoryFeedback(.impact(weight: .heavy), trigger: vm.countdownZeroTrigger)
         .onChange(of: selectedElement?.id) { _, _ in
+            guard let el = selectedElement, !isTransitioning else { return }
             cardTapCount += 1
+            isTransitioning = true
+            // Clear first so SwiftUI doesn't fight dismiss/present
+            selectedElement = nil
+            // Small delay to let any open sheet dismiss first
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                switch el {
+                case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .mantra:
+                    immersiveElement = el
+                default:
+                    sheetElement = el
+                }
+                isTransitioning = false
+            }
         }
         // Meditation mode
+        .fullScreenCover(item: $immersiveElement) { element in
+            ImmersiveDetailRouter(
+                element: element,
+                theme: vm.theme,
+                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                cityName: vm.currentCity.name,
+                panchangContext: vm.todayPanchang
+            )
+        }
         .fullScreenCover(isPresented: $showMeditationMode) {
             AmbientMeditationView(vm: vm)
         }
@@ -308,7 +339,7 @@ struct HomeView: View {
             // Centered Vedic date + Gregorian date
             if let panchang = vm.todayPanchang {
                 Text("\(panchang.lunarMonth) \u{00B7} \(panchang.tithi.paksha.rawValue) Paksha")
-                    .scaledFont(size: 13, weight: .regular)
+                    .scaledFont(size: 13, weight: .regular, design: .serif)
                     .foregroundColor(vm.theme.secondaryText)
             }
 
@@ -320,91 +351,119 @@ struct HomeView: View {
             }
 
             Text(formattedDate)
-                .scaledFont(size: 12, weight: .regular)
+                .scaledFont(size: 12, weight: .regular, design: .serif)
                 .foregroundColor(vm.theme.secondaryText.opacity(0.7))
                 .contentTransition(.interpolate)
         }
         .animation(.easeInOut(duration: 0.3), value: vm.dayOffset)
     }
 
-    // MARK: - Tithi Display (tappable)
+    // MARK: - Tithi Display (moon phase medallion + inline content)
 
     private var tithiSection: some View {
-        VStack(spacing: 10) {
+        Group {
             if let panchang = vm.todayPanchang {
-                Button {
-                    selectedElement = .tithi(panchang.tithi)
-                } label: {
-                    HStack(spacing: 6) {
-                        Text(panchang.tithi.name.uppercased())
-                            .deviLabel(.sacredTitle, theme: vm.theme)
-                            .tracking(2)
-                            .contentTransition(.interpolate)
-
-                        Image(systemName: "info.circle")
-                            .font(.system(size: 14))
-                            .foregroundColor(vm.theme.secondaryText.opacity(0.6))
-                    }
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    selectedElement = .nakshatra(panchang.nakshatra)
-                } label: {
-                    Text("\(panchang.nakshatra.name) Nakshatra")
-                        .scaledFont(size: 15, weight: .regular, design: .serif)
-                        .foregroundColor(vm.theme.secondaryText)
-                        .contentTransition(.interpolate)
-                }
-                .buttonStyle(.plain)
+                TithiHeroSection(
+                    tithi: panchang.tithi,
+                    nakshatra: panchang.nakshatra,
+                    theme: vm.theme,
+                    onTapTithi: { selectedElement = .tithi(panchang.tithi) },
+                    onTapNakshatra: { selectedElement = .nakshatra(panchang.nakshatra) }
+                )
             }
         }
     }
 
-    // MARK: - Three-Fact Info Bar
+    // MARK: - Three-Fact Info Bar (Crystalline Capsules)
 
     private func infoBar(panchang: DailyPanchang) -> some View {
-        HStack(spacing: 0) {
-            // Left: Tithi ends
-            VStack(spacing: 3) {
-                Text("TITHI ENDS")
-                    .scaledFont(size: 10, weight: .medium)
-                    .foregroundColor(vm.theme.secondaryText)
-                    .tracking(0.5)
-                Text(formatTime(panchang.tithi.endTime))
-                    .scaledFont(size: 14, weight: .medium)
-                    .foregroundColor(vm.theme.primaryText)
-                    .minimumScaleFactor(0.8)
+        let nakshatraInfo = PanchangDescriptions.nakshatraInfo(for: panchang.nakshatra.name)
+
+        return HStack(spacing: 8) {
+            // Capsule 1: Tithi ends
+            Button {
+                selectedElement = .tithi(panchang.tithi)
+            } label: {
+                VStack(spacing: 4) {
+                    // Top accent gradient (warm gold)
+                    LinearGradient(
+                        colors: [Color(hex: "D4A040").opacity(0.6), Color(hex: "D4A040").opacity(0.1)],
+                        startPoint: .leading, endPoint: .trailing
+                    )
+                    .frame(height: 2)
+                    .clipShape(Capsule())
+
+                    Text("TITHI ENDS")
+                        .scaledFont(size: 9, weight: .medium)
+                        .foregroundColor(vm.theme.secondaryText)
+                        .tracking(0.5)
+                    Text(formatTime(panchang.tithi.endTime))
+                        .scaledFont(size: 14, weight: .medium)
+                        .foregroundColor(vm.theme.primaryText)
+                        .minimumScaleFactor(0.8)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
+                .contentShape(Rectangle())
             }
-            .frame(maxWidth: .infinity)
+            .buttonStyle(.plain)
+            .deviReveal(delay: 0.0, direction: .fadeUp)
 
-            // Divider
-            Rectangle()
-                .fill(vm.theme.primaryText.opacity(0.10))
-                .frame(width: 0.5, height: 28)
+            // Capsule 2: Nakshatra with symbol
+            Button {
+                selectedElement = .nakshatra(panchang.nakshatra)
+            } label: {
+                VStack(spacing: 4) {
+                    // Top accent (cool silver + pulsing star)
+                    HStack(spacing: 4) {
+                        LinearGradient(
+                            colors: [Color(hex: "B8C4D8").opacity(0.5), Color(hex: "B8C4D8").opacity(0.1)],
+                            startPoint: .leading, endPoint: .trailing
+                        )
+                        .frame(height: 2)
+                        .clipShape(Capsule())
 
-            // Center: Nakshatra
-            VStack(spacing: 3) {
-                Image(systemName: "star.fill")
-                    .font(.system(size: 8))
-                    .foregroundColor(vm.theme.secondaryText)
-                    .symbolEffect(.pulse, isActive: true)
-                Text(panchang.nakshatra.name)
-                    .scaledFont(size: 14, weight: .medium, design: .serif)
-                    .foregroundColor(vm.theme.primaryText)
-                    .minimumScaleFactor(0.8)
+                        Image(systemName: "star.fill")
+                            .font(.system(size: 5))
+                            .foregroundColor(Color(hex: "B8C4D8"))
+                            .symbolEffect(.pulse, isActive: true)
+                    }
+
+                    Text(panchang.nakshatra.name)
+                        .scaledFont(size: 13, weight: .medium, design: .serif)
+                        .foregroundColor(vm.theme.primaryText)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+
+                    if let symbol = nakshatraInfo?.symbol {
+                        Text(symbol)
+                            .scaledFont(size: 10)
+                            .foregroundColor(vm.theme.secondaryText.opacity(0.6))
+                    }
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity)
+                .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
+                .contentShape(Rectangle())
             }
-            .frame(maxWidth: .infinity)
+            .buttonStyle(.plain)
+            .deviReveal(delay: 0.08, direction: .fadeUp)
 
-            // Divider
-            Rectangle()
-                .fill(vm.theme.primaryText.opacity(0.10))
-                .frame(width: 0.5, height: 28)
+            // Capsule 3: Sunset/Sunrise
+            VStack(spacing: 4) {
+                // Top accent (horizon warm-to-cool)
+                LinearGradient(
+                    colors: [Color(hex: "D4A040").opacity(0.5), Color(hex: "7B8EC4").opacity(0.4)],
+                    startPoint: .leading, endPoint: .trailing
+                )
+                .frame(height: 2)
+                .clipShape(Capsule())
 
-            // Right: Sunset/Sunrise time
-            VStack(spacing: 3) {
                 Text(vm.isDaytime ? "SUNSET" : "SUNRISE")
-                    .scaledFont(size: 10, weight: .medium)
+                    .scaledFont(size: 9, weight: .medium)
                     .foregroundColor(vm.theme.secondaryText)
                     .tracking(0.5)
                 Text(formatTime(vm.isDaytime ? panchang.solar.sunset : panchang.solar.sunrise))
@@ -412,10 +471,13 @@ struct HomeView: View {
                     .foregroundColor(vm.theme.primaryText)
                     .minimumScaleFactor(0.8)
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 10)
             .frame(maxWidth: .infinity)
+            .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
+            .deviReveal(delay: 0.16, direction: .fadeUp)
         }
-        .padding(.horizontal, 32)
-        .padding(.vertical, 12)
+        .padding(.horizontal)
     }
 
     // MARK: - Banners (grouped: festivals + fasting + eclipse)
@@ -517,7 +579,7 @@ struct HomeView: View {
         .padding(.horizontal)
     }
 
-    // MARK: - Today's Additional Details (tappable)
+    // MARK: - Today's Additional Details (visually distinct groups)
 
     private var todayDetails: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -536,77 +598,19 @@ struct HomeView: View {
                 .padding(.horizontal)
             }
 
+            // Three distinct visual groups: Vara, Yoga+Karana, Moon arc
             if let panchang = vm.todayPanchang {
-                VStack(spacing: 0) {
-                    tappableDetailRow("Yoga", value: panchang.yoga.name, sacredValue: true) {
-                        selectedElement = .yoga(panchang.yoga)
-                    }
-                    Divider().background(vm.theme.primaryText.opacity(0.08))
-
-                    tappableDetailRow("Karana", value: karanaDisplayValue(panchang), sacredValue: true) {
-                        selectedElement = .karana(panchang.karanas)
-                    }
-                    Divider().background(vm.theme.primaryText.opacity(0.08))
-
-                    if let moonrise = panchang.solar.moonrise {
-                        detailRow("Moonrise", value: formatTime(moonrise))
-                        Divider().background(vm.theme.primaryText.opacity(0.08))
-                    }
-                    if let moonset = panchang.solar.moonset {
-                        detailRow("Moonset", value: formatTime(moonset))
-                        Divider().background(vm.theme.primaryText.opacity(0.08))
-                    }
-
-                    tappableDetailRow("Vara", value: panchang.varaDeity, sacredValue: true) {
-                        selectedElement = .vara(panchang.varaDeity)
-                    }
-                }
-                .padding(.vertical, 4)
-                .deviCard(theme: vm.theme, elevation: .raised)
-                .padding(.horizontal)
+                TodayDetailsSection(
+                    panchang: panchang,
+                    theme: vm.theme,
+                    timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                    onTapYoga: { selectedElement = .yoga(panchang.yoga) },
+                    onTapKarana: { selectedElement = .karana(panchang.karanas) },
+                    onTapVara: { selectedElement = .vara(panchang.varaDeity) }
+                )
             }
         }
         .deviEntrance(delay: 0.16)
-    }
-
-    private func tappableDetailRow(_ label: String, value: String, sacredValue: Bool = false, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack {
-                Text(label)
-                    .scaledFont(size: 15, weight: .regular)
-                    .foregroundColor(vm.theme.secondaryText)
-
-                Spacer()
-
-                Text(value)
-                    .scaledFont(size: 15, weight: .medium, design: sacredValue ? .serif : .default)
-                    .foregroundColor(vm.theme.primaryText)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(vm.theme.secondaryText.opacity(0.4))
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func detailRow(_ label: String, value: String) -> some View {
-        HStack {
-            Text(label)
-                .scaledFont(size: 15, weight: .regular)
-                .foregroundColor(vm.theme.secondaryText)
-
-            Spacer()
-
-            Text(value)
-                .scaledFont(size: 15, weight: .medium)
-                .foregroundColor(vm.theme.primaryText)
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
     }
 
     // MARK: - Upcoming Events (capped + "Show All")
@@ -732,13 +736,6 @@ struct HomeView: View {
         case .eclipse: return Color(hex: "7B8EC4")
         case .festival: return vm.theme.accentColor
         }
-    }
-
-    private func karanaDisplayValue(_ panchang: DailyPanchang) -> String {
-        if panchang.karanas.count <= 1 {
-            return panchang.karana.name
-        }
-        return panchang.karanas.map(\.name).joined(separator: " → ")
     }
 
     private func enrichedFastingName(_ baseType: String, panchang: DailyPanchang) -> String {
