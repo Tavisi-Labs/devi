@@ -106,7 +106,7 @@ struct SplashView: View {
                     .padding(.top, 4)
 
                 // Version
-                Text("v0.9.0")
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.9.0")")
                     .font(.system(size: 10))
                     .foregroundColor(.white.opacity(0.4))
                     .opacity(showVersion ? 1 : 0)

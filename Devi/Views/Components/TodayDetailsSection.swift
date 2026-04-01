@@ -41,7 +41,6 @@ struct TodayDetailsSection: View {
 
     private var varaCard: some View {
         let weekdayName = currentWeekdayName()
-        let info = PanchangDescriptions.varaInfo(for: weekdayName)
         let accentColor = varaAccentColor(for: weekdayName)
 
         return Button {
@@ -242,7 +241,4 @@ struct TodayDetailsSection: View {
         return panchang.karanas.map(\.name).joined(separator: " → ")
     }
 
-    private func formatTime(_ date: Date) -> String {
-        deviFormatTime(date, timezoneIdentifier: timezoneIdentifier)
-    }
 }
