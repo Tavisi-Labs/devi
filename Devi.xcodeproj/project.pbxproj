@@ -40,6 +40,7 @@
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		8D41F88A0DBD80BC84E06CB9 /* TithiImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */; };
+		8FE0D3661114A20B1FC604ED /* WhatsNewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
@@ -78,6 +79,7 @@
 		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
+		1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewSheet.swift; sourceTree = "<group>"; };
 		28501AFF246A728A4B21023D /* VedicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyView.swift; sourceTree = "<group>"; };
 		2AA5417195DA25327519394C /* AmbientMeditationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientMeditationView.swift; sourceTree = "<group>"; };
 		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
@@ -203,6 +205,7 @@
 				D841F44870521127345B2497 /* TodayDetailsSection.swift */,
 				D6C4E430092A2D5C0DA704CB /* UpcomingEventsSheet.swift */,
 				28501AFF246A728A4B21023D /* VedicSkyView.swift */,
+				1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -410,6 +413,7 @@
 				42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */,
 				53ACCE7EEB020C6259E66DD0 /* VedicSkyMotionManager.swift in Sources */,
 				B78F3AB26D72C5A1F22739BD /* VedicSkyView.swift in Sources */,
+				8FE0D3661114A20B1FC604ED /* WhatsNewSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
