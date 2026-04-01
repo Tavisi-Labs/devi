@@ -113,7 +113,7 @@ struct HomeView: View {
                             }
                         )
                         .padding(.horizontal)
-                        .padding(.top, 20)
+                        .padding(.top, 28)
                     }
 
                     // MARK: - 5. Three-fact info bar

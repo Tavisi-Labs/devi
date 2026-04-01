@@ -195,7 +195,7 @@ struct CelestialHeroView: View {
             .frame(height: arcSize / 2 + 60)
 
             // Sun + Moon times below the arc
-            VStack(spacing: 10) {
+            VStack(spacing: 16) {
                 // Sun times
                 HStack {
                     HStack(spacing: 4) {
@@ -296,7 +296,7 @@ struct CelestialHeroView: View {
                     .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 24)
-                .padding(.top, 4)
+                .padding(.top, 12)
             }
 
             // Cosmic signature one-liner
@@ -316,12 +316,12 @@ struct CelestialHeroView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 24)
-                .padding(.top, 6)
+                .padding(.top, 12)
             } else if isLoadingSignature {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(theme.primaryText.opacity(0.04))
                     .frame(height: 16).frame(maxWidth: 200)
-                    .padding(.top, 6)
+                    .padding(.top, 12)
             }
         }
         .onAppear {
