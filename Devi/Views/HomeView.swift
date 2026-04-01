@@ -2,9 +2,11 @@
 // The single main screen of the app — dashboard layout
 
 import SwiftUI
+import StoreKit
 
 struct HomeView: View {
     @ObservedObject var vm: PanchangViewModel
+    @Environment(\.requestReview) private var requestReview
     @State private var showSettings = false
     @State private var selectedElement: PanchangElement?
     @State private var shareCardImage: ShareableCardImage?
@@ -17,6 +19,7 @@ struct HomeView: View {
     @State private var immersiveElement: PanchangElement?
     @State private var sheetElement: PanchangElement?
     @State private var isTransitioning = false
+    @State private var sheetSwitchTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -25,7 +28,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 8), value: vm.timePeriod)
 
-            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod)
+            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod, isPaused: immersiveElement != nil || showMeditationMode)
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 5), value: vm.timePeriod)
 
@@ -195,9 +198,18 @@ struct HomeView: View {
         .onAppear {
             vm.loadData()
             vm.startTimer()
+            vm.recordUsageDay()
+        }
+        .task {
+            try? await Task.sleep(for: .seconds(2))
+            if vm.shouldRequestReview {
+                requestReview()
+                vm.markReviewRequested()
+            }
         }
         .onDisappear {
             vm.stopTimer()
+            sheetSwitchTask?.cancel()
         }
         .sheet(isPresented: $showSettings) {
             SettingsView(vm: vm)
@@ -234,7 +246,10 @@ struct HomeView: View {
             // Clear first so SwiftUI doesn't fight dismiss/present
             selectedElement = nil
             // Small delay to let any open sheet dismiss first
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            sheetSwitchTask?.cancel()
+            sheetSwitchTask = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(0.4))
+                guard !Task.isCancelled else { return }
                 switch el {
                 case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .mantra, .vedicSky:
                     immersiveElement = el
@@ -513,7 +528,7 @@ struct HomeView: View {
         Image(systemName: "sparkles")
             .font(.system(size: 14))
             .foregroundColor(Color(hex: "d4a857"))
-            .symbolEffect(.bounce, options: .speed(0.5), isActive: true)
+            .symbolEffect(.pulse, options: .speed(0.5), isActive: true)
     }
 
     // MARK: - Today's Additional Details (visually distinct groups)

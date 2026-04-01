@@ -6,6 +6,7 @@ import SwiftUI
 struct StarFieldView: View {
     let isDaytime: Bool
     let timePeriod: TimePeriod
+    var isPaused: Bool = false
 
     @State private var stars: [Star] = []
     @State private var wisps: [CloudWisp] = []
@@ -48,7 +49,7 @@ struct StarFieldView: View {
     }
 
     var body: some View {
-        if fieldOpacity == 0 {
+        if isPaused || fieldOpacity == 0 {
             Color.clear
         } else {
             TimelineView(.animation(minimumInterval: 1.0 / 15.0)) { timeline in

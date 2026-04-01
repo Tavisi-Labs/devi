@@ -3,12 +3,15 @@
 
 import SwiftUI
 import MapKit
+import StoreKit
 
 struct SettingsView: View {
     @ObservedObject var vm: PanchangViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.requestReview) private var requestReview
     @State private var showCityPicker = false
     @State private var showPanchangEducation = false
+    @State private var showWhatsNew = false
     @State private var apiKey: String = ""
 
     private var theme: DeviTheme { vm.theme }
@@ -276,7 +279,7 @@ struct SettingsView: View {
                         .padding(.top, 4)
 
                     VStack(spacing: 0) {
-                        // Learn row
+                        // 1. Learn about Panchang
                         Button {
                             showPanchangEducation = true
                         } label: {
@@ -286,7 +289,27 @@ struct SettingsView: View {
 
                         settingsDivider
 
-                        // Version row
+                        // 2. What's New
+                        Button {
+                            showWhatsNew = true
+                        } label: {
+                            settingsRow(title: "What's New", icon: "sparkles", showChevron: true)
+                        }
+                        .buttonStyle(.plain)
+
+                        settingsDivider
+
+                        // 3. Rate Devi
+                        Button {
+                            requestReview()
+                        } label: {
+                            settingsRow(title: "Rate Devi", icon: "star", showChevron: false)
+                        }
+                        .buttonStyle(.plain)
+
+                        settingsDivider
+
+                        // 4. Version + EARLY ACCESS badge
                         HStack {
                             Label {
                                 Text("Version")
@@ -312,28 +335,35 @@ struct SettingsView: View {
 
                         settingsDivider
 
-                        // Feedback
+                        // 5. Send Feedback
                         Link(destination: URL(string: "mailto:hello@deviapp.com")!) {
                             settingsRow(title: "Send Feedback", icon: "envelope", showChevron: true)
                         }
 
                         settingsDivider
 
-                        // Privacy Policy
+                        // 6. Telegram
+                        Link(destination: URL(string: "https://t.me/hareeshnagaraj")!) {
+                            settingsRow(title: "Telegram", icon: "paperplane", showChevron: true)
+                        }
+
+                        settingsDivider
+
+                        // 7. Privacy Policy
                         Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/privacy")!) {
                             settingsRow(title: "Privacy Policy", icon: "hand.raised", showChevron: true)
                         }
 
                         settingsDivider
 
-                        // Support
+                        // 8. Support
                         Link(destination: URL(string: "https://hareeshnagaraj.github.io/devi/support")!) {
                             settingsRow(title: "Support", icon: "questionmark.circle", showChevron: true)
                         }
 
                         settingsDivider
 
-                        // Restart Onboarding
+                        // 9. Restart Onboarding
                         Button {
                             vm.resetOnboarding()
                             dismiss()
@@ -373,6 +403,9 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showPanchangEducation) {
                 PanchangEducationSheet()
+            }
+            .sheet(isPresented: $showWhatsNew) {
+                WhatsNewSheet()
             }
         }
     }

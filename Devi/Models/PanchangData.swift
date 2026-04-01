@@ -695,6 +695,6 @@ extension GrahaSnapshot {
     /// Zero-based nakshatra index (0-26) for a given sidereal longitude.
     /// Distinct from `PanchangCalculator.nakshatraIndex(at:)` which is 1-based (1-27).
     static func nakshatraIndex(forLongitude lon: Double) -> Int {
-        min(Int(lon / (360.0 / 27.0)), 26)
+        max(0, min(Int(lon / (360.0 / 27.0)), 26))
     }
 }

@@ -347,41 +347,38 @@ struct DeviButtonStyle: ButtonStyle {
     let variant: DeviButtonVariant
 
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 17, weight: .semibold))
-            .frame(maxWidth: .infinity)
-            .frame(height: 52)
-            .foregroundColor(variant == .primary ? Color(hex: "1a0a2e") : Color(hex: "d4a857"))
-            .background(
-                Group {
-                    if variant == .primary {
-                        LinearGradient(
-                            colors: [Color(hex: "d4a857"), Color(hex: "c49a4a")],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    } else {
-                        Color.clear
-                    }
-                }
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(
-                Group {
-                    if variant == .secondary {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
-                    }
-                }
-            )
-            .shadow(
-                color: variant == .primary ? Color(hex: "d4a857").opacity(0.3) : .clear,
-                radius: 8,
-                x: 0,
-                y: 4
-            )
-            .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+        switch variant {
+        case .primary:
+            configuration.label
+                .font(.system(size: 15, weight: .semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .foregroundColor(Color(hex: "d4a857"))
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
+                )
+                .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+                .opacity(configuration.isPressed ? 0.7 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+        case .secondary:
+            configuration.label
+                .font(.system(size: 15, weight: .semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .foregroundColor(Color(hex: "d4a857"))
+                .background(Color.clear)
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
+                )
+                .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
+                .opacity(configuration.isPressed ? 0.7 : 1.0)
+                .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+        }
     }
 }
 

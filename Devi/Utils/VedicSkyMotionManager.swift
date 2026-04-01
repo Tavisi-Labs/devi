@@ -8,8 +8,9 @@ final class VedicSkyMotionManager: ObservableObject {
     @Published var scrollOffset: CGFloat = 0
     @Published private(set) var isActive: Bool = false
 
-    // nonisolated(unsafe) so deinit can safely access from any isolation context (#3)
-    private nonisolated(unsafe) var motionManager: CMMotionManager?
+    private static let sharedMotionManager = CMMotionManager()
+    private var motionManager: CMMotionManager { Self.sharedMotionManager }
+
     private let motionQueue = OperationQueue()
     private var referenceYaw: Double?
     private nonisolated(unsafe) var observers: [NSObjectProtocol] = []
@@ -28,9 +29,7 @@ final class VedicSkyMotionManager: ObservableObject {
         motionQueue.name = "com.devi.vedicsky.motion"
         motionQueue.maxConcurrentOperationCount = 1
 
-        let manager = CMMotionManager()
-        manager.deviceMotionUpdateInterval = 1.0 / 30.0
-        motionManager = manager
+        Self.sharedMotionManager.deviceMotionUpdateInterval = 1.0 / 15.0
 
         // (#4) Wrap @MainActor method calls in Task for proper concurrency isolation
         let resignObserver = NotificationCenter.default.addObserver(
@@ -61,16 +60,15 @@ final class VedicSkyMotionManager: ObservableObject {
     }
 
     deinit {
-        // (#3) observers and motionManager are nonisolated(unsafe) — safe to access here
         for observer in observers {
             NotificationCenter.default.removeObserver(observer)
         }
-        motionManager?.stopDeviceMotionUpdates()
     }
 
     func startUpdates() {
+        guard !isActive else { return }
         guard !UIAccessibility.isReduceMotionEnabled else { return }
-        guard let motionManager, motionManager.isDeviceMotionAvailable else { return }
+        guard motionManager.isDeviceMotionAvailable else { return }
 
         shouldBeActive = true
         referenceYaw = nil
@@ -102,7 +100,7 @@ final class VedicSkyMotionManager: ObservableObject {
     func stopUpdates() {
         shouldBeActive = false
         generation += 1
-        motionManager?.stopDeviceMotionUpdates()
+        motionManager.stopDeviceMotionUpdates()
         isActive = false
         referenceYaw = nil
     }

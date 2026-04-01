@@ -45,6 +45,7 @@ struct DeviApp: App {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     vm.loadData()
+                    vm.recordUsageDay()
                     Task {
                         await vm.checkNotificationAuthorization()
                         await vm.rescheduleNotifications()

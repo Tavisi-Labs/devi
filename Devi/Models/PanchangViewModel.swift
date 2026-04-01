@@ -820,6 +820,32 @@ class PanchangViewModel: ObservableObject {
     func checkNotificationAuthorization() async {
         notificationsAuthorized = await notificationService.isAuthorized()
     }
+
+    // MARK: - App Usage Tracking
+
+    /// Records today as a usage day for milestone-based review prompting.
+    func recordUsageDay() {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let today = formatter.string(from: Date())
+
+        let ud = UserDefaults.standard
+        var days = Set(ud.stringArray(forKey: "usageDays") ?? [])
+        days.insert(today)
+        ud.set(Array(days), forKey: "usageDays")
+    }
+
+    /// True when user has used the app on 7+ distinct days and hasn't been prompted yet.
+    var shouldRequestReview: Bool {
+        let ud = UserDefaults.standard
+        let days = ud.stringArray(forKey: "usageDays") ?? []
+        return days.count >= 7 && !ud.bool(forKey: "hasRequestedReview")
+    }
+
+    /// Marks that the StoreKit review prompt has been shown.
+    func markReviewRequested() {
+        UserDefaults.standard.set(true, forKey: "hasRequestedReview")
+    }
 }
 
 // MARK: - TimePeriod Equatable
