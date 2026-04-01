@@ -7,14 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		01C1905E9C521A31B8A32082 /* TithiHeroSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D168198CC485C61496CCB4 /* TithiHeroSection.swift */; };
 		02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360B289972920360586AA1CC /* EclipseCard.swift */; };
 		033C35B8D8C67417071612C3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443E05B8B65D4E3900BC0BDE /* HomeView.swift */; };
 		041C4B7A89FC995267970495 /* ThemePalettes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8682C218AD656AE031131FD5 /* ThemePalettes.swift */; };
 		042795BD186B3F379E603971 /* RightNowCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */; };
 		07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */; };
-		0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406B7EE63A21C444D045C89E /* SunArcView.swift */; };
 		0F6D605D5B1D6E6D380D3770 /* PanchangIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */; };
+		1328185EC8FD8AC59073DB65 /* GrahaImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */; };
 		1A6F1196F35937BD46F24956 /* NakshatraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDD40FACCCF7C25BDCE9C32 /* NakshatraImmersiveView.swift */; };
 		1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3628C62ABE084D82A65819 /* HoraCard.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
@@ -42,6 +41,7 @@
 		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		8D41F88A0DBD80BC84E06CB9 /* TithiImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
+		A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
@@ -74,6 +74,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrahaImmersiveView.swift; sourceTree = "<group>"; };
 		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
@@ -81,11 +82,9 @@
 		2AA5417195DA25327519394C /* AmbientMeditationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientMeditationView.swift; sourceTree = "<group>"; };
 		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		33D168198CC485C61496CCB4 /* TithiHeroSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TithiHeroSection.swift; sourceTree = "<group>"; };
 		35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureService.swift; sourceTree = "<group>"; };
 		360B289972920360586AA1CC /* EclipseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseCard.swift; sourceTree = "<group>"; };
 		4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraImmersiveView.swift; sourceTree = "<group>"; };
-		406B7EE63A21C444D045C89E /* SunArcView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunArcView.swift; sourceTree = "<group>"; };
 		42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTextBuilder.swift; sourceTree = "<group>"; };
 		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		463C6BC7EA5612F2261721C5 /* VedicCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculatorTests.swift; sourceTree = "<group>"; };
@@ -106,6 +105,7 @@
 		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
 		AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangIntegrationTests.swift; sourceTree = "<group>"; };
+		ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelestialHeroView.swift; sourceTree = "<group>"; };
 		B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculatorTests.swift; sourceTree = "<group>"; };
 		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoghadiyaCard.swift; sourceTree = "<group>"; };
@@ -178,10 +178,12 @@
 			isa = PBXGroup;
 			children = (
 				2AA5417195DA25327519394C /* AmbientMeditationView.swift */,
+				ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */,
 				B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */,
 				56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */,
 				360B289972920360586AA1CC /* EclipseCard.swift */,
 				13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */,
+				033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */,
 				2B3628C62ABE084D82A65819 /* HoraCard.swift */,
 				4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */,
 				567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */,
@@ -196,9 +198,7 @@
 				7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */,
 				C450B088E4224ABD6C00279A /* SplashView.swift */,
 				E09C4017C2811FC941DD4451 /* StarFieldView.swift */,
-				406B7EE63A21C444D045C89E /* SunArcView.swift */,
 				5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */,
-				33D168198CC485C61496CCB4 /* TithiHeroSection.swift */,
 				C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */,
 				D841F44870521127345B2497 /* TodayDetailsSection.swift */,
 				D6C4E430092A2D5C0DA704CB /* UpcomingEventsSheet.swift */,
@@ -366,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				49B683FE7E20B75F597BBD2C /* AmbientMeditationView.swift in Sources */,
+				A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */,
 				56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */,
 				D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */,
 				7F91FA1E0A77DD7E0E4D7B9D /* CosmicSignatureCard.swift in Sources */,
@@ -374,6 +375,7 @@
 				02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */,
 				FFDB6BB3B06B31F3F1325A92 /* EclipseImmersiveView.swift in Sources */,
 				F1C112891FF7594EBF4F781B /* FestivalEngine.swift in Sources */,
+				1328185EC8FD8AC59073DB65 /* GrahaImmersiveView.swift in Sources */,
 				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
 				1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */,
 				3A67F38F63892ACD824B97F5 /* HoraImmersiveView.swift in Sources */,
@@ -399,11 +401,9 @@
 				D3F4D6E623EDD5A5157196B6 /* ShareTextBuilder.swift in Sources */,
 				5EB599C9AC45D7298D64A3E3 /* SplashView.swift in Sources */,
 				41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */,
-				0A5F08BFB1C974D3DF626049 /* SunArcView.swift in Sources */,
 				AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */,
 				041C4B7A89FC995267970495 /* ThemePalettes.swift in Sources */,
 				07351827A1A1601D9CBBC45E /* TimeWindowsCard.swift in Sources */,
-				01C1905E9C521A31B8A32082 /* TithiHeroSection.swift in Sources */,
 				8D41F88A0DBD80BC84E06CB9 /* TithiImmersiveView.swift in Sources */,
 				8603D9EE7F01B8A15B92F4AD /* TodayDetailsSection.swift in Sources */,
 				E215CE28308DE6ED3D867351 /* UpcomingEventsSheet.swift in Sources */,

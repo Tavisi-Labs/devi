@@ -3,6 +3,7 @@
 
 import Foundation
 import CoreLocation
+import SwiftUI
 
 // MARK: - Tithi (Lunar Day)
 
@@ -624,6 +625,41 @@ enum Graha: String, CaseIterable, Identifiable {
     }
 }
 
+// MARK: - Graha Extensions
+
+extension Graha {
+    /// Canonical planet color for all UI surfaces.
+    var color: Color {
+        switch self {
+        case .sun:     return Color(hex: "D4A040")
+        case .moon:    return Color(hex: "B8C4D8")
+        case .mars:    return Color(hex: "C45050")
+        case .mercury: return Color(hex: "4AAD6E")
+        case .jupiter: return Color(hex: "C9A96E")
+        case .venus:   return Color(hex: "D47AAD")
+        case .saturn:  return Color(hex: "7B8EC4")
+        case .rahu:    return Color(hex: "5A6A8A")
+        case .ketu:    return Color(hex: "8A5A5A")
+        }
+    }
+
+    /// The 3 nakshatras ruled by this graha (name, 1-based index).
+    /// Each planet rules exactly 3 nakshatras spaced 9 apart in the 27-cycle (Vimshottari Dasha lords).
+    var ruledNakshatras: [(name: String, index: Int)] {
+        switch self {
+        case .ketu:    return [("Ashwini", 1), ("Magha", 10), ("Mula", 19)]
+        case .venus:   return [("Bharani", 2), ("Purva Phalguni", 11), ("Purva Ashadha", 20)]
+        case .sun:     return [("Krittika", 3), ("Uttara Phalguni", 12), ("Uttara Ashadha", 21)]
+        case .moon:    return [("Rohini", 4), ("Hasta", 13), ("Shravana", 22)]
+        case .mars:    return [("Mrigashira", 5), ("Chitra", 14), ("Dhanishta", 23)]
+        case .rahu:    return [("Ardra", 6), ("Swati", 15), ("Shatabhisha", 24)]
+        case .jupiter: return [("Punarvasu", 7), ("Vishakha", 16), ("Purva Bhadrapada", 25)]
+        case .saturn:  return [("Pushya", 8), ("Anuradha", 17), ("Uttara Bhadrapada", 26)]
+        case .mercury: return [("Ashlesha", 9), ("Jyeshtha", 18), ("Revati", 27)]
+        }
+    }
+}
+
 /// Snapshot of all 9 graha positions at a given moment.
 struct GrahaSnapshot {
     struct Position {
@@ -650,4 +686,14 @@ struct NotificationPreferences: Codable {
     var sunset: Bool = true
     var navratriMorning: Bool = true    // Auto-enabled during Navratri
     var minutesBefore: Int = 10         // How early to fire the notification
+}
+
+// MARK: - GrahaSnapshot Helpers
+
+extension GrahaSnapshot {
+    /// Zero-based nakshatra index (0-26) for a given sidereal longitude.
+    /// Distinct from `PanchangCalculator.nakshatraIndex(at:)` which is 1-based (1-27).
+    static func nakshatraIndex(forLongitude lon: Double) -> Int {
+        min(Int(lon / (360.0 / 27.0)), 26)
+    }
 }

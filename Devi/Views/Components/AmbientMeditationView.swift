@@ -150,7 +150,7 @@ struct AmbientMeditationView: View {
 
                 // Compact sun arc (if daytime)
                 if let solar = vm.todayPanchang?.solar, vm.isDaytime {
-                    SunArcView(
+                    CelestialHeroView(
                         progress: vm.sunProgress,
                         isDaytime: true,
                         sunrise: solar.sunrise,

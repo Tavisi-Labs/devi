@@ -27,7 +27,7 @@ struct TodayDetailsSection: View {
                     .deviReveal(delay: 0.12, direction: .fadeUp)
             }
 
-            // Moon times now integrated into SunArcView
+            // Moon times now integrated into CelestialHeroView
         }
         .padding(.horizontal)
         .onAppear {
@@ -66,14 +66,16 @@ struct TodayDetailsSection: View {
                             .foregroundColor(theme.secondaryText.opacity(0.4))
                     }
 
-                    Text(panchang.varaDeity)
-                        .scaledFont(size: 16, weight: .medium, design: .serif)
-                        .foregroundColor(theme.primaryText)
+                    HStack(spacing: 8) {
+                        let vi = varaIcon(for: weekdayName)
+                        Image(systemName: vi.icon)
+                            .font(.system(size: 16))
+                            .foregroundColor(vi.color)
+                            .symbolEffect(.pulse, options: .speed(0.3), isActive: true)
 
-                    if let info = info {
-                        Text("\(info.planet) · \(info.auspiciousActivities.first ?? "")")
-                            .deviLabel(.insight, theme: theme)
-                            .lineLimit(1)
+                        Text(panchang.varaDeity)
+                            .scaledFont(size: 16, weight: .medium, design: .serif)
+                            .foregroundColor(theme.primaryText)
                     }
                 }
                 .padding(.horizontal, 14)
@@ -110,10 +112,6 @@ struct TodayDetailsSection: View {
                     .minimumScaleFactor(0.8)
 
                 if let info = info {
-                    Text(info.meaning)
-                        .deviLabel(.insight, theme: theme)
-                        .lineLimit(1)
-
                     // Quality badge
                     Text(info.quality)
                         .scaledFont(size: 9, weight: .semibold)
@@ -158,10 +156,6 @@ struct TodayDetailsSection: View {
                     .minimumScaleFactor(0.7)
 
                 if let info = info {
-                    Text(info.type)
-                        .deviLabel(.insight, theme: theme)
-                        .lineLimit(1)
-
                     // Type badge (Fixed/Movable)
                     Text(info.type)
                         .scaledFont(size: 9, weight: .semibold)
@@ -188,6 +182,19 @@ struct TodayDetailsSection: View {
     }
 
     // MARK: - Helpers
+
+    private func varaIcon(for weekday: String) -> (icon: String, color: Color) {
+        switch weekday {
+        case "Sunday":    return ("sun.max.fill", Color(hex: "D4A040"))
+        case "Monday":    return ("moon.fill", Color(hex: "B8C4D8"))
+        case "Tuesday":   return ("flame.fill", Color(hex: "C45050"))
+        case "Wednesday": return ("leaf.fill", Color(hex: "4AAD6E"))
+        case "Thursday":  return ("crown.fill", Color(hex: "C9A96E"))
+        case "Friday":    return ("heart.fill", Color(hex: "D47AAD"))
+        case "Saturday":  return ("circle.hexagonpath.fill", Color(hex: "7B8EC4"))
+        default:          return ("circle.fill", Color(hex: "888888"))
+        }
+    }
 
     private func currentWeekdayName() -> String {
         guard let date = ISO8601DateFormatter().date(from: panchang.dateString + "T00:00:00Z") else { return "" }

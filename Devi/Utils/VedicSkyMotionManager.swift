@@ -20,8 +20,6 @@ final class VedicSkyMotionManager: ObservableObject {
         motionQueue.name = "com.devi.vedicsky.motion"
         motionQueue.maxConcurrentOperationCount = 1
 
-        guard !UIAccessibility.isReduceMotionEnabled else { return }
-
         let manager = CMMotionManager()
         manager.deviceMotionUpdateInterval = 1.0 / 30.0
         motionManager = manager
@@ -32,9 +30,7 @@ final class VedicSkyMotionManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            Task { @MainActor in
-                self.stopUpdates()
-            }
+            self.stopUpdates()
         }
         observers.append(resignObserver)
 
@@ -44,9 +40,7 @@ final class VedicSkyMotionManager: ObservableObject {
             queue: .main
         ) { [weak self] _ in
             guard let self else { return }
-            Task { @MainActor in
-                self.startUpdates()
-            }
+            self.startUpdates()
         }
         observers.append(activeObserver)
     }
@@ -55,11 +49,11 @@ final class VedicSkyMotionManager: ObservableObject {
         for observer in observers {
             NotificationCenter.default.removeObserver(observer)
         }
-        observers.removeAll()
         motionManager?.stopDeviceMotionUpdates()
     }
 
     func startUpdates() {
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
         guard let motionManager, motionManager.isDeviceMotionAvailable else { return }
 
         referenceYaw = nil

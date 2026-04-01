@@ -29,25 +29,25 @@
 
 ## Adversarial Review Fixes (mechanical, ~15 lines total)
 
-- [ ] **Remove redundant Task wrapper in notification observers**
+- [x] **Remove redundant Task wrapper in notification observers**
   **Priority:** P3
   `VedicSkyMotionManager.swift` lines 35-37 and 47-49: notification delivered on `.main` queue, class is `@MainActor` — call `self.stopUpdates()` / `self.startUpdates()` directly instead of wrapping in `Task { @MainActor in }`.
 
-- [ ] **Move Reduce Motion check from init() to startUpdates()**
+- [x] **Move Reduce Motion check from init() to startUpdates()**
   **Priority:** P3
   `VedicSkyMotionManager.swift` line 23: `UIAccessibility.isReduceMotionEnabled` checked only in `init()`. Move to `startUpdates()` so it's re-evaluated if user toggles setting while app is running.
 
-- [ ] **Remove unnecessary iOS 18 availability check on sparklesIcon**
+- [x] **Remove unnecessary iOS 18 availability check on sparklesIcon**
   **Priority:** P3
   `HomeView.swift` ~line 622: `if #available(iOS 18.0, *)` guard on `.symbolEffect(.bounce)` is unnecessary — API is available from iOS 17.0 and app targets iOS 17.0+. Remove the availability check.
 
-- [ ] **Remove redundant observers.removeAll() from deinit**
+- [x] **Remove redundant observers.removeAll() from deinit**
   **Priority:** P3
   `VedicSkyMotionManager.swift` line 58: `observers.removeAll()` in `deinit` is redundant (array is about to be deallocated) and technically unsafe under strict concurrency since `deinit` doesn't run on `@MainActor`.
 
-- [ ] **Extract nakshatraIndex helper to deduplicate formula**
+- [x] **Extract nakshatraIndex helper to deduplicate formula**
   **Priority:** P4
-  `min(Int(lon / (360.0 / 27.0)), 26)` appears in 3 places: `VedicSkyView.moonNakshatraIndex`, `VedicSkyView.grahaCard`, `PanchangDetailSheet` graha detail. Extract to a shared utility function.
+  `min(Int(lon / (360.0 / 27.0)), 26)` appears in 3 places: `VedicSkyView.moonNakshatraIndex`, `VedicSkyView.grahaCard`, `PanchangDetailSheet` graha detail. Extracted to `GrahaSnapshot.nakshatraIndex(forLongitude:)` in PanchangData.swift.
 
 ## App Store Submission
 

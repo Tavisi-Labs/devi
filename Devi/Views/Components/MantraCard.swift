@@ -8,6 +8,8 @@ struct MantraCard: View {
     let theme: DeviTheme
     var onTap: (() -> Void)? = nil
 
+    @State private var glowPhase: Bool = false
+
     var body: some View {
         Button {
             onTap?()
@@ -28,40 +30,49 @@ struct MantraCard: View {
                         .foregroundColor(theme.secondaryText.opacity(0.4))
                 }
 
-                // Devanagari mantra
-                Text(mantra.devanagari)
-                    .scaledFont(size: 26)
-                    .foregroundColor(theme.primaryText)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 4)
+                // Devanagari mantra with breathing glow
+                ZStack {
+                    // Breathing gold glow
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    theme.accentColor.opacity(glowPhase ? 0.12 : 0.04),
+                                    Color.clear
+                                ],
+                                center: .center,
+                                startRadius: 10,
+                                endRadius: 100
+                            )
+                        )
+                        .frame(width: 200, height: 80)
+
+                    Text(mantra.devanagari)
+                        .scaledFont(size: 26)
+                        .foregroundColor(theme.primaryText)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
+                .padding(.vertical, 12)
+
+                // Ornamental divider: ─── ॐ ───
+                HStack(spacing: 8) {
+                    Rectangle()
+                        .fill(theme.accentColor.opacity(0.3))
+                        .frame(width: 20, height: 0.5)
+                    Text("ॐ")
+                        .scaledFont(size: 11)
+                        .foregroundColor(theme.accentColor.opacity(0.5))
+                    Rectangle()
+                        .fill(theme.accentColor.opacity(0.3))
+                        .frame(width: 20, height: 0.5)
+                }
 
                 // Transliteration
                 Text(mantra.transliteration)
                     .scaledFont(size: 15, design: .serif)
                     .foregroundColor(theme.secondaryText)
                     .italic()
-
-                // Meaning in flat inner card
-                Text(mantra.meaning)
-                    .scaledFont(size: 13)
-                    .foregroundColor(theme.secondaryText.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(3)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .frame(maxWidth: .infinity)
-                    .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
-
-                // Repetition hint
-                HStack(spacing: 4) {
-                    Image(systemName: "repeat")
-                        .font(.system(size: 10))
-                        .foregroundColor(theme.accentColor.opacity(0.7))
-                    Text("Chant \(mantra.repetitions) times · \(mantra.bestTimeToChant)")
-                        .scaledFont(size: 11, weight: .medium)
-                        .foregroundColor(theme.secondaryText.opacity(0.6))
-                }
             }
             .padding(20)
             .frame(maxWidth: .infinity)
@@ -80,5 +91,10 @@ struct MantraCard: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .onAppear {
+            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
+                glowPhase = true
+            }
+        }
     }
 }

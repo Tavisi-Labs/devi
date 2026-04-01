@@ -16,6 +16,13 @@ struct VedicSkyView: View {
     @State private var appeared: Bool = false
     @State private var glowPhase: Bool = false
     @State private var grahaSnapshot: GrahaSnapshot?
+    @State private var selectedNakshatraIndex: Int? = nil
+    @State private var selectedGrahaElement: PanchangElement? = nil
+
+    /// Forced dark theme — card backgrounds must stay dark regardless of app appearance mode.
+    private var skyTheme: DeviTheme {
+        DeviTheme.forPeriod(.night, style: .classic, appearance: .alwaysDark)
+    }
 
     // MARK: - Refresh Timer (60s)
 
@@ -46,7 +53,7 @@ struct VedicSkyView: View {
     private var moonNakshatraIndex: Int? {
         guard let snap = grahaSnapshot else { return nil }
         let moonLon = snap.longitude(of: .moon)
-        return min(Int(moonLon / (360.0 / 27.0)), 26)
+        return GrahaSnapshot.nakshatraIndex(forLongitude: moonLon)
     }
 
     private var moonNakshatraName: String? {
@@ -56,6 +63,19 @@ struct VedicSkyView: View {
 
     private var moonLongitude: Double? {
         grahaSnapshot?.longitude(of: .moon)
+    }
+
+    private var displayedNakshatraIndex: Int? {
+        selectedNakshatraIndex ?? moonNakshatraIndex
+    }
+
+    private var displayedNakshatraName: String? {
+        guard let idx = displayedNakshatraIndex else { return nil }
+        return Self.nakshatraNames[idx]
+    }
+
+    private var isManualSelection: Bool {
+        selectedNakshatraIndex != nil
     }
 
     // MARK: - Body
@@ -109,6 +129,17 @@ struct VedicSkyView: View {
             }
         }
         .preferredColorScheme(.dark)
+        .fullScreenCover(item: $selectedGrahaElement) { element in
+            if case .graha(let g, let lon) = element {
+                GrahaImmersiveView(
+                    graha: g,
+                    longitude: lon,
+                    grahaSnapshot: grahaSnapshot,
+                    theme: theme,
+                    timezoneIdentifier: timezoneIdentifier
+                )
+            }
+        }
         .onAppear {
             refreshGrahaPositions()
             withAnimation(.spring(response: 0.7, dampingFraction: 0.7)) {
@@ -199,7 +230,7 @@ struct VedicSkyView: View {
     private var eclipticStrip: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("ECLIPTIC — 27 NAKSHATRAS")
-                .deviLabel(.caption, theme: theme)
+                .deviLabel(.caption, theme: skyTheme)
                 .padding(.leading, 4)
 
             ScrollViewReader { proxy in
@@ -207,8 +238,16 @@ struct VedicSkyView: View {
                     HStack(spacing: 4) {
                         ForEach(0..<27, id: \.self) { idx in
                             let isCurrent = idx == moonNakshatraIndex
-                            nakshatraSegment(index: idx, isCurrent: isCurrent)
-                                .id(idx)
+                            let isSelected = idx == selectedNakshatraIndex
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    selectedNakshatraIndex = (selectedNakshatraIndex == idx) ? nil : idx
+                                }
+                            } label: {
+                                nakshatraSegment(index: idx, isCurrent: isCurrent, isSelected: isSelected)
+                            }
+                            .buttonStyle(.plain)
+                            .id(idx)
                         }
                     }
                     .padding(.horizontal, 8)
@@ -224,13 +263,20 @@ struct VedicSkyView: View {
                         }
                     }
                 }
+                .onChange(of: selectedNakshatraIndex) { _, newIdx in
+                    if let idx = newIdx {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            proxy.scrollTo(idx, anchor: .center)
+                        }
+                    }
+                }
             }
         }
         .padding(12)
-        .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+        .deviCard(theme: skyTheme, elevation: .raised, cornerRadius: 16)
     }
 
-    private func nakshatraSegment(index: Int, isCurrent: Bool) -> some View {
+    private func nakshatraSegment(index: Int, isCurrent: Bool, isSelected: Bool = false) -> some View {
         let grahasInSegment = grahasInNakshatra(index: index)
         let rulerColor = planetColor(Self.nakshatraRulers[index])
 
@@ -272,17 +318,24 @@ struct VedicSkyView: View {
                 Spacer().frame(height: 7)
             }
         }
-        .frame(width: isCurrent ? 72 : 60)
+        .frame(width: isCurrent || isSelected ? 72 : 60)
         .frame(height: 120)
         .padding(.vertical, 6)
-        .opacity(isCurrent ? 1.0 : 0.4)
+        .opacity(isCurrent || isSelected ? 1.0 : 0.4)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(hex: "D4A040").opacity(isCurrent ? 0.6 : 0), lineWidth: 1)
+                .stroke(
+                    isCurrent ? Color(hex: "D4A040").opacity(isSelected ? 0.8 : 0.6) :
+                    isSelected ? Color.white.opacity(0.5) : Color.clear,
+                    lineWidth: 1
+                )
         )
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(hex: "D4A040").opacity(isCurrent ? 0.06 : 0))
+                .fill(
+                    isCurrent ? Color(hex: "D4A040").opacity(isSelected ? 0.10 : 0.06) :
+                    isSelected ? Color.white.opacity(0.06) : Color.clear
+                )
         )
     }
 
@@ -291,7 +344,7 @@ struct VedicSkyView: View {
     private var navagrahaGrid: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("NAVAGRAHA POSITIONS")
-                .deviLabel(.caption, theme: theme)
+                .deviLabel(.caption, theme: skyTheme)
                 .padding(.leading, 4)
 
             LazyVGrid(columns: [
@@ -301,7 +354,12 @@ struct VedicSkyView: View {
             ], spacing: 10) {
                 if let snap = grahaSnapshot {
                     ForEach(snap.positions, id: \.graha) { pos in
-                        grahaCard(pos)
+                        Button {
+                            selectedGrahaElement = .graha(pos.graha, pos.longitude)
+                        } label: {
+                            grahaCard(pos)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -312,7 +370,7 @@ struct VedicSkyView: View {
         let graha = position.graha
         let color = planetColor(graha.rawValue)
         let isMoon = graha == .moon
-        let nakshatraIdx = min(Int(position.longitude / (360.0 / 27.0)), 26)
+        let nakshatraIdx = GrahaSnapshot.nakshatraIndex(forLongitude: position.longitude)
 
         return VStack(spacing: 6) {
             // Planet dot with glow
@@ -356,7 +414,7 @@ struct VedicSkyView: View {
         .padding(.vertical, 10)
         .padding(.horizontal, 4)
         .frame(maxWidth: .infinity)
-        .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+        .deviCard(theme: skyTheme, elevation: .flat, cornerRadius: 14)
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .stroke(
@@ -378,15 +436,66 @@ struct VedicSkyView: View {
 
     @ViewBuilder
     private var nakshatraInfoCard: some View {
-        if let name = moonNakshatraName,
+        if let name = displayedNakshatraName,
            let info = PanchangDescriptions.nakshatraInfo(for: name) {
             VStack(alignment: .leading, spacing: 10) {
-                Text("CURRENT NAKSHATRA")
-                    .deviLabel(.caption, theme: theme)
+                // Header with reset button
+                HStack {
+                    Text(isManualSelection ? "SELECTED NAKSHATRA" : "CURRENT NAKSHATRA")
+                        .deviLabel(.caption, theme: skyTheme)
+                    Spacer()
+                    if isManualSelection {
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                selectedNakshatraIndex = nil
+                            }
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text("\u{263D}")
+                                    .font(.system(size: 12))
+                                Text("Moon")
+                                    .font(.system(size: 12, weight: .medium))
+                            }
+                            .foregroundColor(Color(hex: "B8C4D8"))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(Color(hex: "B8C4D8").opacity(0.15))
+                            .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
 
                 Text(info.name)
                     .font(.system(size: 18, weight: .medium, design: .serif))
                     .foregroundColor(.white)
+
+                // Symbol + Quality row
+                HStack(spacing: 16) {
+                    if !info.symbol.isEmpty {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("SYMBOL")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.4))
+                                .tracking(1)
+                            Text(info.symbol)
+                                .font(.system(size: 14, weight: .medium, design: .serif))
+                                .foregroundColor(.white.opacity(0.85))
+                        }
+                    }
+                    Spacer()
+                    if !info.quality.isEmpty {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Text("QUALITY")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.4))
+                                .tracking(1)
+                            Text(info.quality)
+                                .font(.system(size: 14, weight: .medium, design: .serif))
+                                .foregroundColor(.white.opacity(0.85))
+                        }
+                    }
+                }
 
                 // Deity + Ruler row
                 HStack(spacing: 16) {
@@ -416,6 +525,32 @@ struct VedicSkyView: View {
                     }
                 }
 
+                // Grahas in this nakshatra
+                if let nkIdx = displayedNakshatraIndex {
+                    let grahasHere = grahasInNakshatra(index: nkIdx)
+                    if !grahasHere.isEmpty {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("GRAHAS HERE")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.4))
+                                .tracking(1)
+                            HStack(spacing: 10) {
+                                ForEach(grahasHere, id: \.graha) { pos in
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(planetColor(pos.graha.rawValue))
+                                            .frame(width: 8, height: 8)
+                                        Text(pos.graha.sanskritName)
+                                            .font(.system(size: 13, weight: .medium, design: .serif))
+                                            .foregroundColor(.white.opacity(0.85))
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+                }
+
                 // Meaning pull-quote
                 if !info.meaning.isEmpty {
                     Text("\u{201C}\(info.meaning)\u{201D}")
@@ -423,6 +558,27 @@ struct VedicSkyView: View {
                         .foregroundColor(.white.opacity(0.7))
                         .italic()
                         .padding(.top, 4)
+                }
+
+                // Auspicious activities (first 4)
+                if !info.auspiciousActivities.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("AUSPICIOUS FOR")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.4))
+                            .tracking(1)
+                        ForEach(info.auspiciousActivities.prefix(4), id: \.self) { activity in
+                            HStack(alignment: .top, spacing: 6) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(Color(hex: "4AAD6E"))
+                                Text(activity)
+                                    .font(.system(size: 13, weight: .regular))
+                                    .foregroundColor(.white.opacity(0.7))
+                            }
+                        }
+                    }
+                    .padding(.top, 4)
                 }
 
                 // Description
@@ -436,7 +592,8 @@ struct VedicSkyView: View {
             }
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+            .deviCard(theme: skyTheme, elevation: .raised, cornerRadius: 16)
+            .animation(.easeInOut(duration: 0.3), value: displayedNakshatraIndex)
         }
     }
 
@@ -451,7 +608,7 @@ struct VedicSkyView: View {
     private func grahasInNakshatra(index: Int) -> [GrahaSnapshot.Position] {
         guard let snap = grahaSnapshot else { return [] }
         return snap.positions.filter { pos in
-            min(Int(pos.longitude / (360.0 / 27.0)), 26) == index
+            GrahaSnapshot.nakshatraIndex(forLongitude: pos.longitude) == index
         }
     }
 

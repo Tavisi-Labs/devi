@@ -699,7 +699,7 @@ struct PanchangDetailSheet: View {
         case .vedicSky:
             return []
         case .graha(let g, let lon):
-            let nakshatraIdx = min(Int(lon / (360.0 / 27.0)), 26)
+            let nakshatraIdx = GrahaSnapshot.nakshatraIndex(forLongitude: lon)
             let nakshatraNames = [
                 "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
                 "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha",
