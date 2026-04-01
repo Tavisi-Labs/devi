@@ -107,6 +107,50 @@ struct HomeView: View {
                         .padding(.top, 32)
                     }
 
+                    // MARK: - 3B. Live Sky Card
+                    if let nakshatra = vm.todayPanchang?.nakshatra {
+                        Button {
+                            selectedElement = .vedicSky
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: "star.circle.fill")
+                                    .font(.system(size: 22))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [Color(hex: "D4A040"), Color(hex: "C9A96E")],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .symbolEffect(.pulse, options: .speed(0.3), isActive: true)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("LIVE SKY")
+                                        .scaledFont(size: 10, weight: .semibold)
+                                        .foregroundColor(vm.theme.secondaryText)
+                                        .tracking(1)
+                                    Text("Chandra in \(nakshatra.name)")
+                                        .scaledFont(size: 15, weight: .medium, design: .serif)
+                                        .foregroundColor(vm.theme.primaryText)
+                                }
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(vm.theme.secondaryText.opacity(0.4))
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 14)
+                            .deviCard(theme: vm.theme, elevation: .prominent)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal)
+                        .padding(.top, 20)
+                        .deviReveal(delay: 0.0, direction: .fadeUp)
+                    }
+
                     // MARK: - 4. Right Now Card
                     if !vm.rightNowItems.isEmpty {
                         RightNowCard(
@@ -244,7 +288,7 @@ struct HomeView: View {
             // Small delay to let any open sheet dismiss first
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 switch el {
-                case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .mantra:
+                case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .mantra, .vedicSky:
                     immersiveElement = el
                 default:
                     sheetElement = el
@@ -557,10 +601,7 @@ struct HomeView: View {
 
     private func festivalBanner(_ name: String) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 14))
-                .foregroundColor(Color(hex: "d4a857"))
-                .symbolEffect(.bounce, options: .speed(0.5), isActive: true)
+            sparklesIcon
 
             Text("Today: \(name)")
                 .scaledFont(size: 14, weight: .medium)
@@ -577,6 +618,20 @@ struct HomeView: View {
         .background(Color(hex: "d4a857").opacity(0.15))
         .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 12)
         .padding(.horizontal)
+    }
+
+    @ViewBuilder
+    private var sparklesIcon: some View {
+        if #available(iOS 18.0, *) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 14))
+                .foregroundColor(Color(hex: "d4a857"))
+                .symbolEffect(.bounce, options: .speed(0.5), isActive: true)
+        } else {
+            Image(systemName: "sparkles")
+                .font(.system(size: 14))
+                .foregroundColor(Color(hex: "d4a857"))
+        }
     }
 
     // MARK: - Today's Additional Details (visually distinct groups)

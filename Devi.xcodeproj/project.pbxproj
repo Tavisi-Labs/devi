@@ -25,6 +25,7 @@
 		49B683FE7E20B75F597BBD2C /* AmbientMeditationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AA5417195DA25327519394C /* AmbientMeditationView.swift */; };
 		4BD78E7E4989BAAE3EEAD12C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7D21D4B060787531B830527 /* OnboardingView.swift */; };
 		5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */; };
+		53ACCE7EEB020C6259E66DD0 /* VedicSkyMotionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */; };
 		53EB548AF45411CA45FFB15A /* Solar in Frameworks */ = {isa = PBXBuildFile; productRef = 8770626AEDBE1DA0D475369D /* Solar */; };
 		559624404B70E2F0FA657964 /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = 66786E3737FDCA2490A2BECA /* SwissEphemeris */; };
 		561B3143C07D20B5677CE9B9 /* PanchangCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */; };
@@ -44,6 +45,7 @@
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
+		B78F3AB26D72C5A1F22739BD /* VedicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28501AFF246A728A4B21023D /* VedicSkyView.swift */; };
 		B982EA76D203C242C49853BC /* MantraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81FA1582C6CC8D435E75D30 /* MantraCard.swift */; };
 		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
 		C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */; };
@@ -75,6 +77,7 @@
 		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
+		28501AFF246A728A4B21023D /* VedicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyView.swift; sourceTree = "<group>"; };
 		2AA5417195DA25327519394C /* AmbientMeditationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientMeditationView.swift; sourceTree = "<group>"; };
 		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -93,6 +96,7 @@
 		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
 		6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightNowCard.swift; sourceTree = "<group>"; };
 		652253D394F54C12ED04608E /* ShareCardRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardRenderer.swift; sourceTree = "<group>"; };
+		78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyMotionManager.swift; sourceTree = "<group>"; };
 		7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalEngineTests.swift; sourceTree = "<group>"; };
 		7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -198,6 +202,7 @@
 				C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */,
 				D841F44870521127345B2497 /* TodayDetailsSection.swift */,
 				D6C4E430092A2D5C0DA704CB /* UpcomingEventsSheet.swift */,
+				28501AFF246A728A4B21023D /* VedicSkyView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -237,6 +242,7 @@
 			children = (
 				2ED73DBA852A3A4BC9C00E5E /* Theme.swift */,
 				8682C218AD656AE031131FD5 /* ThemePalettes.swift */,
+				78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -402,6 +408,8 @@
 				8603D9EE7F01B8A15B92F4AD /* TodayDetailsSection.swift in Sources */,
 				E215CE28308DE6ED3D867351 /* UpcomingEventsSheet.swift in Sources */,
 				42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */,
+				53ACCE7EEB020C6259E66DD0 /* VedicSkyMotionManager.swift in Sources */,
+				B78F3AB26D72C5A1F22739BD /* VedicSkyView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -519,6 +527,7 @@
 				DEVELOPMENT_TEAM = KTK5RL3ZR3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Devi uses device motion to create an immersive gyroscope-driven sky experience.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -544,6 +553,7 @@
 				DEVELOPMENT_TEAM = KTK5RL3ZR3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Devi uses device motion to create an immersive gyroscope-driven sky experience.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
