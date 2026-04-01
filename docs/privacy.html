@@ -13,24 +13,39 @@
 </head>
 <body>
     <h1>Privacy Policy</h1>
-    <p class="date">Last updated: March 24, 2026</p>
+    <p class="date">Last updated: April 1, 2026</p>
 
     <h2>Overview</h2>
     <p>Devi is a Hindu Panchang (almanac) app. We are committed to protecting your privacy. This policy explains what data Devi collects and how it is used.</p>
 
     <h2>Data We Collect</h2>
-    <p><strong>Devi does not collect, store, or transmit any personal data to external servers.</strong></p>
+    <p><strong>Devi does not collect, store, or transmit any personal data to external servers unless you explicitly opt in.</strong></p>
     <ul>
-        <li><strong>Location:</strong> If you grant permission, your device's location is used locally to determine your nearest city for accurate sunrise/sunset and panchang calculations. Your coordinates are never sent to any server.</li>
-        <li><strong>City Selection:</strong> Your selected city is stored on-device using UserDefaults. It is not transmitted externally.</li>
-        <li><strong>Notification Preferences:</strong> Your notification settings are stored locally on your device.</li>
+        <li><strong>Location:</strong> If you grant permission, your device's location is used once to determine your nearest city for accurate sunrise/sunset and panchang calculations. Coordinates are stored on-device only and are not sent to any external server. You may also select a city manually without granting location access.</li>
+        <li><strong>City Selection:</strong> Your selected city name, country, and coordinates are stored on-device. City search queries are processed by Apple's MapKit framework.</li>
+        <li><strong>Motion Data:</strong> If you grant permission, the gyroscope is used in real time for the immersive Vedic Sky experience. This data is not recorded, stored, or transmitted. The feature respects the Reduce Motion accessibility setting.</li>
+        <li><strong>Notification Preferences:</strong> Your notification settings are stored locally on your device. All notifications are scheduled locally — no push notification server is used.</li>
+        <li><strong>Display Preferences:</strong> Theme, font size, and appearance mode settings are stored on-device.</li>
+    </ul>
+
+    <h2>Optional AI Feature (Cosmic Signature)</h2>
+    <p>Devi offers an optional AI-powered daily insight called "Cosmic Signature." This feature is <strong>entirely opt-in</strong> — it only activates if you enter your own Anthropic API key in Settings.</p>
+    <ul>
+        <li>When enabled, the app sends your selected city name and that day's panchang data (tithi, nakshatra, yoga, karana, festivals) to the Anthropic API to generate a personalized insight.</li>
+        <li>Your API key is stored securely in the iOS Keychain (encrypted by the operating system).</li>
+        <li>No personal information, device identifiers, or location coordinates are sent to Anthropic.</li>
+        <li>If you do not provide an API key, no data is sent externally and the app works fully offline.</li>
     </ul>
 
     <h2>Third-Party Services</h2>
     <p>Devi does not use any analytics, advertising, or tracking services. There are no third-party SDKs that collect user data.</p>
+    <ul>
+        <li><strong>Apple MapKit:</strong> Used for city search. Governed by <a href="https://www.apple.com/privacy/">Apple's Privacy Policy</a>.</li>
+        <li><strong>Anthropic API:</strong> Used only if you opt in to Cosmic Signature. Governed by <a href="https://www.anthropic.com/privacy">Anthropic's Privacy Policy</a>.</li>
+    </ul>
 
     <h2>Data Storage</h2>
-    <p>All data is stored locally on your device. Devi does not have a backend server, user accounts, or cloud storage.</p>
+    <p>All data is stored locally on your device. Devi does not have user accounts, cloud sync, or a backend server. Uninstalling the app removes all stored data.</p>
 
     <h2>Children's Privacy</h2>
     <p>Devi does not collect any personal information and is safe for users of all ages.</p>
