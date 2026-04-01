@@ -1,9 +1,11 @@
-// MARK: - Views/Components/SunArcView.swift
-// The hero visual element — semicircular arc showing sun position
+// MARK: - Views/Components/CelestialHeroView.swift
+// Unified "Celestial Observatory" hero — sun arc with embedded moon phase,
+// nakshatra + live sky row, and cosmic signature one-liner
 
 import SwiftUI
 
-struct SunArcView: View {
+struct CelestialHeroView: View {
+    // Sun arc parameters (from SunArcView)
     let progress: Double      // 0.0 (sunrise) to 1.0 (sunset)
     let isDaytime: Bool
     let sunrise: Date
@@ -17,32 +19,65 @@ struct SunArcView: View {
     let timePeriod: TimePeriod
     let themeStyle: DeviThemeStyle
     let timezoneIdentifier: String
-    /// Called during drag with the scrubbed progress (0.0–1.0)
+
+    // Tithi/Nakshatra (optional — view still works without panchang data)
+    var tithi: Tithi? = nil
+    var nakshatra: Nakshatra? = nil
+
+    // Cosmic signature
+    var cosmicSignature: String? = nil
+    var isLoadingSignature: Bool = false
+
+    // Callbacks
     var onScrub: ((Double) -> Void)? = nil
-    /// Called when drag ends — snap back to live
     var onScrubEnd: (() -> Void)? = nil
+    var onTapTithi: (() -> Void)? = nil
+    var onTapNakshatra: (() -> Void)? = nil
+    var onTapVedicSky: (() -> Void)? = nil
+
+    // MARK: - State
 
     @State private var isScrubbing = false
     @State private var scrubProgress: Double = 0.0
     @State private var lastHourTick: Int = -1
     @State private var clockBreathing: Bool = false
 
-    private let arcSize: CGFloat = 320
+    // Moon state
+    @State private var glowPhase: Bool = false
+    @State private var moonAppeared: Bool = false
 
-    /// The progress value to display — scrubbed or live
+    // Cosmic signature sheet
+    @State private var showFullSignature = false
+
+    private let arcSize: CGFloat = 360
+
+    // MARK: - Computed
+
     private var displayProgress: Double {
         isScrubbing ? scrubProgress : progress
     }
 
-    /// The time represented by the current scrub position
     private var scrubTime: Date {
         let total = sunset.timeIntervalSince(sunrise)
         return sunrise.addingTimeInterval(total * scrubProgress)
     }
 
+    // Moon illumination fraction: 0 = new moon, 1 = full moon
+    private var illuminationFraction: CGFloat {
+        guard let tithi else { return 0.5 }
+        let num = CGFloat(tithi.number)
+        if tithi.paksha == .shukla {
+            return num / 15.0
+        } else {
+            return 1.0 - (num / 15.0)
+        }
+    }
+
+    // MARK: - Body
+
     var body: some View {
         VStack(spacing: 8) {
-            // The arc + sun dot + time display
+            // The arc + sun dot + center content
             ZStack {
                 // Dashed track arc
                 SunArcShape()
@@ -98,8 +133,28 @@ struct SunArcView: View {
                         .transition(.opacity)
                 }
 
-                // Center content: label → hero countdown → current time
-                VStack(spacing: 4) {
+                // Center content: moon + tithi + countdown
+                VStack(spacing: 2) {
+                    // Moon + Tithi (hidden during scrub)
+                    if !isScrubbing, let tithi {
+                        Button { onTapTithi?() } label: {
+                            moonPhaseCanvas(tithi: tithi)
+                        }
+                        .buttonStyle(.plain)
+                        .transition(.scale.combined(with: .opacity))
+
+                        Text(tithi.name.uppercased())
+                            .scaledFont(size: 15, weight: .semibold, design: .serif)
+                            .foregroundColor(theme.primaryText)
+                            .tracking(2)
+                            .contentTransition(.interpolate)
+                            .transition(.opacity)
+
+                        pakshaDotsRow(tithi: tithi)
+                            .transition(.opacity)
+                    }
+
+                    // Countdown label
                     Text(isScrubbing ? "AT THIS TIME" : countdownLabel)
                         .scaledFont(size: 13, weight: .regular, design: .serif)
                         .italic()
@@ -107,16 +162,17 @@ struct SunArcView: View {
                         .tracking(3.0)
                         .contentTransition(.interpolate)
 
+                    // Countdown text
                     if isScrubbing {
                         Text(formatTime(scrubTime))
-                            .scaledFont(size: 48, weight: .light, design: .serif)
+                            .scaledFont(size: 40, weight: .light, design: .serif)
                             .foregroundColor(theme.primaryText)
                             .monospacedDigit()
                             .minimumScaleFactor(0.8)
                             .contentTransition(.numericText())
                     } else {
                         Text(countdownText)
-                            .scaledFont(size: 48, weight: .light, design: .serif)
+                            .scaledFont(size: 40, weight: .light, design: .serif)
                             .foregroundColor(theme.primaryText)
                             .monospacedDigit()
                             .minimumScaleFactor(0.8)
@@ -126,19 +182,21 @@ struct SunArcView: View {
                             .onAppear { clockBreathing = true }
                     }
 
+                    // Current time
                     Text(currentTime)
                         .scaledFont(size: 15, weight: .regular)
                         .foregroundColor(theme.secondaryText)
                         .contentTransition(.numericText())
                         .opacity(isScrubbing ? 0.3 : 1.0)
                 }
-                .offset(y: 30)
+                .offset(y: isScrubbing ? 30 : 20)
+                .animation(.easeInOut(duration: 0.3), value: isScrubbing)
             }
             .frame(height: arcSize / 2 + 60)
 
             // Sun + Moon times below the arc
             VStack(spacing: 10) {
-                // Sun times (always visible)
+                // Sun times
                 HStack {
                     HStack(spacing: 4) {
                         Image(systemName: "sunrise.fill")
@@ -165,7 +223,7 @@ struct SunArcView: View {
                     }
                 }
 
-                // Moon times (when available)
+                // Moon times
                 if moonrise != nil || moonset != nil {
                     HStack {
                         HStack(spacing: 4) {
@@ -195,7 +253,176 @@ struct SunArcView: View {
                 }
             }
             .padding(.horizontal, 48)
+
+            // Nakshatra + Live Sky row
+            if let nakshatra {
+                HStack(spacing: 0) {
+                    // Nakshatra tap (left)
+                    Button { onTapNakshatra?() } label: {
+                        HStack(spacing: 6) {
+                            Circle()
+                                .fill(planetColor(nakshatra.ruler))
+                                .frame(width: 7, height: 7)
+                            Text(nakshatra.name)
+                                .scaledFont(size: 14, weight: .regular, design: .serif)
+                                .foregroundColor(theme.secondaryText)
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    // Live Sky tap (right)
+                    Button { onTapVedicSky?() } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "star.circle.fill")
+                                .font(.system(size: 14))
+                                .foregroundStyle(LinearGradient(
+                                    colors: [Color(hex: "D4A040"), Color(hex: "C9A96E")],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ))
+                                .symbolEffect(.pulse, options: .speed(0.3), isActive: true)
+                            Text("Live Sky")
+                                .scaledFont(size: 13, weight: .medium)
+                                .foregroundColor(theme.secondaryText)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(theme.secondaryText.opacity(0.4))
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 4)
+            }
+
+            // Cosmic signature one-liner
+            if let sig = cosmicSignature {
+                Button { showFullSignature = true } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 10))
+                            .foregroundColor(theme.accentColor.opacity(0.6))
+                        Text(extractFirstSentence(sig))
+                            .scaledFont(size: 13, weight: .regular, design: .serif)
+                            .foregroundColor(theme.primaryText.opacity(0.7))
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 24)
+                .padding(.top, 6)
+            } else if isLoadingSignature {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(theme.primaryText.opacity(0.04))
+                    .frame(height: 16).frame(maxWidth: 200)
+                    .padding(.top, 6)
+            }
         }
+        .onAppear {
+            // Moon glow breathing
+            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
+                glowPhase = true
+            }
+            // Moon entrance spring
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.65)) {
+                moonAppeared = true
+            }
+        }
+        .animation(.easeInOut(duration: 0.8), value: tithi?.number)
+        .animation(.easeInOut(duration: 0.8), value: tithi?.paksha)
+        .sheet(isPresented: $showFullSignature) {
+            CosmicSignatureCard(signature: cosmicSignature, isLoading: false, theme: theme)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
+    }
+
+    // MARK: - Moon Phase Canvas (migrated from TithiHeroSection, 56px)
+
+    @ViewBuilder
+    private func moonPhaseCanvas(tithi: Tithi) -> some View {
+        ZStack {
+            // Silver glow (sized for 44px moon)
+            Circle()
+                .fill(RadialGradient(
+                    colors: [Color(hex: "B8C4D8").opacity(glowPhase ? 0.2 : 0.08), .clear],
+                    center: .center, startRadius: 14, endRadius: 32
+                ))
+                .frame(width: 64, height: 64)
+
+            // Moon canvas — terminator logic from TithiHeroSection
+            Canvas { context, size in
+                let center = CGPoint(x: size.width / 2, y: size.height / 2)
+                let radius = min(size.width, size.height) / 2
+
+                // Full silver moon disc
+                let moonPath = Path(ellipseIn: CGRect(
+                    x: center.x - radius,
+                    y: center.y - radius,
+                    width: radius * 2,
+                    height: radius * 2
+                ))
+                context.fill(moonPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+
+                // Adaptive dark color for light/dark mode
+                let darkColor = theme.isLight ? Color.black.opacity(0.82) : Color(hex: "0B1026").opacity(0.92)
+                let isWaxing = tithi.paksha == .shukla
+
+                // Dark half
+                var darkHalf = Path()
+                if isWaxing {
+                    darkHalf.addArc(center: center, radius: radius, startAngle: .degrees(90), endAngle: .degrees(270), clockwise: false)
+                    darkHalf.closeSubpath()
+                } else {
+                    darkHalf.addArc(center: center, radius: radius, startAngle: .degrees(270), endAngle: .degrees(90), clockwise: false)
+                    darkHalf.closeSubpath()
+                }
+                context.fill(darkHalf, with: .color(darkColor))
+
+                // Terminator ellipse
+                let terminatorWidth = radius * 2 * abs(illuminationFraction * 2 - 1)
+                let terminatorRect = CGRect(
+                    x: center.x - terminatorWidth / 2,
+                    y: center.y - radius,
+                    width: terminatorWidth,
+                    height: radius * 2
+                )
+                let terminatorPath = Path(ellipseIn: terminatorRect)
+
+                if illuminationFraction > 0.5 {
+                    context.fill(terminatorPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+                } else {
+                    context.fill(terminatorPath, with: .color(darkColor))
+                }
+            }
+            .frame(width: 44, height: 44)
+            .clipShape(Circle())
+        }
+        .scaleEffect(moonAppeared ? 1 : 0.85)
+        .opacity(moonAppeared ? 1 : 0.4)
+    }
+
+    // MARK: - Paksha Dots Row
+
+    @ViewBuilder
+    private func pakshaDotsRow(tithi: Tithi) -> some View {
+        HStack(spacing: 3) {
+            ForEach(1...15, id: \.self) { i in
+                Circle()
+                    .fill(i == tithi.number
+                        ? Color(hex: "D4A040")
+                        : Color(hex: "B8C4D8").opacity(0.2))
+                    .frame(width: i == tithi.number ? 6 : 4,
+                           height: i == tithi.number ? 6 : 4)
+            }
+        }
+        .contentTransition(.interpolate)
     }
 
     // MARK: - Drag Gesture
@@ -207,14 +434,11 @@ struct SunArcView: View {
                 let dx = value.location.x - center.x
                 let dy = value.location.y - center.y
 
-                // Convert drag position to progress along the arc
                 let p: Double
                 if dy < 0 {
-                    // Above center — use angular mapping (works perfectly for the arc)
                     let angle = atan2(dy, dx)
                     p = 1.0 - (Double(-angle) / .pi)
                 } else {
-                    // Below center — use horizontal position as linear proxy
                     let halfWidth = arcSize / 2
                     p = Double((dx + halfWidth) / (2 * halfWidth))
                 }
@@ -225,10 +449,8 @@ struct SunArcView: View {
                     lastHourTick = -1
                 }
                 scrubProgress = clampedProgress
-
                 onScrub?(clampedProgress)
 
-                // Track hour crossings for haptic feedback
                 let total = sunset.timeIntervalSince(sunrise)
                 let scrubbedDate = sunrise.addingTimeInterval(total * clampedProgress)
                 let currentHour = Calendar.current.component(.hour, from: scrubbedDate)
@@ -253,6 +475,40 @@ struct SunArcView: View {
     private func formatOptionalTime(_ date: Date?) -> String {
         guard let date else { return "—" }
         return formatTime(date)
+    }
+
+    private func planetColor(_ name: String) -> Color {
+        switch name.lowercased() {
+        case "sun", "surya":     return Color(hex: "D4A040")
+        case "moon", "chandra":  return Color(hex: "B8C4D8")
+        case "mars", "mangala":  return Color(hex: "C45050")
+        case "mercury", "budha": return Color(hex: "4AAD6E")
+        case "jupiter", "guru", "brihaspati": return Color(hex: "C9A96E")
+        case "venus", "shukra":  return Color(hex: "D47AAD")
+        case "saturn", "shani":  return Color(hex: "7B8EC4")
+        case "rahu":             return Color(hex: "5A6A8A")
+        case "ketu":             return Color(hex: "8A5A5A")
+        default:                 return Color(hex: "888888")
+        }
+    }
+
+    private func extractFirstSentence(_ text: String) -> String {
+        // Find first sentence
+        var sentence = text
+        if let range = text.range(of: ". ") {
+            sentence = String(text[text.startIndex...range.lowerBound])
+        } else if let range = text.range(of: ".") {
+            sentence = String(text[text.startIndex...range.lowerBound])
+        }
+        // Cap at ~80 chars for clean one-liner
+        if sentence.count > 80 {
+            let prefix = String(sentence.prefix(80))
+            if let lastSpace = prefix.lastIndex(of: " ") {
+                return String(prefix[prefix.startIndex..<lastSpace]) + "..."
+            }
+            return prefix + "..."
+        }
+        return sentence
     }
 }
 
@@ -285,8 +541,6 @@ struct SunDot: View {
 
     private let sunGold = Color(hex: "f0c040")
 
-    /// 4-phase heartbeat: asymmetric timing mimics a living pulse
-    /// (fast peak, slow exhale → subconsciously reads as "alive")
     enum PulsePhase: CaseIterable {
         case rest, inhale, peak, exhale
 
@@ -328,13 +582,11 @@ struct SunDot: View {
 
         PhaseAnimator(PulsePhase.allCases) { phase in
             ZStack {
-                // Faint halo layer — breathes with phase
                 Circle()
                     .fill(sunGold.opacity(phase.glowOpacity))
                     .frame(width: 80, height: 80)
                     .blur(radius: phase.haloRadius)
 
-                // Warm radial glow (3-stop)
                 Circle()
                     .fill(
                         RadialGradient(
@@ -351,18 +603,15 @@ struct SunDot: View {
                     .frame(width: 56, height: 56)
                     .scaleEffect(phase.scale)
 
-                // Outer ring
                 Circle()
                     .fill(sunGold.opacity(0.3))
                     .frame(width: 28, height: 28)
                     .scaleEffect(phase.scale * 0.98)
 
-                // Inner dot
                 Circle()
                     .fill(theme.accentColor)
                     .frame(width: 14, height: 14)
 
-                // Center highlight
                 Circle()
                     .fill(Color.white.opacity(0.6))
                     .frame(width: 5, height: 5)
@@ -386,7 +635,7 @@ struct SunDot: View {
         Color(hex: "0B1026")
             .ignoresSafeArea()
 
-        SunArcView(
+        CelestialHeroView(
             progress: 0.65,
             isDaytime: true,
             sunrise: Calendar.current.date(bySettingHour: 6, minute: 18, second: 0, of: Date())!,
@@ -399,7 +648,10 @@ struct SunDot: View {
             theme: DeviTheme.forPeriod(.evening),
             timePeriod: .evening,
             themeStyle: .classic,
-            timezoneIdentifier: "America/New_York"
+            timezoneIdentifier: "America/New_York",
+            tithi: Tithi(number: 15, name: "Purnima", paksha: .shukla, endTime: Date()),
+            nakshatra: Nakshatra(number: 12, name: "U.Phalguni", ruler: "Sun", deity: "Aryaman", endTime: Date()),
+            cosmicSignature: "The Purnima tithi brings the peak of lunar energy. A powerful day for spiritual practice and gratitude."
         )
     }
 }

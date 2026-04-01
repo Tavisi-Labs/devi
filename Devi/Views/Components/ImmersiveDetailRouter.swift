@@ -51,6 +51,11 @@ struct ImmersiveDetailRouter: View {
                 mantra: mantra,
                 theme: theme
             )
+        case .vedicSky:
+            VedicSkyView(
+                theme: theme,
+                timezoneIdentifier: timezoneIdentifier
+            )
         default:
             // Fallback — shouldn't be reached via router
             VStack {

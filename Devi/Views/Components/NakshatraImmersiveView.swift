@@ -12,6 +12,11 @@ struct NakshatraImmersiveView: View {
     @State private var appeared: Bool = false
     @State private var constellationDrawn: Bool = false
 
+    /// Forced dark theme — this is a night-sky theater that must stay dark in both light/dark modes.
+    private var skyTheme: DeviTheme {
+        DeviTheme.forPeriod(.night, style: .classic, appearance: .alwaysDark)
+    }
+
     private var info: (meaning: String, description: String, rulingPlanet: String, presidingDeity: String, symbol: String, quality: String, auspiciousActivities: [String])? {
         guard let i = PanchangDescriptions.nakshatraInfo(for: nakshatra.name) else { return nil }
         return (i.meaning, i.description, i.rulingPlanet, i.presidingDeity, i.symbol, i.quality, i.auspiciousActivities)
@@ -19,7 +24,18 @@ struct NakshatraImmersiveView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient.ignoresSafeArea()
+            // Forced dark sky background — must not inherit adaptive theme
+            LinearGradient(
+                stops: [
+                    .init(color: Color(hex: "0A0E1C"), location: 0.0),
+                    .init(color: Color(hex: "121A2C"), location: 0.5),
+                    .init(color: Color(hex: "1C2438"), location: 1.0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
             StarFieldView(isDaytime: false, timePeriod: .night)
                 .ignoresSafeArea()
 
@@ -35,12 +51,12 @@ struct NakshatraImmersiveView: View {
                     // Name & meaning
                     VStack(spacing: 6) {
                         Text(nakshatra.name.uppercased())
-                            .deviLabel(.sacredTitle, theme: theme)
+                            .deviLabel(.sacredTitle, theme: skyTheme)
                             .tracking(2)
 
                         if let info = info {
                             Text(info.meaning)
-                                .deviLabel(.insight, theme: theme)
+                                .deviLabel(.insight, theme: skyTheme)
                         }
                     }
                     .deviReveal(delay: 0.15, direction: .fadeUp)
@@ -65,10 +81,10 @@ struct NakshatraImmersiveView: View {
                                 }
                                 VStack(alignment: .leading, spacing: 1) {
                                     Text("RULER")
-                                        .deviLabel(.caption, theme: theme)
+                                        .deviLabel(.caption, theme: skyTheme)
                                     Text(info.rulingPlanet)
                                         .scaledFont(size: 15, weight: .medium, design: .serif)
-                                        .foregroundColor(theme.primaryText)
+                                        .foregroundColor(skyTheme.primaryText)
                                 }
                             }
 
@@ -77,14 +93,14 @@ struct NakshatraImmersiveView: View {
                             // Deity
                             VStack(alignment: .trailing, spacing: 1) {
                                 Text("DEITY")
-                                    .deviLabel(.caption, theme: theme)
+                                    .deviLabel(.caption, theme: skyTheme)
                                 Text(info.presidingDeity)
                                     .scaledFont(size: 15, weight: .medium, design: .serif)
-                                    .foregroundColor(theme.primaryText)
+                                    .foregroundColor(skyTheme.primaryText)
                             }
                         }
                         .padding(14)
-                        .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+                        .deviCard(theme: skyTheme, elevation: .raised, cornerRadius: 16)
                         .deviReveal(delay: 0.2, direction: .fadeUp)
                     }
 
@@ -95,13 +111,13 @@ struct NakshatraImmersiveView: View {
                             VStack(spacing: 6) {
                                 Text(info.symbol)
                                     .scaledFont(size: 24)
-                                    .foregroundColor(theme.primaryText)
+                                    .foregroundColor(skyTheme.primaryText)
                                 Text("SYMBOL")
-                                    .deviLabel(.caption, theme: theme)
+                                    .deviLabel(.caption, theme: skyTheme)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(14)
-                            .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+                            .deviCard(theme: skyTheme, elevation: .flat, cornerRadius: 14)
 
                             // Quality card
                             VStack(spacing: 6) {
@@ -113,11 +129,11 @@ struct NakshatraImmersiveView: View {
                                     .background(qualityColor(info.quality).opacity(0.15))
                                     .clipShape(Capsule())
                                 Text("QUALITY")
-                                    .deviLabel(.caption, theme: theme)
+                                    .deviLabel(.caption, theme: skyTheme)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(14)
-                            .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+                            .deviCard(theme: skyTheme, elevation: .flat, cornerRadius: 14)
                         }
                         .deviReveal(delay: 0.25, direction: .fadeUp)
                     }
@@ -132,15 +148,15 @@ struct NakshatraImmersiveView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "clock")
                             .font(.system(size: 12))
-                            .foregroundColor(theme.secondaryText)
+                            .foregroundColor(skyTheme.secondaryText)
                         Text("Ends at")
-                            .deviLabel(.detail, theme: theme)
+                            .deviLabel(.detail, theme: skyTheme)
                         Spacer()
                         Text(deviFormatTime(nakshatra.endTime, timezoneIdentifier: timezoneIdentifier))
-                            .deviLabel(.body, theme: theme)
+                            .deviLabel(.body, theme: skyTheme)
                     }
                     .padding(14)
-                    .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+                    .deviCard(theme: skyTheme, elevation: .flat, cornerRadius: 14)
                     .deviReveal(delay: 0.35, direction: .fadeUp)
 
                     // Activities
@@ -155,6 +171,7 @@ struct NakshatraImmersiveView: View {
                 .padding(.bottom, 40)
             }
         }
+        .preferredColorScheme(.dark)
         .onAppear {
             withAnimation(.spring(response: 0.7, dampingFraction: 0.7)) {
                 appeared = true
@@ -172,7 +189,7 @@ struct NakshatraImmersiveView: View {
             Button { dismiss() } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(theme.secondaryText)
+                    .foregroundColor(skyTheme.secondaryText)
                     .frame(width: 36, height: 36)
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())
@@ -188,7 +205,7 @@ struct NakshatraImmersiveView: View {
                     Text("Share")
                         .scaledFont(size: 13, weight: .medium)
                 }
-                .foregroundColor(theme.secondaryText)
+                .foregroundColor(skyTheme.secondaryText)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(.ultraThinMaterial)
@@ -260,15 +277,15 @@ struct NakshatraImmersiveView: View {
         let parts = splitDescription(text)
         return VStack(alignment: .leading, spacing: 12) {
             Text(parts.pullQuote)
-                .deviLabel(.sacredBody, theme: theme)
+                .deviLabel(.sacredBody, theme: skyTheme)
                 .lineSpacing(4)
             if let rest = parts.remainder {
                 Text(rest)
-                    .deviLabel(.detail, theme: theme)
+                    .deviLabel(.detail, theme: skyTheme)
                     .lineSpacing(3)
                     .padding(14)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+                    .deviCard(theme: skyTheme, elevation: .flat, cornerRadius: 14)
             }
         }
     }
@@ -280,23 +297,23 @@ struct NakshatraImmersiveView: View {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 12))
-                    .foregroundColor(theme.auspiciousColor)
+                    .foregroundColor(skyTheme.auspiciousColor)
                 Text("Auspicious For")
                     .scaledFont(size: 14, weight: .semibold)
-                    .foregroundColor(theme.primaryText)
+                    .foregroundColor(skyTheme.primaryText)
             }
             ForEach(activities.prefix(5), id: \.self) { item in
                 HStack(alignment: .top, spacing: 8) {
                     Text("\u{2022}")
-                        .foregroundColor(theme.secondaryText)
+                        .foregroundColor(skyTheme.secondaryText)
                     Text(item)
-                        .deviLabel(.detail, theme: theme)
+                        .deviLabel(.detail, theme: skyTheme)
                 }
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .deviCard(theme: theme, elevation: .raised, cornerRadius: 16)
+        .deviCard(theme: skyTheme, elevation: .raised, cornerRadius: 16)
     }
 
     // MARK: - Helpers
@@ -318,9 +335,9 @@ struct NakshatraImmersiveView: View {
 
     private func qualityColor(_ quality: String) -> Color {
         let q = quality.lowercased()
-        if q.contains("inauspicious") || q.contains("malefic") { return theme.inauspiciousColor }
-        if q.contains("auspicious") || q.contains("benefic") { return theme.auspiciousColor }
-        return theme.cautionColor
+        if q.contains("inauspicious") || q.contains("malefic") { return skyTheme.inauspiciousColor }
+        if q.contains("auspicious") || q.contains("benefic") { return skyTheme.auspiciousColor }
+        return skyTheme.cautionColor
     }
 
     private func splitDescription(_ text: String) -> (pullQuote: String, remainder: String?) {

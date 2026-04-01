@@ -14,6 +14,12 @@ import CSwissEphemeris
 
 private let kSESun: Int32 = 0           // SE_SUN
 private let kSEMoon: Int32 = 1          // SE_MOON
+private let kSEMercury: Int32 = 2       // SE_MERCURY
+private let kSEVenus: Int32 = 3         // SE_VENUS
+private let kSEMars: Int32 = 4          // SE_MARS
+private let kSEJupiter: Int32 = 5       // SE_JUPITER
+private let kSESaturn: Int32 = 6        // SE_SATURN
+private let kSETrueNode: Int32 = 11     // SE_TRUE_NODE (Rahu)
 private let kSEGregCal: Int32 = 1       // SE_GREG_CAL
 private let kSEFlagSidereal: Int32 = 64 * 1024  // SEFLG_SIDEREAL (65536)
 private let kSESidmLahiri: Int32 = 1    // SE_SIDM_LAHIRI
@@ -81,21 +87,34 @@ final class VedicCalculator {
 
     // MARK: - Sidereal Planetary Longitudes
 
-    /// Sun's sidereal (nirayana) longitude in degrees [0, 360).
-    /// Uses Lahiri ayanamsa set at init.
-    func sunSiderealLongitude(at jd: Double) -> Double {
+    /// Generic sidereal longitude for any planet body.
+    /// Returns degrees in [0, 360), or nil on calculation error.
+    /// Planet IDs: kSESun=0, kSEMoon=1, kSEMercury=2, kSEVenus=3, kSEMars=4,
+    /// kSEJupiter=5, kSESaturn=6, kSETrueNode=11 (Rahu).
+    func siderealLongitude(planet: Int32, at jd: Double) -> Double? {
         var xx = [Double](repeating: 0, count: 6)
         var serr = [CChar](repeating: 0, count: 256)
-        swe_calc_ut(jd, kSESun, kSEFlagSidereal, &xx, &serr)
-        return xx[0]
+        let ret = swe_calc_ut(jd, planet, kSEFlagSidereal, &xx, &serr)
+        if ret < 0 {
+            let errStr = String(cString: serr)
+            print("[VedicCalculator] swe_calc_ut failed for planet \(planet): \(errStr)")
+            return nil
+        }
+        var lon = xx[0].truncatingRemainder(dividingBy: 360.0)
+        if lon < 0 { lon += 360.0 }
+        return lon
+    }
+
+    /// Sun's sidereal (nirayana) longitude in degrees [0, 360).
+    /// Uses Lahiri ayanamsa set at init. Returns 0.0 on error (safe for panchang index functions).
+    func sunSiderealLongitude(at jd: Double) -> Double {
+        siderealLongitude(planet: kSESun, at: jd) ?? 0.0
     }
 
     /// Moon's sidereal (nirayana) longitude in degrees [0, 360).
+    /// Returns 0.0 on error (safe for panchang index functions).
     func moonSiderealLongitude(at jd: Double) -> Double {
-        var xx = [Double](repeating: 0, count: 6)
-        var serr = [CChar](repeating: 0, count: 256)
-        swe_calc_ut(jd, kSEMoon, kSEFlagSidereal, &xx, &serr)
-        return xx[0]
+        siderealLongitude(planet: kSEMoon, at: jd) ?? 0.0
     }
 
     // MARK: - Rise/Set Times

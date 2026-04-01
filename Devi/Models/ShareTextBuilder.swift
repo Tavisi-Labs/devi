@@ -258,6 +258,13 @@ enum ShareTextBuilder {
             lines.append(m.meaning)
             lines.append("")
             lines.append("Chant \(m.repetitions) times · \(m.bestTimeToChant)")
+
+        case .vedicSky:
+            lines.append("Vedic Sky — Live Nakshatra & Graha Positions")
+
+        case .graha(let g, let lon):
+            lines.append("\(g.sanskritName) (\(g.rawValue))")
+            lines.append("Sidereal Longitude: \(String(format: "%.1f°", lon))")
         }
 
         lines.append(footer)

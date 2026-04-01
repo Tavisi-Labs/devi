@@ -102,6 +102,21 @@ struct HoraInfo {
     let description: String
 }
 
+struct GrahaInfo {
+    let name: String              // "Sun"
+    let sanskritName: String       // "Surya"
+    let deity: String             // "Surya Deva (Solar Deity)"
+    let nature: String            // "Benefic" or "Malefic"
+    let guna: String              // "Sattvic", "Rajasic", "Tamasic"
+    let element: String           // "Fire", "Water", "Earth", "Air", "Ether"
+    let day: String               // "Sunday"
+    let gemstone: String          // "Ruby (Manikya)"
+    let mantra: (devanagari: String, transliteration: String)
+    let description: String
+    let auspiciousActivities: [String]
+    let avoidActivities: [String]
+}
+
 struct ChoghadiyaTypeInfo {
     let name: String
     let meaning: String
@@ -2683,5 +2698,140 @@ enum PanchangDescriptions {
 
     static func dailyMantra(for weekday: Int) -> DailyMantra? {
         dailyMantras[weekday]
+    }
+
+    // MARK: - Graha Info (9 Navagraha)
+
+    static let grahaInfos: [String: GrahaInfo] = [
+        "Sun": GrahaInfo(
+            name: "Sun",
+            sanskritName: "Surya",
+            deity: "Surya Deva (Solar Deity)",
+            nature: "Malefic",
+            guna: "Sattvic",
+            element: "Fire",
+            day: "Sunday",
+            gemstone: "Ruby (Manikya)",
+            mantra: (devanagari: "ॐ सूर्याय नमः", transliteration: "Om Suryaya Namah"),
+            description: "Surya is the soul of the cosmic body, the Atmakaraka who illuminates all worlds. In Vedic cosmology, the Sun rides a chariot drawn by seven horses representing the seven days, driven by Aruna (the dawn). As king of the Navagraha, Surya governs vitality, authority, and self-realization. His light dispels ignorance — the Gayatri Mantra, humanity's most sacred hymn, is addressed to him. A strong Sun in the horoscope bestows leadership, confidence, and recognition; a weak Sun brings ego conflicts and lack of direction.",
+            auspiciousActivities: ["Government and authority work", "Leadership decisions", "Health and vitality practices", "Spiritual illumination rituals", "Starting positions of power"],
+            avoidActivities: ["Secretive dealings", "Partnerships with equals", "Night activities", "Cold or damp ventures"]
+        ),
+        "Moon": GrahaInfo(
+            name: "Moon",
+            sanskritName: "Chandra",
+            deity: "Chandra Deva (Lunar Deity)",
+            nature: "Benefic",
+            guna: "Sattvic",
+            element: "Water",
+            day: "Monday",
+            gemstone: "Pearl (Moti)",
+            mantra: (devanagari: "ॐ चन्द्राय नमः", transliteration: "Om Chandraya Namah"),
+            description: "Chandra is the mind of the cosmic body, governing emotions, intuition, and the subconscious. Born from the churning of the cosmic ocean (Samudra Manthan), the Moon wears the crescent on Shiva's head as a symbol of mastery over the mind. Chandra rules the tides, the menstrual cycle, and the growth of plants. In Jyotish, the Moon's nakshatra at birth determines the Mahadasha sequence — making it the single most important factor in Vedic astrology. A strong Moon gives emotional stability, creativity, and public favor.",
+            auspiciousActivities: ["Meditation and contemplation", "Water-related activities", "Nurturing and caregiving", "Creative arts and music", "Public appearances"],
+            avoidActivities: ["Aggressive confrontations", "Fire-related work", "Harsh negotiations", "Surgery"]
+        ),
+        "Mars": GrahaInfo(
+            name: "Mars",
+            sanskritName: "Mangala",
+            deity: "Mangala Deva (God of War)",
+            nature: "Malefic",
+            guna: "Tamasic",
+            element: "Fire",
+            day: "Tuesday",
+            gemstone: "Red Coral (Moonga)",
+            mantra: (devanagari: "ॐ मङ्गलाय नमः", transliteration: "Om Mangalaya Namah"),
+            description: "Mangala is the commander of the celestial army, born from Shiva's sweat drop that fell upon the Earth. He embodies raw courage, physical strength, and the warrior spirit. Mars governs brothers, property, surgery, and mechanical skill. In the Navagraha temple, Mars faces south — the direction of Yama, death — reflecting his fearless nature. Mangal Dosha (Mars affliction in marriage houses) is one of the most consulted factors in Vedic matchmaking. A strong Mars gives courage, land ownership, and athletic ability.",
+            auspiciousActivities: ["Physical training and sports", "Property transactions", "Legal battles and competition", "Surgery and medical procedures", "Engineering and construction"],
+            avoidActivities: ["Marriage ceremonies", "Peaceful negotiations", "Starting gentle ventures", "Lending money"]
+        ),
+        "Mercury": GrahaInfo(
+            name: "Mercury",
+            sanskritName: "Budha",
+            deity: "Budha Deva (God of Intellect)",
+            nature: "Neutral",
+            guna: "Rajasic",
+            element: "Earth",
+            day: "Wednesday",
+            gemstone: "Emerald (Panna)",
+            mantra: (devanagari: "ॐ बुधाय नमः", transliteration: "Om Budhaya Namah"),
+            description: "Budha is the prince among planets, born from the union of Chandra and Tara (Jupiter's wife) — making him both brilliant and controversial in mythology. He governs intellect, speech, commerce, mathematics, and all forms of communication. Mercury is the only planet considered truly neutral — he takes on the nature of planets he associates with. In the information age, Mercury's significance has grown enormously as he rules technology, data, and networks. A strong Mercury gives sharp wit, business acumen, and eloquent speech.",
+            auspiciousActivities: ["Business transactions and trade", "Writing and communication", "Education and learning", "Accounting and mathematics", "Short-distance travel"],
+            avoidActivities: ["Long-term commitments", "Agricultural work", "Physical labor", "Spiritual retreats"]
+        ),
+        "Jupiter": GrahaInfo(
+            name: "Jupiter",
+            sanskritName: "Guru",
+            deity: "Brihaspati (Guru of the Devas)",
+            nature: "Benefic",
+            guna: "Sattvic",
+            element: "Ether",
+            day: "Thursday",
+            gemstone: "Yellow Sapphire (Pukhraj)",
+            mantra: (devanagari: "ॐ बृहस्पतये नमः", transliteration: "Om Brihaspataye Namah"),
+            description: "Brihaspati is the guru of the devas, the most benefic force in the Navagraha mandala. He embodies wisdom, dharma, expansion, and divine grace. Jupiter rules higher education, philosophy, law, children, and spiritual practice. His transit through each rashi lasts approximately one year, making Jupiter's movement the primary timing mechanism for major life events in Jyotish. The Guru Chandala yoga (Jupiter-Rahu conjunction) is feared as it corrupts wisdom. A strong Jupiter gives wisdom, wealth, progeny, and spiritual depth — there is virtually nothing inauspicious about his influence.",
+            auspiciousActivities: ["Spiritual practices and rituals", "Education and teaching", "Marriage ceremonies", "Charitable giving", "Starting new ventures"],
+            avoidActivities: []
+        ),
+        "Venus": GrahaInfo(
+            name: "Venus",
+            sanskritName: "Shukra",
+            deity: "Shukracharya (Guru of the Asuras)",
+            nature: "Benefic",
+            guna: "Rajasic",
+            element: "Water",
+            day: "Friday",
+            gemstone: "Diamond (Heera)",
+            mantra: (devanagari: "ॐ शुक्राय नमः", transliteration: "Om Shukraya Namah"),
+            description: "Shukracharya is the guru of the asuras, possessor of the Sanjivani Vidya — the knowledge of reviving the dead. Despite teaching the demons, Venus is deeply benefic, ruling beauty, art, luxury, romance, and sensory pleasure. Shukra is the only planet who knows the Mrita-Sanjivani mantra, making him indispensable even to the gods. He governs marriage, vehicles, jewelry, and all forms of aesthetic refinement. Venus and Jupiter are the two gurus of the cosmos — Jupiter teaches through wisdom, Venus through experience. A strong Venus bestows artistic talent, material comfort, and harmonious relationships.",
+            auspiciousActivities: ["Art, music, and creative work", "Luxury purchases and jewelry", "Romance and social gatherings", "Beauty and fashion", "Vehicle purchases"],
+            avoidActivities: ["Austerities and fasting", "Medical procedures", "Harsh confrontations", "Renunciation practices"]
+        ),
+        "Saturn": GrahaInfo(
+            name: "Saturn",
+            sanskritName: "Shani",
+            deity: "Shani Deva (Lord of Karma)",
+            nature: "Malefic",
+            guna: "Tamasic",
+            element: "Air",
+            day: "Saturday",
+            gemstone: "Blue Sapphire (Neelam)",
+            mantra: (devanagari: "ॐ शनैश्चराय नमः", transliteration: "Om Shanaishcharaya Namah"),
+            description: "Shani is the most feared yet most just of all grahas — the cosmic judge who delivers karma with absolute impartiality. Son of Surya and Chhaya (Shadow), Saturn's very gaze is said to bring hardship. The 7.5-year Sade Sati (Saturn's transit over natal Moon) is the most dreaded period in Jyotish, yet it is also the greatest teacher. Shani rules discipline, longevity, servants, and spiritual detachment. His slow movement (29.5-year orbit) means his lessons unfold over years, not days. Those who serve the poor, practice patience, and live righteously have nothing to fear from Shani — he rewards dharma as surely as he punishes adharma.",
+            auspiciousActivities: ["Discipline and penance", "Service to the poor", "Charity and donations", "Meditation and spiritual practice", "Organizational tasks"],
+            avoidActivities: ["Starting new ventures", "Marriage and celebrations", "Travel for pleasure", "Important purchases", "Risky investments"]
+        ),
+        "Rahu": GrahaInfo(
+            name: "Rahu",
+            sanskritName: "Rahu",
+            deity: "Durga / Sarpa Devata",
+            nature: "Malefic",
+            guna: "Tamasic",
+            element: "Air",
+            day: "Saturday",
+            gemstone: "Hessonite Garnet (Gomed)",
+            mantra: (devanagari: "ॐ राहवे नमः", transliteration: "Om Rahave Namah"),
+            description: "Rahu is the north lunar node — the severed head of the asura Svarbhanu, who disguised himself as a deva to drink the Amrita (nectar of immortality). Vishnu's Sudarshana Chakra beheaded him, but the nectar had already touched his throat, granting the head immortality as Rahu and the body as Ketu. As a shadow planet (chaya graha) with no physical body, Rahu operates through illusion, obsession, and worldly desire. He amplifies whatever he touches — creating sudden fame, foreign connections, unconventional paths, and technological mastery. Rahu rules eclipses by swallowing the Sun and Moon, making eclipse periods spiritually potent. A well-placed Rahu gives political power, innovation, and cross-cultural success.",
+            auspiciousActivities: ["Foreign dealings and travel", "Technology and innovation", "Unconventional career moves", "Research and investigation", "Breaking old patterns"],
+            avoidActivities: ["Traditional ceremonies", "Sacred rituals", "Making long-term promises", "Trusting appearances"]
+        ),
+        "Ketu": GrahaInfo(
+            name: "Ketu",
+            sanskritName: "Ketu",
+            deity: "Ganesha / Chitragupta",
+            nature: "Malefic",
+            guna: "Tamasic",
+            element: "Fire",
+            day: "Tuesday",
+            gemstone: "Cat's Eye (Lehsunia)",
+            mantra: (devanagari: "ॐ केतवे नमः", transliteration: "Om Ketave Namah"),
+            description: "Ketu is the south lunar node — the headless body of Svarbhanu, moving through the cosmos driven by pure instinct and past-life memory. Where Rahu craves worldly experience, Ketu seeks liberation (moksha) from it. As the karaka of spiritual enlightenment, Ketu strips away material attachments, often through sudden losses that ultimately free the soul. He rules past-life karma, psychic abilities, and the mystical sciences. Ketu's influence creates saints, mystics, and healers — or confusion and aimlessness when the native resists detachment. Ketu is considered the most spiritually potent graha, granting moksha to those ready to receive it. His flag-like symbol represents the banner of spiritual victory.",
+            auspiciousActivities: ["Meditation and spiritual practice", "Healing and alternative medicine", "Past-life exploration", "Letting go of attachments", "Mystical studies"],
+            avoidActivities: ["Material acquisitions", "Starting worldly ventures", "Marriage and partnerships", "Financial speculation"]
+        ),
+    ]
+
+    static func grahaInfo(for grahaName: String) -> GrahaInfo? {
+        grahaInfos[grahaName]
     }
 }

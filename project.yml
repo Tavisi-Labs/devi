@@ -39,6 +39,7 @@ targets:
         INFOPLIST_KEY_UIRequiresFullScreen: true
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "Devi uses your location to calculate accurate sunrise, sunset, and prayer times for your area."
         INFOPLIST_KEY_UILaunchScreen_Generation: true
+        INFOPLIST_KEY_NSMotionUsageDescription: "Devi uses device motion to create an immersive gyroscope-driven sky experience."
     dependencies:
       - package: Solar
       - package: SwissEphemeris

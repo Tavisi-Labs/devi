@@ -350,6 +350,10 @@ struct PanchangDetailSheet: View {
             return c.quality.rawValue
         case .mantra(let m):
             return "\(m.deity) — \(weekdayName(for: m.weekday))"
+        case .vedicSky:
+            return "Live Nakshatra & Graha Positions"
+        case .graha(let g, let lon):
+            return "\(g.sanskritName) at \(String(format: "%.1f°", lon))"
         }
     }
 
@@ -572,6 +576,10 @@ struct PanchangDetailSheet: View {
             return PanchangDescriptions.choghadiyaInfo(for: c.name)?.description
         case .mantra(let m):
             return m.significance
+        case .vedicSky:
+            return nil
+        case .graha(let g, _):
+            return "\(g.sanskritName) (\(g.rawValue)) — one of the nine Vedic celestial bodies (navagraha) that influence earthly life in Jyotish astrology."
         }
     }
 
@@ -687,6 +695,24 @@ struct PanchangDetailSheet: View {
                 ("Best Time", m.bestTimeToChant),
                 ("Repetitions", "\(m.repetitions) times"),
                 ("Day", weekdayName(for: m.weekday))
+            ]
+        case .vedicSky:
+            return []
+        case .graha(let g, let lon):
+            let nakshatraIdx = GrahaSnapshot.nakshatraIndex(forLongitude: lon)
+            let nakshatraNames = [
+                "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
+                "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha",
+                "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati",
+                "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha",
+                "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
+                "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+            ]
+            return [
+                ("Sanskrit Name", g.sanskritName),
+                ("Longitude", String(format: "%.2f°", lon)),
+                ("Nakshatra", nakshatraNames[nakshatraIdx]),
+                ("Type", g.isShadow ? "Shadow Planet (Chaya Graha)" : "Physical Planet")
             ]
         }
     }

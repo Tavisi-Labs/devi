@@ -89,7 +89,7 @@ struct TimeWindowsCard: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
         .opacity(past ? 0.4 : 1.0)
         .contentShape(Rectangle())
     }
@@ -130,6 +130,11 @@ struct TimeWindowsCard: View {
                     statusBadge(window: window, color: color, isActive: isActive, past: past)
                 }
 
+                let wi = windowIcon(for: window.type)
+                Image(systemName: wi.icon)
+                    .font(.system(size: 12))
+                    .foregroundColor(wi.color)
+
                 Text(window.type.rawValue)
                     .scaledFont(size: 14, weight: .medium)
                     .foregroundColor(theme.primaryText)
@@ -145,14 +150,6 @@ struct TimeWindowsCard: View {
                 .foregroundColor(theme.secondaryText)
                 .monospacedDigit()
 
-            // Recommendation from PanchangDescriptions
-            if let info = timeWindowInfoKey(for: window),
-               let twInfo = PanchangDescriptions.timeWindowInfo(for: info) {
-                Text(shortRecommendation(twInfo.recommendation))
-                    .deviLabel(.insight, theme: theme)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
@@ -234,12 +231,14 @@ struct TimeWindowsCard: View {
         }
     }
 
-    private func shortRecommendation(_ full: String) -> String {
-        // Extract just the first sentence or clause
-        if let dotRange = full.range(of: ". ") {
-            return String(full[full.startIndex..<dotRange.lowerBound])
+    private func windowIcon(for type: TimeWindow.WindowType) -> (icon: String, color: Color) {
+        switch type {
+        case .brahmaMuhurta:  return ("sunrise.fill", theme.auspiciousColor)
+        case .abhijitMuhurta: return ("sparkle", theme.auspiciousColor)
+        case .rahuKalam:      return ("xmark.octagon.fill", theme.inauspiciousColor)
+        case .gulikaKalam:    return ("exclamationmark.triangle.fill", theme.inauspiciousColor)
+        case .yamaganda:      return ("bolt.trianglebadge.exclamationmark.fill", theme.inauspiciousColor)
         }
-        return String(full.prefix(60))
     }
 
     private func formatTime(_ date: Date) -> String {
