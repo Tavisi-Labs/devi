@@ -17,6 +17,8 @@ enum PanchangElement: Identifiable {
     case hora(Hora)                  // Planetary hour detail
     case choghadiya(Choghadiya)      // Choghadiya period detail
     case mantra(DailyMantra)         // Daily weekday mantra detail
+    case vedicSky                    // Full-screen ecliptic strip (Tier 1)
+    case graha(Graha, Double)        // Individual graha detail (Tier 2) — graha + longitude
 
     var id: String {
         switch self {
@@ -33,6 +35,8 @@ enum PanchangElement: Identifiable {
         case .hora(let h): return "hora-\(h.sequenceIndex)"
         case .choghadiya(let c): return "choghadiya-\(c.sequenceIndex)"
         case .mantra(let m): return "mantra-\(m.weekday)"
+        case .vedicSky: return "vedicSky"
+        case .graha(let g, _): return "graha-\(g.rawValue)"
         }
     }
 
@@ -51,6 +55,8 @@ enum PanchangElement: Identifiable {
         case .hora(let h): return h.planetName
         case .choghadiya(let c): return c.name
         case .mantra(let m): return m.deity
+        case .vedicSky: return "Vedic Sky"
+        case .graha(let g, _): return g.rawValue
         }
     }
 
@@ -69,6 +75,8 @@ enum PanchangElement: Identifiable {
         case .hora: return "HORA"
         case .choghadiya: return "CHOGHADIYA"
         case .mantra: return "MANTRA"
+        case .vedicSky: return "VEDIC SKY"
+        case .graha: return "GRAHA"
         }
     }
 }

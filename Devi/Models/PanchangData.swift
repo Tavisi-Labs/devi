@@ -574,6 +574,72 @@ struct UserCity: Codable, Identifiable, Hashable {
     }
 }
 
+// MARK: - Graha (Vedic Planets)
+
+enum Graha: String, CaseIterable, Identifiable {
+    case sun = "Sun"
+    case moon = "Moon"
+    case mars = "Mars"
+    case mercury = "Mercury"
+    case jupiter = "Jupiter"
+    case venus = "Venus"
+    case saturn = "Saturn"
+    case rahu = "Rahu"
+    case ketu = "Ketu"
+
+    var id: String { rawValue }
+
+    var sanskritName: String {
+        switch self {
+        case .sun: return "Surya"
+        case .moon: return "Chandra"
+        case .mars: return "Mangala"
+        case .mercury: return "Budha"
+        case .jupiter: return "Guru"
+        case .venus: return "Shukra"
+        case .saturn: return "Shani"
+        case .rahu: return "Rahu"
+        case .ketu: return "Ketu"
+        }
+    }
+
+    /// Shadow planets (chaya graha) have no physical body — computed from lunar nodes.
+    var isShadow: Bool {
+        self == .rahu || self == .ketu
+    }
+
+    /// Swiss Ephemeris planet ID for swe_calc_ut. Ketu has no SE body — derived from Rahu.
+    var planetId: Int32 {
+        switch self {
+        case .sun: return 0       // SE_SUN
+        case .moon: return 1      // SE_MOON
+        case .mercury: return 2   // SE_MERCURY
+        case .venus: return 3     // SE_VENUS
+        case .mars: return 4      // SE_MARS
+        case .jupiter: return 5   // SE_JUPITER
+        case .saturn: return 6    // SE_SATURN
+        case .rahu: return 11     // SE_TRUE_NODE
+        case .ketu: return -1     // Derived: (rahu + 180) mod 360
+        }
+    }
+}
+
+/// Snapshot of all 9 graha positions at a given moment.
+struct GrahaSnapshot {
+    struct Position {
+        let graha: Graha
+        let longitude: Double  // Sidereal longitude in degrees [0, 360)
+    }
+
+    let positions: [Position]  // Always 9 entries, one per Graha
+    let computedAt: Date
+
+    /// Find the position for a specific graha.
+    func longitude(of graha: Graha) -> Double {
+        positions.first(where: { $0.graha == graha })?.longitude ?? 0
+    }
+}
+
 // MARK: - Notification Preferences
 
 struct NotificationPreferences: Codable {

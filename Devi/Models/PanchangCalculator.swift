@@ -503,6 +503,30 @@ enum PanchangCalculator {
         return FestivalEngine.festivals(forYear: year)[dateString] ?? []
     }
 
+    // MARK: - Graha Snapshot (All 9 Vedic Planets)
+
+    /// Compute sidereal longitudes for all 9 grahas at a given Julian Day.
+    /// Ketu = (Rahu longitude + 180) mod 360 — it has no independent SE body.
+    static func computeGrahaSnapshot(julianDay jd: Double) -> GrahaSnapshot {
+        let calc = VedicCalculator.shared
+        var positions: [GrahaSnapshot.Position] = []
+        var rahuLon: Double = 0
+
+        for graha in Graha.allCases {
+            let lon: Double
+            if graha == .ketu {
+                // Ketu is the south lunar node — always diametrically opposite Rahu
+                lon = (rahuLon + 180.0).truncatingRemainder(dividingBy: 360.0)
+            } else {
+                lon = calc.siderealLongitude(planet: graha.planetId, at: jd)
+                if graha == .rahu { rahuLon = lon }
+            }
+            positions.append(GrahaSnapshot.Position(graha: graha, longitude: lon))
+        }
+
+        return GrahaSnapshot(positions: positions, computedAt: calc.date(from: jd))
+    }
+
     // MARK: - Samvathsara (60-Year Jupiter Cycle)
 
     /// The 60 samvathsara names in order. Index 0 = Prabhava (year 1 of cycle).
