@@ -91,8 +91,8 @@ struct HomeView: View {
                             onScrubEnd: {
                                 vm.virtualTimeOffset = nil
                             },
-                            onTapTithi: { selectedElement = .tithi(vm.todayPanchang!.tithi) },
-                            onTapNakshatra: { selectedElement = .nakshatra(vm.todayPanchang!.nakshatra) },
+                            onTapTithi: { if let t = vm.todayPanchang?.tithi { selectedElement = .tithi(t) } },
+                            onTapNakshatra: { if let n = vm.todayPanchang?.nakshatra { selectedElement = .nakshatra(n) } },
                             onTapVedicSky: { selectedElement = .vedicSky }
                         )
                         .sensoryFeedback(.selection, trigger: vm.virtualTimeOffset != nil)

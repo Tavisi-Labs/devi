@@ -18,15 +18,12 @@ struct VedicSkyView: View {
     @State private var grahaSnapshot: GrahaSnapshot?
     @State private var selectedNakshatraIndex: Int? = nil
     @State private var selectedGrahaElement: PanchangElement? = nil
+    @State private var hasScrolledToMoon: Bool = false
 
     /// Forced dark theme — card backgrounds must stay dark regardless of app appearance mode.
     private var skyTheme: DeviTheme {
         DeviTheme.forPeriod(.night, style: .classic, appearance: .alwaysDark)
     }
-
-    // MARK: - Refresh Timer (60s)
-
-    private let refreshTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
 
     // MARK: - Static Data
 
@@ -155,8 +152,12 @@ struct VedicSkyView: View {
         .onDisappear {
             motionManager.stopUpdates()
         }
-        .onReceive(refreshTimer) { _ in
-            refreshGrahaPositions()
+        .task {
+            // (#1) Auto-cancelled on view disappear — no timer leak
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(60))
+                refreshGrahaPositions()
+            }
         }
     }
 
@@ -254,8 +255,9 @@ struct VedicSkyView: View {
                     // Subtle gyro parallax
                     .offset(x: min(max(motionManager.scrollOffset * 0.1, -30), 30))
                 }
-                .onAppear {
-                    if let idx = moonNakshatraIndex {
+                .onChange(of: grahaSnapshot?.computedAt) { _, _ in
+                    if !hasScrolledToMoon, let idx = moonNakshatraIndex {
+                        hasScrolledToMoon = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                             withAnimation(.easeInOut(duration: 0.5)) {
                                 proxy.scrollTo(idx, anchor: .center)

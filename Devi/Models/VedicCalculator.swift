@@ -88,18 +88,17 @@ final class VedicCalculator {
     // MARK: - Sidereal Planetary Longitudes
 
     /// Generic sidereal longitude for any planet body.
-    /// Returns degrees in [0, 360). Falls back to 0.0 on calculation error.
+    /// Returns degrees in [0, 360), or nil on calculation error.
     /// Planet IDs: kSESun=0, kSEMoon=1, kSEMercury=2, kSEVenus=3, kSEMars=4,
     /// kSEJupiter=5, kSESaturn=6, kSETrueNode=11 (Rahu).
-    func siderealLongitude(planet: Int32, at jd: Double) -> Double {
+    func siderealLongitude(planet: Int32, at jd: Double) -> Double? {
         var xx = [Double](repeating: 0, count: 6)
         var serr = [CChar](repeating: 0, count: 256)
         let ret = swe_calc_ut(jd, planet, kSEFlagSidereal, &xx, &serr)
         if ret < 0 {
-            // Calculation failed — log and return safe fallback
             let errStr = String(cString: serr)
             print("[VedicCalculator] swe_calc_ut failed for planet \(planet): \(errStr)")
-            return 0.0
+            return nil
         }
         var lon = xx[0].truncatingRemainder(dividingBy: 360.0)
         if lon < 0 { lon += 360.0 }
@@ -107,14 +106,15 @@ final class VedicCalculator {
     }
 
     /// Sun's sidereal (nirayana) longitude in degrees [0, 360).
-    /// Uses Lahiri ayanamsa set at init.
+    /// Uses Lahiri ayanamsa set at init. Returns 0.0 on error (safe for panchang index functions).
     func sunSiderealLongitude(at jd: Double) -> Double {
-        siderealLongitude(planet: kSESun, at: jd)
+        siderealLongitude(planet: kSESun, at: jd) ?? 0.0
     }
 
     /// Moon's sidereal (nirayana) longitude in degrees [0, 360).
+    /// Returns 0.0 on error (safe for panchang index functions).
     func moonSiderealLongitude(at jd: Double) -> Double {
-        siderealLongitude(planet: kSEMoon, at: jd)
+        siderealLongitude(planet: kSEMoon, at: jd) ?? 0.0
     }
 
     // MARK: - Rise/Set Times

@@ -610,7 +610,8 @@ enum Graha: String, CaseIterable, Identifiable {
     }
 
     /// Swiss Ephemeris planet ID for swe_calc_ut. Ketu has no SE body — derived from Rahu.
-    var planetId: Int32 {
+    /// Returns nil for Ketu; callers must compute Ketu as (Rahu + 180) mod 360.
+    var planetId: Int32? {
         switch self {
         case .sun: return 0       // SE_SUN
         case .moon: return 1      // SE_MOON
@@ -620,7 +621,7 @@ enum Graha: String, CaseIterable, Identifiable {
         case .jupiter: return 5   // SE_JUPITER
         case .saturn: return 6    // SE_SATURN
         case .rahu: return 11     // SE_TRUE_NODE
-        case .ketu: return -1     // Derived: (rahu + 180) mod 360
+        case .ketu: return nil    // Derived: (rahu + 180) mod 360
         }
     }
 }

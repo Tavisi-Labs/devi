@@ -510,16 +510,22 @@ enum PanchangCalculator {
     static func computeGrahaSnapshot(julianDay jd: Double) -> GrahaSnapshot {
         let calc = VedicCalculator.shared
         var positions: [GrahaSnapshot.Position] = []
-        var rahuLon: Double = 0
+
+        // Pre-compute Rahu longitude — Ketu is derived from it.
+        // This removes the fragile dependency on Graha.allCases declaration order. (#10)
+        let rahuLon = calc.siderealLongitude(planet: 11, at: jd) ?? 0.0  // SE_TRUE_NODE
 
         for graha in Graha.allCases {
             let lon: Double
             if graha == .ketu {
                 // Ketu is the south lunar node — always diametrically opposite Rahu
                 lon = (rahuLon + 180.0).truncatingRemainder(dividingBy: 360.0)
+            } else if graha == .rahu {
+                lon = rahuLon
+            } else if let pid = graha.planetId {
+                lon = calc.siderealLongitude(planet: pid, at: jd) ?? 0.0
             } else {
-                lon = calc.siderealLongitude(planet: graha.planetId, at: jd)
-                if graha == .rahu { rahuLon = lon }
+                continue
             }
             positions.append(GrahaSnapshot.Position(graha: graha, longitude: lon))
         }

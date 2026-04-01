@@ -56,14 +56,6 @@ struct ImmersiveDetailRouter: View {
                 theme: theme,
                 timezoneIdentifier: timezoneIdentifier
             )
-        case .graha(let g, let lon):
-            GrahaImmersiveView(
-                graha: g,
-                longitude: lon,
-                grahaSnapshot: nil,
-                theme: theme,
-                timezoneIdentifier: timezoneIdentifier
-            )
         default:
             // Fallback — shouldn't be reached via router
             VStack {
