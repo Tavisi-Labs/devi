@@ -1,0 +1,276 @@
+// MARK: - Models/HoroscopeEngine.swift
+// Stateless rules engine that produces a DailyHoroscope from a NatalChart + transit data.
+//
+// The engine is deterministic: given the same NatalChart, GrahaSnapshot, date, and timezone,
+// it always produces the same reading. Variant selection uses a stable hash of day-of-year
+// plus birth rashi, so the reading changes daily but is consistent across app launches.
+//
+// All astronomical positions come from Swiss Ephemeris via VedicCalculator/PanchangCalculator.
+// Content comes from HoroscopeContentLibrary (themes, category readings, mantras, colors).
+
+import Foundation
+
+// MARK: - Horoscope Engine
+
+/// Pure computation layer for daily horoscope generation.
+/// No state, no UI, no persistence — just rules.
+enum HoroscopeEngine {
+
+    // MARK: - Nakshatra Reference Tables
+
+    private static let nakshatraNames = [
+        "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
+        "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha",
+        "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati",
+        "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha",
+        "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
+        "Purva Bhadrapada", "Uttara Bhadrapada", "Revati",
+    ]
+
+    private static let nakshatraRulers = [
+        "Ketu", "Venus", "Sun", "Moon", "Mars",
+        "Rahu", "Jupiter", "Saturn", "Mercury", "Ketu",
+        "Venus", "Sun", "Moon", "Mars", "Rahu",
+        "Jupiter", "Saturn", "Mercury", "Ketu", "Venus",
+        "Sun", "Moon", "Mars", "Rahu", "Jupiter",
+        "Saturn", "Mercury",
+    ]
+
+    // MARK: - Public API
+
+    /// Generate a complete daily horoscope reading.
+    ///
+    /// - Parameters:
+    ///   - natalChart: The user's birth chart (Moon rashi, nakshatra, graha positions)
+    ///   - todaySnapshot: Current transit positions of all 9 grahas
+    ///   - date: The date for this reading (used for variant selection)
+    ///   - timezoneIdentifier: User's timezone for consistent day boundary
+    /// - Returns: A fully populated `DailyHoroscope`
+    static func generateReading(
+        natalChart: NatalChart,
+        todaySnapshot: GrahaSnapshot,
+        date: Date,
+        timezoneIdentifier: String
+    ) -> DailyHoroscope {
+
+        // --- 1. Moon house (transit Moon relative to birth Moon rashi) ---
+        let transitMoonLon = todaySnapshot.longitude(of: .moon)
+        let transitMoonRashi = Rashi.from(siderealLongitude: transitMoonLon)
+        let moonHouse = Rashi.moonHouse(birthRashi: natalChart.birthRashi, transitRashi: transitMoonRashi)
+
+        // --- 2. Transit nakshatra of the Moon ---
+        let transitNakshatraIdx = nakshatraIndexFromLongitude(transitMoonLon) // 0-based
+        let transitNakshatra = nakshatraNames[transitNakshatraIdx]
+        let transitNakshatraRuler = nakshatraRulers[transitNakshatraIdx]
+
+        // --- 3. Jupiter and Saturn houses (whole-sign from birth Moon) ---
+        let jupiterLon = todaySnapshot.longitude(of: .jupiter)
+        let jupiterRashi = Rashi.from(siderealLongitude: jupiterLon)
+        let jupiterHouse = Rashi.moonHouse(birthRashi: natalChart.birthRashi, transitRashi: jupiterRashi)
+
+        let saturnLon = todaySnapshot.longitude(of: .saturn)
+        let saturnRashi = Rashi.from(siderealLongitude: saturnLon)
+        let saturnHouse = Rashi.moonHouse(birthRashi: natalChart.birthRashi, transitRashi: saturnRashi)
+
+        // --- 4. Variant selection (stable daily hash) ---
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: timezoneIdentifier) ?? .current
+        let dayOfYear = cal.ordinality(of: .day, in: .year, for: date) ?? 1
+        let variantSeed = dayOfYear + natalChart.birthRashi.rawValue
+
+        // --- 5. Theme statement and supporting text ---
+        let themes = HoroscopeContentLibrary.themes
+        // themes is indexed by house (index 0 = house 1)
+        let houseThemes = themes[moonHouse - 1]
+        let themeVariantIndex = variantSeed % houseThemes.count
+        let selectedTheme = houseThemes[themeVariantIndex]
+
+        // Apply Jupiter/Saturn modifiers to supporting text
+        let jupiterFlavor = jupiterModifierText(house: jupiterHouse)
+        let saturnFlavor = saturnModifierText(house: saturnHouse, birthRashi: natalChart.birthRashi)
+        let supportingText = composeSupportingText(
+            baseText: selectedTheme.supportingText,
+            jupiterFlavor: jupiterFlavor,
+            saturnFlavor: saturnFlavor
+        )
+
+        // --- 6. Category readings ---
+        let categoryReadings = buildCategoryReadings(
+            moonHouse: moonHouse,
+            variantSeed: variantSeed
+        )
+
+        // --- 7. Mantra (based on transit Moon's nakshatra) ---
+        let mantra = HoroscopeContentLibrary.nakshatraMantra[transitNakshatra]
+            ?? MantraReading(
+                sanskrit: "Om Chandraya Namaha",
+                translation: "Salutations to the Moon",
+                deity: "Chandra"
+            )
+
+        // --- 8. Auspicious color (based on transit Moon's nakshatra ruler) ---
+        let auspiciousColor = HoroscopeContentLibrary.planetColor[transitNakshatraRuler]
+            ?? AuspiciousColor(name: "White", hex: "#FFFFFF")
+
+        // --- 9. Significant aspects ---
+        let aspects = buildSignificantAspects(
+            jupiterHouse: jupiterHouse,
+            saturnHouse: saturnHouse,
+            moonHouse: moonHouse,
+            transitNakshatra: transitNakshatra,
+            birthRashi: natalChart.birthRashi
+        )
+
+        // --- 10. Transit context ---
+        let transitContext = TransitContext(
+            moonHouse: moonHouse,
+            moonHouseVedicName: TransitContext.houseVedicNames[moonHouse] ?? "Unknown",
+            moonNakshatra: transitNakshatra,
+            significantAspects: aspects,
+            birthRashi: natalChart.birthRashi,
+            birthTimeKnown: natalChart.birthTimeKnown
+        )
+
+        return DailyHoroscope(
+            date: date,
+            themeStatement: selectedTheme.themeStatement,
+            supportingText: supportingText,
+            doList: selectedTheme.doList,
+            dontList: selectedTheme.dontList,
+            categories: categoryReadings,
+            mantra: mantra,
+            auspiciousColor: auspiciousColor,
+            transitContext: transitContext
+        )
+    }
+
+    // MARK: - Jupiter Modifier
+
+    /// Returns optional flavor text when Jupiter occupies a notable house.
+    /// Jupiter is the great benefic (Guru) -- its transit through certain houses
+    /// amplifies fortune, wisdom, or expansion in that life domain.
+    static func jupiterModifierText(house: Int) -> String? {
+        return HoroscopeContentLibrary.jupiterModifiers[house]
+    }
+
+    // MARK: - Saturn Modifier
+
+    /// Returns optional flavor text when Saturn occupies a notable house.
+    /// Includes Sade Sati detection: Saturn in houses 12, 1, or 2 from birth Moon
+    /// triggers a 7.5-year period of karmic lessons and restructuring.
+    static func saturnModifierText(house: Int, birthRashi: Rashi) -> String? {
+        // Sade Sati: Saturn transiting houses 12, 1, or 2 from birth Moon rashi
+        let isSadeSati = house == 12 || house == 1 || house == 2
+        if isSadeSati {
+            let phase: String
+            switch house {
+            case 12: phase = "rising (approaching)"
+            case 1:  phase = "peak (over birth Moon)"
+            case 2:  phase = "setting (departing)"
+            default: phase = ""
+            }
+            let baseMod = HoroscopeContentLibrary.saturnModifiers[house] ?? ""
+            return "Sade Sati is active (\(phase)). \(baseMod)".trimmingCharacters(in: .whitespaces)
+        }
+
+        return HoroscopeContentLibrary.saturnModifiers[house]
+    }
+
+    // MARK: - Private Helpers
+
+    /// Convert sidereal longitude to 0-based nakshatra index (0-26).
+    private static func nakshatraIndexFromLongitude(_ longitude: Double) -> Int {
+        var lon = longitude.truncatingRemainder(dividingBy: 360.0)
+        if lon < 0 { lon += 360.0 }
+        return max(0, min(Int(lon / (360.0 / 27.0)), 26))
+    }
+
+    /// Build the four category readings (love, work, spirituality, health)
+    /// using the content library's house-indexed category data.
+    private static func buildCategoryReadings(
+        moonHouse: Int,
+        variantSeed: Int
+    ) -> [CategoryReading] {
+        return HoroscopeCategory.allCases.map { category in
+            if let houseReadings = HoroscopeContentLibrary.categoryReadings[moonHouse],
+               let reading = houseReadings[category] {
+                return CategoryReading(
+                    category: category,
+                    summary: reading.summary,
+                    intensity: reading.intensity
+                )
+            }
+            // Fallback: neutral reading if content library has no entry
+            return CategoryReading(
+                category: category,
+                summary: "A day of steady progress. Stay mindful and present.",
+                intensity: 3
+            )
+        }
+    }
+
+    /// Compose the supporting text paragraph by appending planetary modifier flavor.
+    private static func composeSupportingText(
+        baseText: String,
+        jupiterFlavor: String?,
+        saturnFlavor: String?
+    ) -> String {
+        var text = baseText
+
+        if let jupiter = jupiterFlavor {
+            text += " " + jupiter
+        }
+        if let saturn = saturnFlavor {
+            text += " " + saturn
+        }
+
+        return text
+    }
+
+    /// Build the significant aspects array for the TransitContext "Why?" sheet.
+    /// These are human-readable sentences explaining what's astronomically happening.
+    private static func buildSignificantAspects(
+        jupiterHouse: Int,
+        saturnHouse: Int,
+        moonHouse: Int,
+        transitNakshatra: String,
+        birthRashi: Rashi
+    ) -> [String] {
+        var aspects: [String] = []
+
+        // Moon transit
+        let moonVedicName = TransitContext.houseVedicNames[moonHouse] ?? ""
+        aspects.append(
+            "Moon transits your \(ordinal(moonHouse)) house (\(moonVedicName)) in \(transitNakshatra) nakshatra"
+        )
+
+        // Jupiter transit
+        let jupiterVedicName = TransitContext.houseVedicNames[jupiterHouse] ?? ""
+        aspects.append(
+            "Jupiter transits your \(ordinal(jupiterHouse)) house (\(jupiterVedicName))"
+        )
+
+        // Saturn transit
+        let saturnVedicName = TransitContext.houseVedicNames[saturnHouse] ?? ""
+        let sadeSatiNote = (saturnHouse == 12 || saturnHouse == 1 || saturnHouse == 2)
+            ? " — Sade Sati active"
+            : ""
+        aspects.append(
+            "Saturn transits your \(ordinal(saturnHouse)) house (\(saturnVedicName))\(sadeSatiNote)"
+        )
+
+        return aspects
+    }
+
+    /// Format an integer as an ordinal string (1st, 2nd, 3rd, ..., 12th).
+    private static func ordinal(_ n: Int) -> String {
+        let suffix: String
+        switch n {
+        case 1: suffix = "st"
+        case 2: suffix = "nd"
+        case 3: suffix = "rd"
+        default: suffix = "th"
+        }
+        return "\(n)\(suffix)"
+    }
+}

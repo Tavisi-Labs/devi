@@ -17,6 +17,7 @@
 		1A6F1196F35937BD46F24956 /* NakshatraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDD40FACCCF7C25BDCE9C32 /* NakshatraImmersiveView.swift */; };
 		1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3628C62ABE084D82A65819 /* HoraCard.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
+		3860A0C5E7E8EBDDE33BE0A0 /* BirthDataInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */; };
 		3A67F38F63892ACD824B97F5 /* HoraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */; };
 		41142C81C5E2D770EC583DD4 /* StarFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E09C4017C2811FC941DD4451 /* StarFieldView.swift */; };
 		42FE1E1812A05B960A355B67 /* VedicCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */; };
@@ -31,17 +32,22 @@
 		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
 		56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */; };
 		5EB599C9AC45D7298D64A3E3 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C450B088E4224ABD6C00279A /* SplashView.swift */; };
+		624E5AF00F42EDA4A17ECE19 /* HoroscopeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */; };
+		6417150C3CC2E6CF46A87DF7 /* DailyHoroscopeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */; };
 		708E7940DAE93761EEE03CB1 /* NavratriImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA76E848BCC85F71C8F2F932 /* NavratriImmersiveView.swift */; };
 		71D519F2868C2EE0819D0FE4 /* CosmicSignatureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */; };
 		791512C664A793D2A7BC135F /* ImmersiveDetailRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */; };
+		7B0E9795A87EF475225A63D0 /* BirthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D840F7AE864A89B21805B /* BirthChart.swift */; };
 		7B6A8BF3CFA9E14750B5DB44 /* FestivalEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */; };
 		7F91FA1E0A77DD7E0E4D7B9D /* CosmicSignatureCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */; };
+		8048089370A230E90252292D /* HoroscopeWhySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */; };
 		8603D9EE7F01B8A15B92F4AD /* TodayDetailsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D841F44870521127345B2497 /* TodayDetailsSection.swift */; };
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		8D41F88A0DBD80BC84E06CB9 /* TithiImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */; };
 		8FE0D3661114A20B1FC604ED /* WhatsNewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
+		A0537DCC64EBC4F94496F641 /* HoroscopeContentLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */; };
 		A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
@@ -60,6 +66,7 @@
 		E574296E06EE9C16B5996C00 /* ShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */; };
 		E64B749D9006963AA44B0B38 /* MantraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */; };
 		F1C112891FF7594EBF4F781B /* FestivalEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48727AA41391F93867A785C /* FestivalEngine.swift */; };
+		F455D4049C3DFE659B2BC780 /* DailyHoroscope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09CCD6EC44FF0C844D532EE4 /* DailyHoroscope.swift */; };
 		FAD1BCA1A51DFC533472ED90 /* VedicCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463C6BC7EA5612F2261721C5 /* VedicCalculatorTests.swift */; };
 		FFDB6BB3B06B31F3F1325A92 /* EclipseImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */; };
 /* End PBXBuildFile section */
@@ -76,8 +83,10 @@
 
 /* Begin PBXFileReference section */
 		033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrahaImmersiveView.swift; sourceTree = "<group>"; };
+		09CCD6EC44FF0C844D532EE4 /* DailyHoroscope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHoroscope.swift; sourceTree = "<group>"; };
 		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
+		0E7D840F7AE864A89B21805B /* BirthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthChart.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
 		1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewSheet.swift; sourceTree = "<group>"; };
 		28501AFF246A728A4B21023D /* VedicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyView.swift; sourceTree = "<group>"; };
@@ -85,6 +94,7 @@
 		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureService.swift; sourceTree = "<group>"; };
+		35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeWhySheet.swift; sourceTree = "<group>"; };
 		360B289972920360586AA1CC /* EclipseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseCard.swift; sourceTree = "<group>"; };
 		4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraImmersiveView.swift; sourceTree = "<group>"; };
 		42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTextBuilder.swift; sourceTree = "<group>"; };
@@ -93,9 +103,12 @@
 		4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculator.swift; sourceTree = "<group>"; };
 		567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveDetailRouter.swift; sourceTree = "<group>"; };
 		56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureCard.swift; sourceTree = "<group>"; };
+		5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHoroscopeCard.swift; sourceTree = "<group>"; };
+		5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeEngine.swift; sourceTree = "<group>"; };
 		5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWindowsCard.swift; sourceTree = "<group>"; };
 		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
 		6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightNowCard.swift; sourceTree = "<group>"; };
+		63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataInputView.swift; sourceTree = "<group>"; };
 		652253D394F54C12ED04608E /* ShareCardRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardRenderer.swift; sourceTree = "<group>"; };
 		78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyMotionManager.swift; sourceTree = "<group>"; };
 		7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalEngineTests.swift; sourceTree = "<group>"; };
@@ -129,6 +142,7 @@
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculator.swift; sourceTree = "<group>"; };
+		F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeContentLibrary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,11 +197,13 @@
 				ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */,
 				B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */,
 				56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */,
+				5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */,
 				360B289972920360586AA1CC /* EclipseCard.swift */,
 				13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */,
 				033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */,
 				2B3628C62ABE084D82A65819 /* HoraCard.swift */,
 				4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */,
+				35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */,
 				567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */,
 				D81FA1582C6CC8D435E75D30 /* MantraCard.swift */,
 				EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */,
@@ -213,9 +229,13 @@
 		63D4C2FC48BFDEA82A2DC0A7 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				0E7D840F7AE864A89B21805B /* BirthChart.swift */,
 				8671B2E2810F5DB127BCD949 /* CitySearchService.swift */,
 				35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */,
+				09CCD6EC44FF0C844D532EE4 /* DailyHoroscope.swift */,
 				C48727AA41391F93867A785C /* FestivalEngine.swift */,
+				F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */,
+				5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */,
 				7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */,
 				4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */,
 				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
@@ -232,6 +252,7 @@
 		8481CF9F392B620436155731 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */,
 				443E05B8B65D4E3900BC0BDE /* HomeView.swift */,
 				F7D21D4B060787531B830527 /* OnboardingView.swift */,
 				7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */,
@@ -369,11 +390,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				49B683FE7E20B75F597BBD2C /* AmbientMeditationView.swift in Sources */,
+				7B0E9795A87EF475225A63D0 /* BirthChart.swift in Sources */,
+				3860A0C5E7E8EBDDE33BE0A0 /* BirthDataInputView.swift in Sources */,
 				A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */,
 				56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */,
 				D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */,
 				7F91FA1E0A77DD7E0E4D7B9D /* CosmicSignatureCard.swift in Sources */,
 				71D519F2868C2EE0819D0FE4 /* CosmicSignatureService.swift in Sources */,
+				F455D4049C3DFE659B2BC780 /* DailyHoroscope.swift in Sources */,
+				6417150C3CC2E6CF46A87DF7 /* DailyHoroscopeCard.swift in Sources */,
 				B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */,
 				02C6D1FD157998C26E7416B9 /* EclipseCard.swift in Sources */,
 				FFDB6BB3B06B31F3F1325A92 /* EclipseImmersiveView.swift in Sources */,
@@ -382,6 +407,9 @@
 				033C35B8D8C67417071612C3 /* HomeView.swift in Sources */,
 				1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */,
 				3A67F38F63892ACD824B97F5 /* HoraImmersiveView.swift in Sources */,
+				A0537DCC64EBC4F94496F641 /* HoroscopeContentLibrary.swift in Sources */,
+				624E5AF00F42EDA4A17ECE19 /* HoroscopeEngine.swift in Sources */,
+				8048089370A230E90252292D /* HoroscopeWhySheet.swift in Sources */,
 				791512C664A793D2A7BC135F /* ImmersiveDetailRouter.swift in Sources */,
 				B982EA76D203C242C49853BC /* MantraCard.swift in Sources */,
 				E64B749D9006963AA44B0B38 /* MantraImmersiveView.swift in Sources */,

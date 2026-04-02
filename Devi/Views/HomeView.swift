@@ -20,6 +20,8 @@ struct HomeView: View {
     @State private var sheetElement: PanchangElement?
     @State private var isTransitioning = false
     @State private var sheetSwitchTask: Task<Void, Never>?
+    @State private var showWhySheet = false
+    @State private var showBirthDataInput = false
 
     var body: some View {
         ZStack {
@@ -64,6 +66,24 @@ struct HomeView: View {
                         .transition(.scale.combined(with: .opacity))
                         .sensoryFeedback(.impact(weight: .medium), trigger: vm.dayOffset)
                         .padding(.top, 8)
+                    }
+
+                    // MARK: - 1b. Daily Horoscope Card (first content section)
+                    if let horoscope = vm.dailyHoroscope {
+                        DailyHoroscopeCard(
+                            horoscope: horoscope,
+                            theme: vm.theme,
+                            onTapWhy: { showWhySheet = true }
+                        )
+                        .padding(.horizontal)
+                        .padding(.top, 16)
+                        .deviEntrance()
+                    } else if vm.birthData == nil && vm.hasCompletedOnboarding {
+                        // "Set up your horoscope" prompt card
+                        horoscopeSetupPrompt
+                            .padding(.horizontal)
+                            .padding(.top, 16)
+                            .deviEntrance()
                     }
 
                     // MARK: - 2. Celestial Observatory
@@ -271,6 +291,23 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $showMeditationMode) {
             AmbientMeditationView(vm: vm)
+        }
+        .sheet(isPresented: $showWhySheet) {
+            if let context = vm.dailyHoroscope?.transitContext {
+                HoroscopeWhySheet(transitContext: context, theme: vm.theme)
+            }
+        }
+        .sheet(isPresented: $showBirthDataInput) {
+            BirthDataInputView(
+                theme: vm.theme,
+                currentCity: vm.currentCity,
+                existingData: vm.birthData,
+                onSave: { data in
+                    vm.saveBirthData(data)
+                    showBirthDataInput = false
+                },
+                onCancel: { showBirthDataInput = false }
+            )
         }
     }
 
@@ -740,6 +777,54 @@ struct HomeView: View {
         formatter.dateFormat = "EEEE, MMMM d"
         formatter.timeZone = TimeZone(identifier: vm.currentCity.timezoneIdentifier) ?? .current
         return formatter.string(from: vm.displayDate)
+    }
+
+    // MARK: - Horoscope Setup Prompt
+
+    private var horoscopeSetupPrompt: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "moon.stars")
+                    .font(.system(size: 16))
+                    .foregroundColor(vm.theme.accentColor)
+                Text("YOUR DAY")
+                    .scaledFont(size: 11, weight: .bold)
+                    .tracking(2)
+                    .foregroundColor(vm.theme.secondaryText)
+                Spacer()
+            }
+
+            Text("Discover your daily Vedic reading")
+                .scaledFont(size: 18, weight: .regular, design: .serif)
+                .foregroundColor(vm.theme.primaryText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text("Based on your birth Moon rashi and today's planetary transits")
+                .scaledFont(size: 14, weight: .regular)
+                .foregroundColor(vm.theme.secondaryText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Button {
+                showBirthDataInput = true
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 12))
+                    Text("Set Up Horoscope")
+                        .scaledFont(size: 14, weight: .semibold)
+                }
+                .foregroundColor(vm.theme.accentColor)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(vm.theme.accentColor.opacity(0.12))
+                .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 4)
+        }
+        .padding(20)
+        .deviCard(theme: vm.theme, elevation: .raised)
     }
 
     // MARK: - Day Navigation Gesture

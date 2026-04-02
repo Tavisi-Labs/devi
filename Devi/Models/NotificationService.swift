@@ -69,6 +69,8 @@ final class NotificationService: Sendable {
         let navratri: Bool
         let eclipse: Bool
         let minutesBefore: Int
+        let horoscope: Bool
+        let horoscopeThemes: [String: String]  // dateString → theme statement
     }
 
     // MARK: - Scheduling
@@ -162,7 +164,25 @@ final class NotificationService: Sendable {
             }
         }
 
-        // 4. Eclipse alerts
+        // 4. Daily horoscope (7 AM local)
+        if input.horoscope {
+            for day in input.days {
+                let dateStr = day.dateString
+                guard let themeStatement = input.horoscopeThemes[dateStr] else { continue }
+
+                if let fire = Self.dateFromString(dateStr, hour: 7, minute: 0, timezone: tz), fire > now {
+                    let content = UNMutableNotificationContent()
+                    content.title = "Your Day at a Glance"
+                    content.body = themeStatement
+                    content.sound = .default
+                    content.categoryIdentifier = Self.dailySummaryCategory
+
+                    pending.append(("devi.horoscope.\(dateStr)", content, fire))
+                }
+            }
+        }
+
+        // 5. Eclipse alerts (renumbered after horoscope insertion)
         if input.eclipse {
             for eclipse in input.eclipses {
                 let eclipseId = eclipse.id
@@ -204,11 +224,11 @@ final class NotificationService: Sendable {
             }
         }
 
-        // 5. Sort by fire date ascending, truncate to 64 (iOS limit)
+        // 6. Sort by fire date ascending, truncate to 64 (iOS limit)
         pending.sort { $0.fireDate < $1.fireDate }
         let final64 = pending.prefix(64)
 
-        // 6. Schedule all
+        // 7. Schedule all
         for item in final64 {
             let interval = item.fireDate.timeIntervalSinceNow
             guard interval > 0 else { continue }

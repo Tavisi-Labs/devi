@@ -57,6 +57,10 @@ struct OnboardingView: View {
     // City selection state
     @State private var citySelected = false
 
+    // Birth data (optional onboarding step)
+    @State private var showBirthDataStep = false
+    @State private var birthDataAppeared = false
+
     // Per-page entrance animation triggers
     @State private var welcomeAppeared = false
     @State private var cityPageAppeared = false
@@ -84,6 +88,7 @@ struct OnboardingView: View {
                 switch currentPage {
                 case 0:  welcomePage
                 case 1:  cityPage
+                case 2:  birthDataPage
                 default: notificationPage
                 }
             }
@@ -272,7 +277,7 @@ struct OnboardingView: View {
                         currentPage = 2
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        notifPageAppeared = true
+                        birthDataAppeared = true
                     }
                 } label: {
                     Text("Continue")
@@ -476,7 +481,124 @@ struct OnboardingView: View {
         }
     }
 
-    // MARK: - Page 3: Notification Presets
+    // MARK: - Page 3: Birth Data (Optional)
+
+    private var birthDataPage: some View {
+        VStack(spacing: 0) {
+            Spacer()
+
+            VStack(spacing: 28) {
+                // Icon
+                Image(systemName: "moon.stars")
+                    .font(.system(size: 44, weight: .light))
+                    .foregroundColor(theme.accentColor)
+                    .opacity(birthDataAppeared ? 1 : 0)
+                    .animation(.easeOut(duration: 0.5).delay(0.1), value: birthDataAppeared)
+
+                // Title
+                Text("Your Daily Vedic Reading")
+                    .scaledFont(size: 24, weight: .regular, design: .serif)
+                    .foregroundColor(theme.primaryText)
+                    .opacity(birthDataAppeared ? 1 : 0)
+                    .offset(y: birthDataAppeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.5).delay(0.2), value: birthDataAppeared)
+
+                // Description
+                Text("Enter your birth details to receive a personalized daily horoscope based on your Moon rashi and planetary transits.")
+                    .scaledFont(size: 15, weight: .regular)
+                    .foregroundColor(theme.secondaryText)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 24)
+                    .opacity(birthDataAppeared ? 1 : 0)
+                    .offset(y: birthDataAppeared ? 0 : 12)
+                    .animation(.easeOut(duration: 0.5).delay(0.3), value: birthDataAppeared)
+
+                // Features
+                VStack(spacing: 10) {
+                    birthDataFeature(icon: "sparkle", text: "Daily theme, do's and don'ts", delay: 0.4)
+                    birthDataFeature(icon: "heart.fill", text: "Love, work, health & spirituality", delay: 0.5)
+                    birthDataFeature(icon: "lock.shield", text: "All data stays on your device", delay: 0.6)
+                }
+                .padding(.horizontal, 32)
+            }
+            .padding(.horizontal, 16)
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                // Set up button
+                Button {
+                    showBirthDataStep = true
+                } label: {
+                    Text("Enter Birth Details")
+                }
+                .deviButton(.primary)
+                .padding(.horizontal, 32)
+                .opacity(birthDataAppeared ? 1 : 0)
+                .offset(y: birthDataAppeared ? 0 : 12)
+                .animation(.easeOut(duration: 0.5).delay(0.7), value: birthDataAppeared)
+
+                // Skip button
+                Button {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        currentPage = 3
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        notifPageAppeared = true
+                    }
+                } label: {
+                    Text("Skip for Now")
+                        .scaledFont(size: 14, weight: .medium)
+                        .foregroundColor(theme.secondaryText.opacity(0.7))
+                }
+                .opacity(birthDataAppeared ? 1 : 0)
+                .animation(.easeOut(duration: 0.5).delay(0.8), value: birthDataAppeared)
+            }
+            .padding(.bottom, 48)
+        }
+        .sheet(isPresented: $showBirthDataStep) {
+            BirthDataInputView(
+                theme: theme,
+                currentCity: vm.currentCity,
+                existingData: nil,
+                onSave: { data in
+                    vm.saveBirthData(data)
+                    showBirthDataStep = false
+                    // Move to notifications page
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        currentPage = 3
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        notifPageAppeared = true
+                    }
+                },
+                onCancel: {
+                    showBirthDataStep = false
+                }
+            )
+        }
+    }
+
+    private func birthDataFeature(icon: String, text: String, delay: Double) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(theme.accentColor)
+                .frame(width: 24)
+
+            Text(text)
+                .scaledFont(size: 14, weight: .regular)
+                .foregroundColor(theme.primaryText.opacity(0.8))
+
+            Spacer()
+        }
+        .opacity(birthDataAppeared ? 1 : 0)
+        .offset(y: birthDataAppeared ? 0 : 10)
+        .animation(.easeOut(duration: 0.4).delay(delay), value: birthDataAppeared)
+    }
+
+    // MARK: - Page 4: Notification Presets
 
     private var notificationPage: some View {
         VStack(spacing: 0) {

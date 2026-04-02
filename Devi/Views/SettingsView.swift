@@ -12,6 +12,7 @@ struct SettingsView: View {
     @State private var showCityPicker = false
     @State private var showPanchangEducation = false
     @State private var showWhatsNew = false
+    @State private var showBirthDataInput = false
     @State private var apiKey: String = ""
 
     private var theme: DeviTheme { vm.theme }
@@ -82,6 +83,96 @@ struct SettingsView: View {
                     Text("Panchang times are calculated for this city.")
                         .deviLabel(.caption, theme: theme)
                         .frame(maxWidth: .infinity, alignment: .leading)
+
+                    // MARK: - Card 1b — Birth Details
+                    Text("YOUR HOROSCOPE")
+                        .deviLabel(.caption, theme: theme)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 4)
+
+                    VStack(spacing: 0) {
+                        if let bd = vm.birthData, let natal = vm.natalChart {
+                            // Show current birth rashi
+                            HStack {
+                                Label {
+                                    Text("Birth Rashi")
+                                        .foregroundColor(theme.primaryText)
+                                } icon: {
+                                    Image(systemName: "moon.stars")
+                                        .foregroundColor(theme.accentColor)
+                                }
+                                Spacer()
+                                Text("\(natal.birthRashi.sanskritName) (\(natal.birthRashi.westernName))")
+                                    .foregroundColor(theme.secondaryText)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+
+                            settingsDivider
+
+                            // Edit birth details
+                            Button {
+                                showBirthDataInput = true
+                            } label: {
+                                settingsRow(title: "Edit Birth Details", icon: "pencil", showChevron: true)
+                            }
+                            .buttonStyle(.plain)
+
+                            settingsDivider
+
+                            // Clear birth data
+                            Button {
+                                vm.clearBirthData()
+                            } label: {
+                                HStack {
+                                    Label {
+                                        Text("Clear Birth Data")
+                                            .foregroundColor(.red)
+                                    } icon: {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red.opacity(0.7))
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            // No birth data set
+                            Button {
+                                showBirthDataInput = true
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "moon.stars")
+                                        .foregroundColor(theme.accentColor)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Set Up Horoscope")
+                                            .scaledFont(size: 15, weight: .medium)
+                                            .foregroundColor(theme.primaryText)
+                                        Text("Enter your birth details for daily readings")
+                                            .scaledFont(size: 13)
+                                            .foregroundColor(theme.secondaryText)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(theme.secondaryText.opacity(0.5))
+                                }
+                                .padding(16)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .deviCard(theme: theme, elevation: .raised)
+
+                    if vm.birthData != nil {
+                        Text("Your birth data is stored only on this device and is never sent to any server.")
+                            .deviLabel(.caption, theme: theme)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
 
                     // MARK: - Card 2 — Display
                     Text("DISPLAY")
@@ -406,6 +497,18 @@ struct SettingsView: View {
             }
             .sheet(isPresented: $showWhatsNew) {
                 WhatsNewSheet()
+            }
+            .sheet(isPresented: $showBirthDataInput) {
+                BirthDataInputView(
+                    theme: theme,
+                    currentCity: vm.currentCity,
+                    existingData: vm.birthData,
+                    onSave: { data in
+                        vm.saveBirthData(data)
+                        showBirthDataInput = false
+                    },
+                    onCancel: { showBirthDataInput = false }
+                )
             }
         }
     }

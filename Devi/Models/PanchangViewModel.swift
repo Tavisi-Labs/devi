@@ -39,6 +39,15 @@ class PanchangViewModel: ObservableObject {
     @Published var samvathsaraName: String = ""
     @Published var todayFestivals: [String] = []
 
+    // MARK: - Horoscope
+    @Published var dailyHoroscope: DailyHoroscope?
+    @Published var birthData: BirthData?
+    @Published var natalChart: NatalChart?
+    @Published var showBirthDataInput: Bool = false
+    @Published var notifHoroscope: Bool = true {
+        didSet { UserDefaults.standard.set(notifHoroscope, forKey: "notif.horoscope"); scheduleNotificationReschedule() }
+    }
+
     // MARK: - Cosmic Signature (AI)
     @Published var cosmicSignature: String?
     @Published var isLoadingSignature = false
@@ -108,6 +117,7 @@ class PanchangViewModel: ObservableObject {
     private var timerCancellable: AnyCancellable?
     private let dataStore = PanchangDataStore() // Kept for eclipse data (separate concern)
     private var panchangCache: [String: DailyPanchang] = [:]  // city+date → panchang
+    private var horoscopeCache: [String: DailyHoroscope] = [:]  // date-rashi → horoscope
     private var lastCacheCity: String = ""
 
     // MARK: - Computed
@@ -303,6 +313,15 @@ class PanchangViewModel: ObservableObject {
             appearanceMode = mode
         }
 
+        // Load persisted horoscope notification preference
+        if ud.object(forKey: "notif.horoscope") != nil { notifHoroscope = ud.bool(forKey: "notif.horoscope") }
+
+        // Load persisted birth data and compute natal chart
+        birthData = BirthData.load()
+        if let bd = birthData {
+            natalChart = NatalChart.compute(from: bd)
+        }
+
         // Load persisted city (if user previously selected one)
         if let cityName = ud.string(forKey: "city.name"),
            let country = ud.string(forKey: "city.country"),
@@ -465,6 +484,9 @@ class PanchangViewModel: ObservableObject {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
             theme = DeviTheme.forPeriod(timePeriod, style: themeStyle, appearance: appearanceMode)
         }
+
+        // Load daily horoscope (if birth data is set)
+        loadHoroscope()
 
         // Fetch cosmic signature (async, non-blocking)
         if let panchang = todayPanchang {
@@ -638,6 +660,63 @@ class PanchangViewModel: ObservableObject {
         upcomingEvents = events.sorted { $0.daysAway < $1.daysAway }
     }
 
+    // MARK: - Horoscope
+
+    /// Compute today's horoscope from birth data + current transits.
+    private func loadHoroscope() {
+        guard let natal = natalChart else {
+            dailyHoroscope = nil
+            return
+        }
+
+        let targetDate = displayDate
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let dateString = dateFormatter.string(from: targetDate)
+
+        // Check in-memory cache (same day + same rashi = same reading)
+        let cacheKey = "\(dateString)-\(natal.birthRashi.rawValue)"
+        if let cached = horoscopeCache[cacheKey] {
+            dailyHoroscope = cached
+            return
+        }
+
+        // Compute today's graha snapshot
+        let jd = VedicCalculator.shared.julianDay(from: targetDate)
+        let todaySnapshot = PanchangCalculator.computeGrahaSnapshot(julianDay: jd)
+
+        // Generate reading
+        let horoscope = HoroscopeEngine.generateReading(
+            natalChart: natal,
+            todaySnapshot: todaySnapshot,
+            date: targetDate,
+            timezoneIdentifier: currentCity.timezoneIdentifier
+        )
+
+        dailyHoroscope = horoscope
+        horoscopeCache[cacheKey] = horoscope
+    }
+
+    /// Save birth data, recompute natal chart and horoscope, reschedule notifications.
+    func saveBirthData(_ data: BirthData) {
+        data.save()
+        birthData = data
+        natalChart = NatalChart.compute(from: data)
+        horoscopeCache.removeAll()
+        loadHoroscope()
+        scheduleNotificationReschedule()
+    }
+
+    /// Clear birth data and remove horoscope.
+    func clearBirthData() {
+        BirthData.clear()
+        birthData = nil
+        natalChart = nil
+        dailyHoroscope = nil
+        horoscopeCache.removeAll()
+        scheduleNotificationReschedule()
+    }
+
     // MARK: - Location
 
     func requestLocation() {
@@ -797,6 +876,22 @@ class PanchangViewModel: ObservableObject {
             }
         }
 
+        // Pre-compute 7 days of horoscope theme statements for notifications
+        var horoscopeThemes: [String: String] = [:]
+        if let natal = natalChart, notifHoroscope {
+            for day in days {
+                let jd = VedicCalculator.shared.julianDay(from: day.solar.sunrise)
+                let snapshot = PanchangCalculator.computeGrahaSnapshot(julianDay: jd)
+                let reading = HoroscopeEngine.generateReading(
+                    natalChart: natal,
+                    todaySnapshot: snapshot,
+                    date: day.solar.sunrise,
+                    timezoneIdentifier: currentCity.timezoneIdentifier
+                )
+                horoscopeThemes[day.dateString] = reading.themeStatement
+            }
+        }
+
         let input = NotificationService.ScheduleInput(
             days: days,
             navratriDays: navratriDays,
@@ -810,7 +905,9 @@ class PanchangViewModel: ObservableObject {
             brahmaMuhurta: notifBrahmaMuhurta,
             navratri: notifNavratriMorning,
             eclipse: notifEclipseAlert,
-            minutesBefore: notifMinutesBefore
+            minutesBefore: notifMinutesBefore,
+            horoscope: notifHoroscope && natalChart != nil,
+            horoscopeThemes: horoscopeThemes
         )
 
         await notificationService.reschedule(input)

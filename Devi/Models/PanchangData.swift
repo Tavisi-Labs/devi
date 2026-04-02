@@ -575,6 +575,103 @@ struct UserCity: Codable, Identifiable, Hashable {
     }
 }
 
+// MARK: - Rashi (Zodiac Sign)
+
+enum Rashi: Int, CaseIterable, Codable {
+    case mesha = 0       // Aries
+    case vrishabha       // Taurus
+    case mithuna         // Gemini
+    case karka           // Cancer
+    case simha           // Leo
+    case kanya           // Virgo
+    case tula            // Libra
+    case vrishchika      // Scorpio
+    case dhanu           // Sagittarius
+    case makara          // Capricorn
+    case kumbha          // Aquarius
+    case meena           // Pisces
+
+    var sanskritName: String {
+        switch self {
+        case .mesha: return "Mesha"
+        case .vrishabha: return "Vrishabha"
+        case .mithuna: return "Mithuna"
+        case .karka: return "Karka"
+        case .simha: return "Simha"
+        case .kanya: return "Kanya"
+        case .tula: return "Tula"
+        case .vrishchika: return "Vrishchika"
+        case .dhanu: return "Dhanu"
+        case .makara: return "Makara"
+        case .kumbha: return "Kumbha"
+        case .meena: return "Meena"
+        }
+    }
+
+    var westernName: String {
+        switch self {
+        case .mesha: return "Aries"
+        case .vrishabha: return "Taurus"
+        case .mithuna: return "Gemini"
+        case .karka: return "Cancer"
+        case .simha: return "Leo"
+        case .kanya: return "Virgo"
+        case .tula: return "Libra"
+        case .vrishchika: return "Scorpio"
+        case .dhanu: return "Sagittarius"
+        case .makara: return "Capricorn"
+        case .kumbha: return "Aquarius"
+        case .meena: return "Pisces"
+        }
+    }
+
+    var rulingPlanet: String {
+        switch self {
+        case .mesha: return "Mars"
+        case .vrishabha: return "Venus"
+        case .mithuna: return "Mercury"
+        case .karka: return "Moon"
+        case .simha: return "Sun"
+        case .kanya: return "Mercury"
+        case .tula: return "Venus"
+        case .vrishchika: return "Mars"
+        case .dhanu: return "Jupiter"
+        case .makara: return "Saturn"
+        case .kumbha: return "Saturn"
+        case .meena: return "Jupiter"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .mesha: return "♈"
+        case .vrishabha: return "♉"
+        case .mithuna: return "♊"
+        case .karka: return "♋"
+        case .simha: return "♌"
+        case .kanya: return "♍"
+        case .tula: return "♎"
+        case .vrishchika: return "♏"
+        case .dhanu: return "♐"
+        case .makara: return "♑"
+        case .kumbha: return "♒"
+        case .meena: return "♓"
+        }
+    }
+
+    /// Compute rashi from sidereal longitude (handles negative/wraparound)
+    static func from(siderealLongitude: Double) -> Rashi {
+        let normalized = ((siderealLongitude.truncatingRemainder(dividingBy: 360.0)) + 360.0)
+            .truncatingRemainder(dividingBy: 360.0)
+        return Rashi(rawValue: Int(normalized / 30.0) % 12)!
+    }
+
+    /// House of transit Moon relative to birth Moon (1-indexed, Vedic whole-sign)
+    static func moonHouse(birthRashi: Rashi, transitRashi: Rashi) -> Int {
+        ((transitRashi.rawValue - birthRashi.rawValue + 12) % 12) + 1
+    }
+}
+
 // MARK: - Graha (Vedic Planets)
 
 enum Graha: String, CaseIterable, Identifiable {
