@@ -91,7 +91,7 @@ struct SettingsView: View {
                         .padding(.top, 4)
 
                     VStack(spacing: 0) {
-                        if let bd = vm.birthData, let natal = vm.natalChart {
+                        if let _ = vm.birthData, let natal = vm.natalChart {
                             // Show current birth rashi
                             HStack {
                                 Label {
