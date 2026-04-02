@@ -23,6 +23,12 @@ class CosmicSignatureService {
 
     // MARK: - API Key
 
+    /// Whether an API key is configured (Keychain or Info.plist)
+    var hasAPIKey: Bool { apiKey != nil }
+
+    /// Set to true when an API key was present but the API call failed
+    private(set) var lastFetchAPIFailed: Bool = false
+
     /// Reads the API key from iOS Keychain or environment.
     /// Returns nil if no key is configured (falls back to offline mode).
     private var apiKey: String? {
@@ -43,25 +49,33 @@ class CosmicSignatureService {
 
     /// Fetches the cosmic signature for today. Returns cached result if available,
     /// otherwise calls Claude API or falls back to offline generation.
-    func fetchSignature(panchang: DailyPanchang, city: String) async -> String {
+    /// Pass `forceRefresh: true` to bypass cache (e.g. on retry after API failure).
+    func fetchSignature(panchang: DailyPanchang, city: String, forceRefresh: Bool = false) async -> String {
         let dateString = panchang.dateString
 
-        // 1. Check cache
-        if let cached = cachedSignature(city: city, dateString: dateString) {
+        // 1. Check cache (skip on forced refresh)
+        if !forceRefresh, let cached = cachedSignature(city: city, dateString: dateString) {
             return cached
         }
 
         // 2. Try Claude API if key is available
+        lastFetchAPIFailed = false
         if let key = apiKey {
             if let apiResult = await callClaudeAPI(panchang: panchang, city: city, apiKey: key) {
                 cacheSignature(apiResult, city: city, dateString: dateString)
                 return apiResult
             }
+            // API key was configured but the call failed
+            lastFetchAPIFailed = true
         }
 
         // 3. Offline fallback: compose from PanchangDescriptions
         let fallback = offlineFallback(panchang: panchang)
-        cacheSignature(fallback, city: city, dateString: dateString)
+        // Only cache fallback when there's no API key (permanent offline mode).
+        // When API key exists but call failed, don't cache — allows retry to re-attempt API.
+        if !lastFetchAPIFailed {
+            cacheSignature(fallback, city: city, dateString: dateString)
+        }
         return fallback
     }
 

@@ -229,7 +229,7 @@ struct CelestialHeroView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "moonrise.fill")
                                 .font(.system(size: 10))
-                                .foregroundColor(Color(hex: "B8C4D8").opacity(0.6))
+                                .foregroundColor(theme.lunarColor.opacity(0.6))
                             VStack(alignment: .leading, spacing: 1) {
                                 Text("Moonrise")
                                     .deviLabel(.caption, theme: theme)
@@ -247,7 +247,7 @@ struct CelestialHeroView: View {
                             }
                             Image(systemName: "moonset.fill")
                                 .font(.system(size: 10))
-                                .foregroundColor(Color(hex: "B8C4D8").opacity(0.6))
+                                .foregroundColor(theme.lunarColor.opacity(0.6))
                         }
                     }
                 }
@@ -351,7 +351,7 @@ struct CelestialHeroView: View {
             // Silver glow (sized for 44px moon)
             Circle()
                 .fill(RadialGradient(
-                    colors: [Color(hex: "B8C4D8").opacity(glowPhase ? 0.2 : 0.08), .clear],
+                    colors: [theme.lunarColor.opacity(glowPhase ? 0.2 : 0.08), .clear],
                     center: .center, startRadius: 14, endRadius: 32
                 ))
                 .frame(width: 64, height: 64)
@@ -368,10 +368,10 @@ struct CelestialHeroView: View {
                     width: radius * 2,
                     height: radius * 2
                 ))
-                context.fill(moonPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+                context.fill(moonPath, with: .color(theme.lunarColor.opacity(0.9)))
 
                 // Adaptive dark color for light/dark mode
-                let darkColor = theme.isLight ? Color.black.opacity(0.82) : Color(hex: "0B1026").opacity(0.92)
+                let darkColor = theme.isLight ? Color.black.opacity(0.82) : theme.deepBackground.opacity(0.92)
                 let isWaxing = tithi.paksha == .shukla
 
                 // Dark half
@@ -396,7 +396,7 @@ struct CelestialHeroView: View {
                 let terminatorPath = Path(ellipseIn: terminatorRect)
 
                 if illuminationFraction > 0.5 {
-                    context.fill(terminatorPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+                    context.fill(terminatorPath, with: .color(theme.lunarColor.opacity(0.9)))
                 } else {
                     context.fill(terminatorPath, with: .color(darkColor))
                 }
@@ -416,8 +416,8 @@ struct CelestialHeroView: View {
             ForEach(1...15, id: \.self) { i in
                 Circle()
                     .fill(i == tithi.number
-                        ? Color(hex: "D4A040")
-                        : Color(hex: "B8C4D8").opacity(0.2))
+                        ? theme.cautionColor
+                        : theme.lunarColor.opacity(0.2))
                     .frame(width: i == tithi.number ? 6 : 4,
                            height: i == tithi.number ? 6 : 4)
             }
@@ -478,18 +478,7 @@ struct CelestialHeroView: View {
     }
 
     private func planetColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "sun", "surya":     return Color(hex: "D4A040")
-        case "moon", "chandra":  return Color(hex: "B8C4D8")
-        case "mars", "mangala":  return Color(hex: "C45050")
-        case "mercury", "budha": return Color(hex: "4AAD6E")
-        case "jupiter", "guru", "brihaspati": return Color(hex: "C9A96E")
-        case "venus", "shukra":  return Color(hex: "D47AAD")
-        case "saturn", "shani":  return Color(hex: "7B8EC4")
-        case "rahu":             return Color(hex: "5A6A8A")
-        case "ketu":             return Color(hex: "8A5A5A")
-        default:                 return Color(hex: "888888")
-        }
+        Graha.named(name)?.color ?? Color(hex: "888888")
     }
 
     private func extractFirstSentence(_ text: String) -> String {
@@ -539,7 +528,7 @@ struct SunDot: View {
     let arcSize: CGFloat
     let theme: DeviTheme
 
-    private let sunGold = Color(hex: "f0c040")
+    private var sunGold: Color { theme.solarGlow }
 
     enum PulsePhase: CaseIterable {
         case rest, inhale, peak, exhale

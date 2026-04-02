@@ -51,14 +51,30 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Cosmic Signature (AI)
     @Published var cosmicSignature: String?
     @Published var isLoadingSignature = false
+    @Published var cosmicSignatureError: Bool = false
     private let cosmicService = CosmicSignatureService()
     private var signatureTask: Task<Void, Never>?
+    private var fetchGeneration: Int = 0  // Prevents stale Task results from overwriting fresh state
 
     // MARK: - Haptic Triggers
     /// Incremented when countdown hits 0:00:00 — triggers heavy haptic
     @Published var countdownZeroTrigger: Int = 0
     /// Virtual time offset for sun arc scrubbing (nil = live)
     @Published var virtualTimeOffset: TimeInterval? = nil
+
+    // MARK: - Gesture Discovery Hints
+    /// Number of app launches recorded — used to show gesture hints on first 3 launches
+    @Published var hintLaunchCount: Int = 0
+    /// True when the user should see gesture discovery hints (first 3 launches)
+    var shouldShowHints: Bool { hintLaunchCount < 3 }
+
+    // MARK: - Transition Pill ("What Changed")
+    /// Set when the tithi has changed since the user last opened the app
+    @Published var tithiChangedMessage: String?
+
+    // MARK: - Location Error
+    /// Set when geocoding fails and nearest-city fallback is used
+    @Published var locationError: String?
 
     /// The effective "now" — either real time or scrubbed virtual time
     var effectiveNow: Date {
@@ -250,16 +266,7 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Color Helpers (for RightNowItems)
 
     private func horaColor(_ planetName: String) -> Color {
-        switch planetName {
-        case "Sun":     return Color(hex: "D4A040")
-        case "Moon":    return Color(hex: "B8C4D8")
-        case "Mars":    return Color(hex: "C45050")
-        case "Mercury": return Color(hex: "4AAD6E")
-        case "Jupiter": return Color(hex: "C9A96E")
-        case "Venus":   return Color(hex: "D47AAD")
-        case "Saturn":  return Color(hex: "7B8EC4")
-        default:        return Color(hex: "888888")
-        }
+        Graha.named(planetName)?.color ?? Color(hex: "888888")
     }
 
     private func choghadiyaColor(_ quality: ChoghadiyaQuality) -> Color {
@@ -321,6 +328,9 @@ class PanchangViewModel: ObservableObject {
         if let bd = birthData {
             natalChart = NatalChart.compute(from: bd)
         }
+
+        // Load hint launch counter for gesture discovery
+        hintLaunchCount = ud.integer(forKey: "hintLaunchCount")
 
         // Load persisted city (if user previously selected one)
         if let cityName = ud.string(forKey: "city.name"),
@@ -479,6 +489,26 @@ class PanchangViewModel: ObservableObject {
             todayFestivals.append("Satya Narayana Pooja")
         }
 
+        // Detect tithi change since last app open (only for today view)
+        // Uses displayName ("Shukla Panchami") not bare name ("Panchami") to catch paksha transitions
+        if isViewingToday, let currentTithi = todayPanchang?.tithi.displayName {
+            let ud = UserDefaults.standard
+            let lastSeenTithi = ud.string(forKey: "lastSeenTithi")
+            if let last = lastSeenTithi, last != currentTithi {
+                tithiChangedMessage = "Tithi changed to \(currentTithi)"
+                // Don't update lastSeenTithi yet — let the pill persist until dismissed
+            } else if tithiChangedMessage == nil {
+                // Only update when there's no active message being shown
+                ud.set(currentTithi, forKey: "lastSeenTithi")
+            }
+        } else {
+            tithiChangedMessage = nil
+            // When navigating away from today, update lastSeenTithi so pill dismisses on return
+            if let currentTithi = todayPanchang?.tithi.displayName {
+                UserDefaults.standard.set(currentTithi, forKey: "lastSeenTithi")
+            }
+        }
+
         // Set initial theme (always based on real time, not day offset)
         if let solar = todayPanchang?.solar, isViewingToday {
             timePeriod = TimePeriod.current(sunrise: solar.sunrise, sunset: solar.sunset)
@@ -494,17 +524,33 @@ class PanchangViewModel: ObservableObject {
         }
     }
 
-    private func fetchCosmicSignature(panchang: DailyPanchang) {
+    private func fetchCosmicSignature(panchang: DailyPanchang, forceRefresh: Bool = false) {
         signatureTask?.cancel()
+        fetchGeneration += 1
+        let myGeneration = fetchGeneration
         isLoadingSignature = true
+        cosmicSignatureError = false
         signatureTask = Task {
             let result = await cosmicService.fetchSignature(
                 panchang: panchang,
-                city: currentCity.name
+                city: currentCity.name,
+                forceRefresh: forceRefresh
             )
-            guard !Task.isCancelled else { return }
+            // Only apply results if this is still the latest fetch (prevents race from rapid retries)
+            guard !Task.isCancelled, myGeneration == fetchGeneration else { return }
             cosmicSignature = result
             isLoadingSignature = false
+            if cosmicService.lastFetchAPIFailed {
+                cosmicSignatureError = true
+            }
+        }
+    }
+
+    /// Retry cosmic signature fetch after an error
+    func retryCosmicSignature() {
+        cosmicSignatureError = false
+        if let panchang = todayPanchang {
+            fetchCosmicSignature(panchang: panchang, forceRefresh: true)
         }
     }
 
@@ -781,9 +827,12 @@ class PanchangViewModel: ObservableObject {
         // Offline fallback: snap to nearest popular city
         let nearest = UserCity.nearest(to: location)
         selectCity(nearest)
+        // Set error after selectCity (which clears locationError) so the message persists
+        locationError = "Could not determine exact location. Using nearest city."
     }
 
     func selectCity(_ city: UserCity) {
+        locationError = nil
         currentCity = city
         persistCity(city)
         loadData()
@@ -918,6 +967,16 @@ class PanchangViewModel: ObservableObject {
         notificationsAuthorized = await notificationService.isAuthorized()
     }
 
+    // MARK: - Tithi Change Pill
+
+    /// Dismiss the tithi change pill and update UserDefaults so it won't reappear.
+    func dismissTithiChange() {
+        tithiChangedMessage = nil
+        if let currentTithi = todayPanchang?.tithi.displayName {
+            UserDefaults.standard.set(currentTithi, forKey: "lastSeenTithi")
+        }
+    }
+
     // MARK: - App Usage Tracking
 
     /// Records today as a usage day for milestone-based review prompting.
@@ -928,8 +987,15 @@ class PanchangViewModel: ObservableObject {
 
         let ud = UserDefaults.standard
         var days = Set(ud.stringArray(forKey: "usageDays") ?? [])
+        let isNewDay = !days.contains(today)
         days.insert(today)
         ud.set(Array(days), forKey: "usageDays")
+
+        // Only increment hint counter once per calendar day (not every foreground)
+        if isNewDay {
+            hintLaunchCount += 1
+            ud.set(hintLaunchCount, forKey: "hintLaunchCount")
+        }
     }
 
     /// True when user has used the app on 7+ distinct days and hasn't been prompted yet.

@@ -726,6 +726,17 @@ enum Graha: String, CaseIterable, Identifiable {
 // MARK: - Graha Extensions
 
 extension Graha {
+    /// Look up a Graha by English name ("Sun"), Sanskrit name ("Surya"), or lowercase ("sun", "surya").
+    static func named(_ name: String) -> Graha? {
+        let lower = name.lowercased()
+        // Try English raw value first (case-insensitive)
+        if let match = Graha.allCases.first(where: { $0.rawValue.lowercased() == lower }) {
+            return match
+        }
+        // Try Sanskrit name (case-insensitive)
+        return Graha.allCases.first(where: { $0.sanskritName.lowercased() == lower })
+    }
+
     /// Canonical planet color for all UI surfaces.
     var color: Color {
         switch self {

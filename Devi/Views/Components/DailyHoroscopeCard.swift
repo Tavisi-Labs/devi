@@ -15,7 +15,6 @@ struct DailyHoroscopeCard: View {
 
     // MARK: - Constants
 
-    private let goldAccent = Color(hex: "D4A040")
     private let intensityDotSize: CGFloat = 4
     private let maxIntensity = 5
     private let colorSwatchSize: CGFloat = 16
@@ -73,7 +72,7 @@ struct DailyHoroscopeCard: View {
             } label: {
                 Text(isTextExpanded ? "Show less" : "Read more")
                     .scaledFont(size: 12, weight: .medium)
-                    .foregroundColor(goldAccent)
+                    .foregroundColor(theme.accentColor)
             }
             .buttonStyle(.plain)
         }
@@ -130,7 +129,7 @@ struct DailyHoroscopeCard: View {
                 // Center diamond fulcrum
                 Image(systemName: "diamond.fill")
                     .font(.system(size: 5))
-                    .foregroundColor(goldAccent.opacity(0.4))
+                    .foregroundColor(theme.accentColor.opacity(0.4))
 
                 Spacer()
 
@@ -334,7 +333,7 @@ struct DailyHoroscopeCard: View {
         VStack(spacing: 0) {
             ForEach(0..<itemCount, id: \.self) { index in
                 Circle()
-                    .fill(goldAccent.opacity(0.4))
+                    .fill(theme.accentColor.opacity(0.4))
                     .frame(width: 3, height: 3)
                 if index < itemCount - 1 {
                     Rectangle()
@@ -395,18 +394,18 @@ struct DailyHoroscopeCard: View {
                 Text(category.displayName)
                     .scaledFont(size: 12, weight: .medium)
             }
-            .foregroundColor(isSelected ? goldAccent : theme.primaryText.opacity(0.7))
+            .foregroundColor(isSelected ? theme.accentColor : theme.primaryText.opacity(0.7))
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
             .background(
                 Capsule()
                     .fill(isSelected
-                          ? goldAccent.opacity(0.15)
+                          ? theme.accentColor.opacity(0.15)
                           : theme.primaryText.opacity(0.08))
             )
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? goldAccent.opacity(0.3) : Color.clear, lineWidth: 1)
+                    .stroke(isSelected ? theme.accentColor.opacity(0.3) : Color.clear, lineWidth: 1)
             )
         }
         .buttonStyle(.plain)
@@ -438,7 +437,7 @@ struct DailyHoroscopeCard: View {
             HStack(spacing: 3) {
                 ForEach(1...maxIntensity, id: \.self) { index in
                     Circle()
-                        .fill(index <= filled ? goldAccent : theme.primaryText.opacity(0.15))
+                        .fill(index <= filled ? theme.accentColor : theme.primaryText.opacity(0.15))
                         .frame(width: intensityDotSize, height: intensityDotSize)
                 }
             }
@@ -492,7 +491,7 @@ struct DailyHoroscopeCard: View {
                     Text("Why this reading?")
                         .scaledFont(size: 12, weight: .medium)
                 }
-                .foregroundColor(goldAccent.opacity(0.8))
+                .foregroundColor(theme.accentColor.opacity(0.8))
             }
             .buttonStyle(.plain)
         }

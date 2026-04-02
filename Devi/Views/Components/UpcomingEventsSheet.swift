@@ -86,8 +86,8 @@ struct UpcomingEventsSheet: View {
 
     private func eventDotColor(_ type: UpcomingEvent.EventType) -> Color {
         switch type {
-        case .fasting:  return Color(hex: "c54b2a")
-        case .eclipse:  return Color(hex: "7B8EC4")
+        case .fasting:  return theme.fastingColor
+        case .eclipse:  return theme.eclipseColor
         case .festival: return theme.accentColor
         }
     }

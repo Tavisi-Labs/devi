@@ -13,7 +13,6 @@ struct SettingsView: View {
     @State private var showPanchangEducation = false
     @State private var showWhatsNew = false
     @State private var showBirthDataInput = false
-    @State private var apiKey: String = ""
 
     private var theme: DeviTheme { vm.theme }
 
@@ -316,54 +315,7 @@ struct SettingsView: View {
                         .deviLabel(.caption, theme: theme)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
-                    // MARK: - Card 5 — Cosmic Signature
-                    Text("COSMIC SIGNATURE (AI)")
-                        .deviLabel(.caption, theme: theme)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.top, 4)
-
-                    VStack(spacing: 12) {
-                        HStack {
-                            Label {
-                                Text("API Key")
-                                    .foregroundColor(theme.primaryText)
-                            } icon: {
-                                Image(systemName: "key")
-                                    .foregroundColor(theme.accentColor)
-                            }
-                            Spacer()
-                            if apiKey.isEmpty {
-                                Text("Not set")
-                                    .foregroundColor(theme.secondaryText)
-                            } else {
-                                Text("••••\(String(apiKey.suffix(4)))")
-                                    .foregroundColor(theme.secondaryText)
-                                    .monospacedDigit()
-                            }
-                        }
-
-                        SecureField("sk-ant-...", text: $apiKey)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
-                            .font(.system(size: 14, design: .monospaced))
-                            .padding(10)
-                            .background(theme.primaryText.opacity(0.06))
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            .onChange(of: apiKey) { _, newValue in
-                                let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines)
-                                if !trimmed.isEmpty {
-                                    KeychainHelper.save(key: "anthropic_api_key", value: trimmed)
-                                }
-                            }
-                    }
-                    .padding(16)
-                    .deviCard(theme: theme, elevation: .raised)
-
-                    Text("Optional. Paste your Anthropic API key for AI-generated daily insights. Without a key, insights use Vedic descriptions offline.")
-                        .deviLabel(.caption, theme: theme)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                    // MARK: - Card 6 — About & Learn
+                    // MARK: - Card 5 — About & Learn
                     Text("ABOUT & LEARN")
                         .deviLabel(.caption, theme: theme)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -483,11 +435,8 @@ struct SettingsView: View {
             .task {
                 await vm.checkNotificationAuthorization()
             }
-            .onAppear {
-                apiKey = KeychainHelper.read(key: "anthropic_api_key") ?? ""
-            }
             .sheet(isPresented: $showCityPicker) {
-                CityPickerView(selectedCity: vm.currentCity) { city in
+                CityPickerView(selectedCity: vm.currentCity, theme: theme) { city in
                     vm.selectCity(city)
                     showCityPicker = false
                 }
@@ -560,6 +509,7 @@ struct SettingsView: View {
 
 struct CityPickerView: View {
     let selectedCity: UserCity
+    let theme: DeviTheme
     let onSelect: (UserCity) -> Void
     @Environment(\.dismiss) private var dismiss
     @StateObject private var searchService = CitySearchService()
@@ -631,7 +581,7 @@ struct CityPickerView: View {
                 HStack {
                     Spacer()
                     ProgressView()
-                        .tint(Color(hex: "d4a857"))
+                        .tint(theme.accentColor)
                     Text("Searching...")
                         .foregroundColor(.secondary)
                         .scaledFont(size: 14)
@@ -680,7 +630,7 @@ struct CityPickerView: View {
                             Spacer()
                             if city.id == selectedCity.id {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(Color(hex: "d4a857"))
+                                    .foregroundColor(theme.accentColor)
                             }
                         }
                     }
@@ -697,7 +647,7 @@ struct CityPickerView: View {
                 .ignoresSafeArea()
             VStack(spacing: 12) {
                 ProgressView()
-                    .tint(Color(hex: "d4a857"))
+                    .tint(theme.accentColor)
                     .scaleEffect(1.2)
                 Text("Loading city details...")
                     .scaledFont(size: 14, weight: .medium)

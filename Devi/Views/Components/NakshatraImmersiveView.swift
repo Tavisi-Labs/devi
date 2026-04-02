@@ -230,6 +230,7 @@ struct NakshatraImmersiveView: View {
                 .frame(width: 200, height: 200)
 
             Canvas { context, size in
+                let lunar = skyTheme.lunarColor
                 let scale = min(size.width, size.height) / 2
                 let center = CGPoint(x: size.width / 2, y: size.height / 2)
 
@@ -241,7 +242,7 @@ struct NakshatraImmersiveView: View {
                         var path = Path()
                         path.move(to: CGPoint(x: center.x + from.x * scale, y: center.y + from.y * scale))
                         path.addLine(to: CGPoint(x: center.x + to.x * scale, y: center.y + to.y * scale))
-                        context.stroke(path, with: .color(Color(hex: "B8C4D8").opacity(0.35)), lineWidth: 0.8)
+                        context.stroke(path, with: .color(lunar.opacity(0.35)), lineWidth: 0.8)
                     }
                 }
 
@@ -255,7 +256,7 @@ struct NakshatraImmersiveView: View {
                                           width: starSize * 4, height: starSize * 4)
                     context.fill(
                         Path(ellipseIn: glowRect),
-                        with: .color(Color(hex: "B8C4D8").opacity(0.2))
+                        with: .color(lunar.opacity(0.2))
                     )
 
                     // Star point
@@ -263,7 +264,7 @@ struct NakshatraImmersiveView: View {
                                           width: starSize, height: starSize)
                     context.fill(
                         Path(ellipseIn: starRect),
-                        with: .color(Color(hex: "B8C4D8").opacity(0.9))
+                        with: .color(lunar.opacity(0.9))
                     )
                 }
             }
@@ -319,18 +320,7 @@ struct NakshatraImmersiveView: View {
     // MARK: - Helpers
 
     private func planetColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "sun", "surya":     return Color(hex: "D4A040")
-        case "moon", "chandra":  return Color(hex: "B8C4D8")
-        case "mars", "mangala":  return Color(hex: "C45050")
-        case "mercury", "budha": return Color(hex: "4AAD6E")
-        case "jupiter", "guru", "brihaspati": return Color(hex: "C9A96E")
-        case "venus", "shukra":  return Color(hex: "D47AAD")
-        case "saturn", "shani":  return Color(hex: "7B8EC4")
-        case "rahu":             return Color(hex: "5A6A8A")
-        case "ketu":             return Color(hex: "8A5A5A")
-        default:                 return Color(hex: "888888")
-        }
+        Graha.named(name)?.color ?? Color(hex: "888888")
     }
 
     private func qualityColor(_ quality: String) -> Color {

@@ -326,16 +326,7 @@ struct HoraImmersiveView: View {
     // MARK: - Helpers
 
     private func planetColor(_ name: String) -> Color {
-        switch name {
-        case "Sun":     return Color(hex: "D4A040")
-        case "Moon":    return Color(hex: "B8C4D8")
-        case "Mars":    return Color(hex: "C45050")
-        case "Mercury": return Color(hex: "4AAD6E")
-        case "Jupiter": return Color(hex: "C9A96E")
-        case "Venus":   return Color(hex: "D47AAD")
-        case "Saturn":  return Color(hex: "7B8EC4")
-        default:        return theme.secondaryText
-        }
+        Graha.named(name)?.color ?? Color(hex: "888888")
     }
 
     private func qualityColor(_ text: String) -> Color {

@@ -45,6 +45,7 @@
 		892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */; };
 		8992D5E9996958173E0A21FB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */; };
 		8D41F88A0DBD80BC84E06CB9 /* TithiImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */; };
+		8DBED32007EB0171D49C0960 /* PanchangViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3CD313ECBD6E3B4210C728D /* PanchangViewModelTests.swift */; };
 		8FE0D3661114A20B1FC604ED /* WhatsNewSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */; };
 		90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */; };
 		A0537DCC64EBC4F94496F641 /* HoroscopeContentLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */; };
@@ -54,8 +55,10 @@
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
 		B78F3AB26D72C5A1F22739BD /* VedicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28501AFF246A728A4B21023D /* VedicSkyView.swift */; };
 		B982EA76D203C242C49853BC /* MantraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81FA1582C6CC8D435E75D30 /* MantraCard.swift */; };
+		BB17FB7B8C16645B7689C2FB /* CollapsibleSectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A1815747C232A6F55E52048 /* CollapsibleSectionCard.swift */; };
 		C19C27D51654472CE9003804 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */; };
 		C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */; };
+		CA126CEA7A3B889CD64DA13F /* PanchangSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B2F0E2D69E31D81A8EF4F0 /* PanchangSkeletonView.swift */; };
 		CB25FABBF7A538EBB8428BEB /* PanchangCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */; };
 		D242439F6807E30BD55D80D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D40FE13768033F483BCEA6DC /* Assets.xcassets */; };
 		D3F4D6E623EDD5A5157196B6 /* ShareTextBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */; };
@@ -96,6 +99,7 @@
 		35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureService.swift; sourceTree = "<group>"; };
 		35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeWhySheet.swift; sourceTree = "<group>"; };
 		360B289972920360586AA1CC /* EclipseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseCard.swift; sourceTree = "<group>"; };
+		38B2F0E2D69E31D81A8EF4F0 /* PanchangSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangSkeletonView.swift; sourceTree = "<group>"; };
 		4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraImmersiveView.swift; sourceTree = "<group>"; };
 		42768E6995593EC9DAD7C9DA /* ShareTextBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareTextBuilder.swift; sourceTree = "<group>"; };
 		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -111,6 +115,7 @@
 		63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataInputView.swift; sourceTree = "<group>"; };
 		652253D394F54C12ED04608E /* ShareCardRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardRenderer.swift; sourceTree = "<group>"; };
 		78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyMotionManager.swift; sourceTree = "<group>"; };
+		7A1815747C232A6F55E52048 /* CollapsibleSectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsibleSectionCard.swift; sourceTree = "<group>"; };
 		7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalEngineTests.swift; sourceTree = "<group>"; };
 		7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -119,6 +124,7 @@
 		8682C218AD656AE031131FD5 /* ThemePalettes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePalettes.swift; sourceTree = "<group>"; };
 		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
 		9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviApp.swift; sourceTree = "<group>"; };
+		A3CD313ECBD6E3B4210C728D /* PanchangViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModelTests.swift; sourceTree = "<group>"; };
 		AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangIntegrationTests.swift; sourceTree = "<group>"; };
 		ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelestialHeroView.swift; sourceTree = "<group>"; };
 		B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculatorTests.swift; sourceTree = "<group>"; };
@@ -185,6 +191,7 @@
 				7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */,
 				B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */,
 				AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */,
+				A3CD313ECBD6E3B4210C728D /* PanchangViewModelTests.swift */,
 				463C6BC7EA5612F2261721C5 /* VedicCalculatorTests.swift */,
 			);
 			path = DeviTests;
@@ -196,6 +203,7 @@
 				2AA5417195DA25327519394C /* AmbientMeditationView.swift */,
 				ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */,
 				B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */,
+				7A1815747C232A6F55E52048 /* CollapsibleSectionCard.swift */,
 				56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */,
 				5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */,
 				360B289972920360586AA1CC /* EclipseCard.swift */,
@@ -212,6 +220,7 @@
 				BA76E848BCC85F71C8F2F932 /* NavratriImmersiveView.swift */,
 				0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */,
 				994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */,
+				38B2F0E2D69E31D81A8EF4F0 /* PanchangSkeletonView.swift */,
 				6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */,
 				7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */,
 				C450B088E4224ABD6C00279A /* SplashView.swift */,
@@ -395,6 +404,7 @@
 				A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */,
 				56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */,
 				D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */,
+				BB17FB7B8C16645B7689C2FB /* CollapsibleSectionCard.swift in Sources */,
 				7F91FA1E0A77DD7E0E4D7B9D /* CosmicSignatureCard.swift in Sources */,
 				71D519F2868C2EE0819D0FE4 /* CosmicSignatureService.swift in Sources */,
 				F455D4049C3DFE659B2BC780 /* DailyHoroscope.swift in Sources */,
@@ -424,6 +434,7 @@
 				564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */,
 				5097A9E579276D1E06D6FBD9 /* PanchangDetailSheet.swift in Sources */,
 				C54A04ED991BFEE0E79B7AB4 /* PanchangElement.swift in Sources */,
+				CA126CEA7A3B889CD64DA13F /* PanchangSkeletonView.swift in Sources */,
 				892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */,
 				042795BD186B3F379E603971 /* RightNowCard.swift in Sources */,
 				90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */,
@@ -452,6 +463,7 @@
 				7B6A8BF3CFA9E14750B5DB44 /* FestivalEngineTests.swift in Sources */,
 				CB25FABBF7A538EBB8428BEB /* PanchangCalculatorTests.swift in Sources */,
 				0F6D605D5B1D6E6D380D3770 /* PanchangIntegrationTests.swift in Sources */,
+				8DBED32007EB0171D49C0960 /* PanchangViewModelTests.swift in Sources */,
 				FAD1BCA1A51DFC533472ED90 /* VedicCalculatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

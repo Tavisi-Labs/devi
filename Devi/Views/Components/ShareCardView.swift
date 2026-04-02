@@ -28,11 +28,11 @@ struct ShareCardView: View {
 
                 // Decorative divider
                 HStack(spacing: 8) {
-                    Rectangle().fill(Color(hex: "d4a857").opacity(0.4)).frame(width: 60, height: 1)
+                    Rectangle().fill(theme.accentColor.opacity(0.4)).frame(width: 60, height: 1)
                     Image(systemName: "sparkle")
                         .font(.system(size: 10))
-                        .foregroundColor(Color(hex: "d4a857").opacity(0.6))
-                    Rectangle().fill(Color(hex: "d4a857").opacity(0.4)).frame(width: 60, height: 1)
+                        .foregroundColor(theme.accentColor.opacity(0.6))
+                    Rectangle().fill(theme.accentColor.opacity(0.4)).frame(width: 60, height: 1)
                 }
 
                 Spacer().frame(height: 40)
@@ -68,7 +68,7 @@ struct ShareCardView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "star.fill")
                         .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "d4a857"))
+                        .foregroundColor(theme.accentColor)
                     Text(panchang.nakshatra.name)
                         .font(.system(size: 24, weight: .medium, design: .serif))
                         .foregroundColor(theme.primaryText)
@@ -121,7 +121,7 @@ struct ShareCardView: View {
                     VStack(spacing: 8) {
                         Text(mantra.devanagari)
                             .font(.system(size: 26, weight: .regular, design: .serif))
-                            .foregroundColor(Color(hex: "d4a857"))
+                            .foregroundColor(theme.accentColor)
 
                         Text(mantra.transliteration)
                             .font(.system(size: 16, weight: .regular, design: .serif))
@@ -163,7 +163,7 @@ struct ShareCardView: View {
 
                 // Gold border line
                 Rectangle()
-                    .fill(Color(hex: "d4a857").opacity(0.3))
+                    .fill(theme.accentColor.opacity(0.3))
                     .frame(height: 1)
                     .padding(.horizontal, 60)
 
@@ -180,7 +180,7 @@ struct ShareCardView: View {
 
             // Gold border frame
             RoundedRectangle(cornerRadius: 0)
-                .stroke(Color(hex: "d4a857").opacity(0.2), lineWidth: 2)
+                .stroke(theme.accentColor.opacity(0.2), lineWidth: 2)
                 .padding(20)
         }
         .frame(width: 1080, height: 1920)

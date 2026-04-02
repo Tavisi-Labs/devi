@@ -11,10 +11,9 @@ struct EclipseCard: View {
     let cityName: String
     var onTap: (() -> Void)? = nil
 
-    // Cool lunar blue-silver palette — eclipses are shadow events
-    private let eclipseBlue = Color(hex: "7B8EC4")
-    private let eclipseSilver = Color(hex: "A8B4D4")
-    private let eclipseDark = Color(hex: "3A4570")
+    // Semantic color aliases (from theme)
+    private var eclipseBlue: Color { theme.eclipseColor }
+    private var eclipseSilver: Color { theme.lunarColor }
 
     private var daysAway: Int {
         eclipse.daysFrom(todayDateString)

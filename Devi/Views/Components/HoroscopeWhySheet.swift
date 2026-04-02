@@ -131,8 +131,26 @@ struct HoroscopeWhySheet: View {
                             .deviLabel(.section, theme: theme)
 
                         HStack(spacing: 12) {
-                            Text(transitContext.birthRashi.symbol)
-                                .font(.system(size: 32))
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        Graha.named(transitContext.birthRashi.rulingPlanet)?.color.opacity(0.15)
+                                        ?? theme.accentColor.opacity(0.15)
+                                    )
+                                Circle()
+                                    .stroke(
+                                        Graha.named(transitContext.birthRashi.rulingPlanet)?.color.opacity(0.3)
+                                        ?? theme.accentColor.opacity(0.3),
+                                        lineWidth: 1
+                                    )
+                                Text(transitContext.birthRashi.symbol)
+                                    .font(.system(size: 20))
+                                    .foregroundColor(
+                                        Graha.named(transitContext.birthRashi.rulingPlanet)?.color
+                                        ?? theme.accentColor
+                                    )
+                            }
+                            .frame(width: 44, height: 44)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(transitContext.birthRashi.sanskritName)

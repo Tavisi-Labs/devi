@@ -136,6 +136,13 @@ struct DeviTheme {
     let inauspiciousColor: Color = Color(hex: "C45050")
     let cautionColor: Color = Color(hex: "D4A040")
 
+    // Semantic element colors (from DESIGN.md palette)
+    let lunarColor: Color
+    let solarGlow: Color
+    let fastingColor: Color
+    let eclipseColor: Color
+    let deepBackground: Color
+
     // MARK: - Time-based themes
 
     static func forPeriod(_ period: TimePeriod, style: DeviThemeStyle = .classic, appearance: DeviAppearanceMode = .alwaysDark) -> DeviTheme {
@@ -148,7 +155,12 @@ struct DeviTheme {
             accentColor: Color(hex: p.accent),
             primaryText: Color(hex: p.primaryText),
             secondaryText: Color(hex: p.secondaryText).opacity(p.secondaryTextOpacity),
-            isLight: isLight
+            isLight: isLight,
+            lunarColor: Color(hex: p.lunarColor),
+            solarGlow: Color(hex: p.solarGlow),
+            fastingColor: Color(hex: p.fastingColor),
+            eclipseColor: Color(hex: p.eclipseColor),
+            deepBackground: Color(hex: p.deepBackground)
         )
     }
 
@@ -345,6 +357,7 @@ enum DeviButtonVariant {
 
 struct DeviButtonStyle: ButtonStyle {
     let variant: DeviButtonVariant
+    var accentColor: Color = Color(hex: "d4a857")
 
     func makeBody(configuration: Configuration) -> some View {
         switch variant {
@@ -353,12 +366,12 @@ struct DeviButtonStyle: ButtonStyle {
                 .font(.system(size: 15, weight: .semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .foregroundColor(Color(hex: "d4a857"))
+                .foregroundColor(accentColor)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
+                        .stroke(accentColor.opacity(0.4), lineWidth: 1)
                 )
                 .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
                 .opacity(configuration.isPressed ? 0.7 : 1.0)
@@ -368,12 +381,12 @@ struct DeviButtonStyle: ButtonStyle {
                 .font(.system(size: 15, weight: .semibold))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .foregroundColor(Color(hex: "d4a857"))
+                .foregroundColor(accentColor)
                 .background(Color.clear)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(Color(hex: "d4a857").opacity(0.4), lineWidth: 1)
+                        .stroke(accentColor.opacity(0.4), lineWidth: 1)
                 )
                 .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
                 .opacity(configuration.isPressed ? 0.7 : 1.0)
@@ -385,6 +398,9 @@ struct DeviButtonStyle: ButtonStyle {
 extension View {
     func deviButton(_ variant: DeviButtonVariant) -> some View {
         self.buttonStyle(DeviButtonStyle(variant: variant))
+    }
+    func deviButton(_ variant: DeviButtonVariant, theme: DeviTheme) -> some View {
+        self.buttonStyle(DeviButtonStyle(variant: variant, accentColor: theme.accentColor))
     }
 }
 

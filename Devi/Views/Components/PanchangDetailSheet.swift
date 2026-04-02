@@ -207,14 +207,14 @@ struct PanchangDetailSheet: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "d4a857").opacity(glowPhase ? 0.3 : 0.1), .clear],
+                            colors: [theme.accentColor.opacity(glowPhase ? 0.3 : 0.1), .clear],
                             center: .center, startRadius: 4, endRadius: 24
                         )
                     )
                     .frame(width: 56, height: 56)
                 Image(systemName: "sparkles")
                     .font(.system(size: 28))
-                    .foregroundColor(Color(hex: "d4a857"))
+                    .foregroundColor(theme.accentColor)
             }
             .frame(maxWidth: .infinity)
             .deviReveal(delay: 0.05, direction: .scale)
@@ -225,14 +225,14 @@ struct PanchangDetailSheet: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color(hex: "c54b2a").opacity(glowPhase ? 0.3 : 0.1), .clear],
+                            colors: [theme.fastingColor.opacity(glowPhase ? 0.3 : 0.1), .clear],
                             center: .center, startRadius: 4, endRadius: 24
                         )
                     )
                     .frame(width: 56, height: 56)
                 Image(systemName: "flame.fill")
                     .font(.system(size: 28))
-                    .foregroundColor(Color(hex: "c54b2a"))
+                    .foregroundColor(theme.fastingColor)
             }
             .frame(maxWidth: .infinity)
             .deviReveal(delay: 0.05, direction: .scale)
@@ -246,16 +246,7 @@ struct PanchangDetailSheet: View {
     private var varaColor: Color {
         if case .vara(let v) = element {
             let deity = v.components(separatedBy: " (").first ?? v
-            switch deity {
-            case "Surya":   return Color(hex: "D4A040")
-            case "Chandra": return Color(hex: "B8C4D8")
-            case "Mangala": return Color(hex: "C45050")
-            case "Budha":   return Color(hex: "4AAD6E")
-            case "Guru":    return Color(hex: "C9A96E")
-            case "Shukra":  return Color(hex: "D47AAD")
-            case "Shani":   return Color(hex: "7B8EC4")
-            default:        return theme.accentColor
-            }
+            return Graha.named(deity)?.color ?? theme.accentColor
         }
         return theme.accentColor
     }
@@ -423,7 +414,7 @@ struct PanchangDetailSheet: View {
                         HStack {
                             Circle()
                                 .fill(contact.label == "Maximum"
-                                      ? Color(hex: "7B8EC4")
+                                      ? theme.eclipseColor
                                       : theme.secondaryText.opacity(0.4))
                                 .frame(width: contact.label == "Maximum" ? 8 : 5,
                                        height: contact.label == "Maximum" ? 8 : 5)
@@ -851,7 +842,7 @@ struct PanchangDetailSheet: View {
             HStack(spacing: 6) {
                 Image(systemName: "book.closed.fill")
                     .font(.system(size: 12))
-                    .foregroundColor(Color(hex: "7B8EC4"))
+                    .foregroundColor(theme.eclipseColor)
                 Text("Samudra Manthan")
                     .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
@@ -869,7 +860,7 @@ struct PanchangDetailSheet: View {
             HStack(spacing: 6) {
                 Image(systemName: "sparkles")
                     .font(.system(size: 12))
-                    .foregroundColor(Color(hex: "7B8EC4"))
+                    .foregroundColor(theme.eclipseColor)
                 Text("Spiritual Significance")
                     .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
@@ -893,7 +884,7 @@ struct PanchangDetailSheet: View {
             HStack(spacing: 6) {
                 Image(systemName: "waveform")
                     .font(.system(size: 12))
-                    .foregroundColor(Color(hex: "7B8EC4"))
+                    .foregroundColor(theme.eclipseColor)
                 Text("Mantras for Eclipse")
                     .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)
@@ -965,7 +956,7 @@ struct PanchangDetailSheet: View {
             HStack(spacing: 6) {
                 Image(systemName: "waveform")
                     .font(.system(size: 12))
-                    .foregroundColor(Color(hex: "c54b2a"))
+                    .foregroundColor(theme.fastingColor)
                 Text("Mantra for \(deity)")
                     .scaledFont(size: 14, weight: .semibold, design: .serif)
                     .foregroundColor(theme.primaryText)

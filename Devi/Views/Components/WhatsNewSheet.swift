@@ -22,7 +22,7 @@ struct WhatsNewSheet: View {
                                 .font(.system(size: 32, weight: .light, design: .serif))
                                 .foregroundStyle(
                                     LinearGradient(
-                                        colors: [Color(hex: "D4A857"), Color(hex: "C9A96E")],
+                                        colors: [theme.accentColor, theme.accentColor.opacity(0.8)],
                                         startPoint: .leading,
                                         endPoint: .trailing
                                     )
@@ -95,7 +95,7 @@ struct WhatsNewSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color(hex: "d4a857"))
+                        .foregroundColor(theme.accentColor)
                 }
             }
         }

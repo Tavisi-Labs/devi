@@ -86,7 +86,7 @@ struct HomeView: View {
                             .deviEntrance()
                     }
 
-                    // MARK: - 2. Celestial Observatory
+                    // MARK: - 2. Celestial Observatory + Right Now
                     if let solar = vm.todayPanchang?.solar {
                         CelestialHeroView(
                             progress: vm.sunProgress,
@@ -120,27 +120,54 @@ struct HomeView: View {
                         )
                         .sensoryFeedback(.selection, trigger: vm.virtualTimeOffset != nil)
                         .padding(.top, vm.isViewingToday ? 24 : 12)
-                    }
 
-                    // MARK: - 4. Right Now Card
-                    if !vm.rightNowItems.isEmpty {
-                        RightNowCard(
-                            items: vm.rightNowItems,
-                            theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                            onTapItem: { element in
-                                selectedElement = element
+                        // Cosmic signature retry (shown on API failure)
+                        if vm.cosmicSignatureError {
+                            Button {
+                                vm.retryCosmicSignature()
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.system(size: 11, weight: .medium))
+                                    Text("Retry cosmic reading")
+                                        .scaledFont(size: 12, weight: .medium)
+                                }
+                                .foregroundColor(vm.theme.accentColor.opacity(0.7))
                             }
-                        )
-                        .padding(.horizontal)
-                        .padding(.top, 28)
-                    }
+                            .buttonStyle(.plain)
+                            .padding(.top, 8)
+                            .transition(.opacity)
+                        }
 
-                    // MARK: - 5. Three-fact info bar
-                    if let panchang = vm.todayPanchang {
-                        infoBar(panchang: panchang)
+                        // Right Now Card
+                        if !vm.rightNowItems.isEmpty {
+                            RightNowCard(
+                                items: vm.rightNowItems,
+                                theme: vm.theme,
+                                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                                onTapItem: { element in
+                                    selectedElement = element
+                                }
+                            )
+                            .padding(.horizontal)
+                            .padding(.top, 16)
+                        }
+
+                        // Gesture discovery hint (first 3 launches)
+                        if vm.shouldShowHints {
+                            Text("Tap the arc to scrub time \u{00B7} Swipe header for days")
+                                .scaledFont(size: 11, weight: .regular)
+                                .foregroundColor(vm.theme.secondaryText.opacity(0.5))
+                                .padding(.top, 8)
+                                .transition(.opacity)
+                        }
+                    } else {
+                        // Loading skeleton — shown while panchang computes
+                        PanchangSkeletonView(theme: vm.theme)
                             .padding(.top, 24)
                     }
+
+                    // (Info bar removed — tithi/nakshatra already in CelestialHeroView)
 
                     // MARK: - 6. Today's Details
                     todayDetails
@@ -150,48 +177,67 @@ struct HomeView: View {
                     bannersSection
                         .padding(.top, 24)
 
-                    // MARK: - 8. Time Windows (2-col grid)
+                    // MARK: - 8. Time Windows (collapsible)
                     if !vm.activeTimeWindows.isEmpty {
-                        TimeWindowsCard(
-                            windows: vm.activeTimeWindows,
+                        CollapsibleSectionCard(
+                            "TIME WINDOWS",
                             theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                            effectiveNow: vm.effectiveNow,
-                            onTapWindow: { window in
-                                selectedElement = .timeWindow(window)
-                            }
-                        )
-                        .padding(.horizontal)
+                            sectionKey: "timeWindows",
+                            isCollapsedDefault: false
+                        ) {
+                            TimeWindowsCard(
+                                windows: vm.activeTimeWindows,
+                                theme: vm.theme,
+                                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                                effectiveNow: vm.effectiveNow,
+                                onTapWindow: { window in
+                                    selectedElement = .timeWindow(window)
+                                }
+                            )
+                            .padding(.horizontal)
+                        }
                         .padding(.top, 32)
                     }
 
-                    // MARK: - 9. Hora (horizontal strip)
+                    // MARK: - 9. Hora (collapsible)
                     if let panchang = vm.todayPanchang {
-                        HoraCard(
-                            horas: panchang.horas,
+                        CollapsibleSectionCard(
+                            "HORA",
                             theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                            effectiveNow: vm.effectiveNow,
-                            onTapHora: { hora in
-                                selectedElement = .hora(hora)
-                            }
-                        )
-                        .padding(.horizontal)
+                            sectionKey: "hora"
+                        ) {
+                            HoraCard(
+                                horas: panchang.horas,
+                                theme: vm.theme,
+                                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                                effectiveNow: vm.effectiveNow,
+                                onTapHora: { hora in
+                                    selectedElement = .hora(hora)
+                                }
+                            )
+                            .padding(.horizontal)
+                        }
                         .padding(.top, 32)
                     }
 
-                    // MARK: - 10. Choghadiya (dual horizontal strips)
+                    // MARK: - 10. Choghadiya (collapsible)
                     if let panchang = vm.todayPanchang {
-                        ChoghadiyaCard(
-                            choghadiyas: panchang.choghadiyas,
+                        CollapsibleSectionCard(
+                            "CHOGHADIYA",
                             theme: vm.theme,
-                            timezoneIdentifier: vm.currentCity.timezoneIdentifier,
-                            effectiveNow: vm.effectiveNow,
-                            onTapChoghadiya: { chog in
-                                selectedElement = .choghadiya(chog)
-                            }
-                        )
-                        .padding(.horizontal)
+                            sectionKey: "choghadiya"
+                        ) {
+                            ChoghadiyaCard(
+                                choghadiyas: panchang.choghadiyas,
+                                theme: vm.theme,
+                                timezoneIdentifier: vm.currentCity.timezoneIdentifier,
+                                effectiveNow: vm.effectiveNow,
+                                onTapChoghadiya: { chog in
+                                    selectedElement = .choghadiya(chog)
+                                }
+                            )
+                            .padding(.horizontal)
+                        }
                         .padding(.top, 32)
                     }
 
@@ -380,11 +426,28 @@ struct HomeView: View {
                 .scaledFont(size: 16, weight: .medium)
                 .foregroundColor(vm.theme.primaryText)
 
+            // "What changed" transition pill (tap to dismiss)
+            if let changed = vm.tithiChangedMessage {
+                Text(changed)
+                    .scaledFont(size: 11, weight: .medium)
+                    .foregroundColor(vm.theme.accentColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(vm.theme.accentColor.opacity(0.10))
+                    .clipShape(Capsule())
+                    .transition(.scale.combined(with: .opacity))
+                    .onTapGesture {
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            vm.dismissTithiChange()
+                        }
+                    }
+            }
+
             if let panchang = vm.todayPanchang {
                 HStack(spacing: 4) {
                     Image(systemName: panchang.tithi.paksha == .shukla ? "moon.fill" : "moon")
                         .font(.system(size: 11))
-                        .foregroundColor(Color(hex: "B8C4D8"))
+                        .foregroundColor(vm.theme.lunarColor)
                     Text("\(panchang.lunarMonth) \u{00B7} \(panchang.tithi.paksha.rawValue) Paksha \u{00B7} \(formattedDate)")
                         .scaledFont(size: 12, weight: .regular, design: .serif)
                         .foregroundColor(vm.theme.secondaryText)
@@ -395,75 +458,6 @@ struct HomeView: View {
         .animation(.easeInOut(duration: 0.3), value: vm.dayOffset)
     }
 
-    // MARK: - Three-Fact Info Bar (Crystalline Capsules)
-
-    private func infoBar(panchang: DailyPanchang) -> some View {
-        HStack(spacing: 8) {
-            // Capsule 1: Tithi end time
-            Button {
-                selectedElement = .tithi(panchang.tithi)
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "moon.stars.fill")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "D4A040"))
-                        .symbolEffect(.pulse, options: .speed(0.3), isActive: true)
-                    Text(formatTime(panchang.tithi.endTime))
-                        .scaledFont(size: 14, weight: .medium)
-                        .foregroundColor(vm.theme.primaryText)
-                        .minimumScaleFactor(0.8)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .deviReveal(delay: 0.0, direction: .fadeUp)
-
-            // Capsule 2: Nakshatra name
-            Button {
-                selectedElement = .nakshatra(panchang.nakshatra)
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "B8C4D8"))
-                        .symbolEffect(.pulse, isActive: true)
-                    Text(panchang.nakshatra.name)
-                        .scaledFont(size: 13, weight: .medium, design: .serif)
-                        .foregroundColor(vm.theme.primaryText)
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .frame(maxWidth: .infinity)
-                .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .deviReveal(delay: 0.08, direction: .fadeUp)
-
-            // Capsule 3: Sunset/Sunrise time
-            HStack(spacing: 6) {
-                Image(systemName: vm.isDaytime ? "sunset.fill" : "sunrise.fill")
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "D4A040"))
-                Text(formatTime(vm.isDaytime ? panchang.solar.sunset : panchang.solar.sunrise))
-                    .scaledFont(size: 14, weight: .medium)
-                    .foregroundColor(vm.theme.primaryText)
-                    .minimumScaleFactor(0.8)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity)
-            .deviCard(theme: vm.theme, elevation: .flat, cornerRadius: 14)
-            .deviReveal(delay: 0.16, direction: .fadeUp)
-        }
-        .padding(.horizontal)
-    }
 
     // MARK: - Banners (grouped: festivals + fasting + eclipse)
 
@@ -518,7 +512,7 @@ struct HomeView: View {
         HStack(spacing: 8) {
             Image(systemName: "flame.fill")
                 .font(.system(size: 14))
-                .foregroundColor(Color(hex: "c54b2a"))
+                .foregroundColor(vm.theme.fastingColor)
                 .symbolEffect(.variableColor.iterative, options: .speed(0.3), isActive: true)
 
             Text("Today is \(displayName)")
@@ -533,7 +527,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(hex: "c54b2a").opacity(0.15))
+        .background(vm.theme.fastingColor.opacity(0.15))
         .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 12)
         .padding(.horizontal)
     }
@@ -556,7 +550,7 @@ struct HomeView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
-        .background(Color(hex: "d4a857").opacity(0.15))
+        .background(vm.theme.accentColor.opacity(0.15))
         .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 12)
         .padding(.horizontal)
     }
@@ -564,7 +558,7 @@ struct HomeView: View {
     private var sparklesIcon: some View {
         Image(systemName: "sparkles")
             .font(.system(size: 14))
-            .foregroundColor(Color(hex: "d4a857"))
+            .foregroundColor(vm.theme.accentColor)
             .symbolEffect(.pulse, options: .speed(0.5), isActive: true)
     }
 
@@ -608,6 +602,23 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 12) {
             OrnamentalDivider("UPCOMING", theme: vm.theme)
 
+            // Festival anticipation badge (tomorrow only)
+            if let tomorrowFest = vm.upcomingEvents.first(where: { $0.daysAway == 1 && $0.type == .festival }) {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkle")
+                        .font(.system(size: 11))
+                        .foregroundColor(vm.theme.accentColor)
+                    Text("Tomorrow: \(tomorrowFest.name)")
+                        .scaledFont(size: 13, weight: .medium)
+                        .foregroundColor(vm.theme.accentColor)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(vm.theme.accentColor.opacity(0.08))
+                .clipShape(Capsule())
+                .padding(.horizontal)
+            }
+
             if !vm.cappedUpcomingEvents.isEmpty {
                 VStack(spacing: 0) {
                     ForEach(vm.cappedUpcomingEvents) { event in
@@ -636,6 +647,18 @@ struct HomeView: View {
                     }
                     .buttonStyle(.plain)
                 }
+            } else {
+                // Empty state — no upcoming events loaded yet
+                VStack(spacing: 8) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 24))
+                        .foregroundColor(vm.theme.secondaryText.opacity(0.3))
+                    Text("Loading upcoming festivals...")
+                        .scaledFont(size: 13, weight: .regular)
+                        .foregroundColor(vm.theme.secondaryText.opacity(0.5))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
             }
         }
         .deviEntrance(delay: 0.24)
@@ -721,8 +744,8 @@ struct HomeView: View {
 
     private func eventDotColor(_ type: UpcomingEvent.EventType) -> Color {
         switch type {
-        case .fasting: return Color(hex: "c54b2a")
-        case .eclipse: return Color(hex: "7B8EC4")
+        case .fasting: return vm.theme.fastingColor
+        case .eclipse: return vm.theme.eclipseColor
         case .festival: return vm.theme.accentColor
         }
     }
@@ -759,10 +782,6 @@ struct HomeView: View {
             )
             isRenderingCard = false
         }
-    }
-
-    private func formatTime(_ date: Date) -> String {
-        deviFormatTime(date, timezoneIdentifier: vm.currentCity.timezoneIdentifier)
     }
 
     /// Always actual today — used for eclipse proximity comparison (not day-navigated)

@@ -17,6 +17,13 @@ struct ThemePalette {
     let arcStart: String
     let arcEnd: String
     let arcShadow: String
+
+    // Semantic colors — constant across themes for now (future: per-style overrides)
+    var lunarColor: String = "B8C4D8"
+    var solarGlow: String = "f0c040"
+    var fastingColor: String = "c54b2a"
+    var eclipseColor: String = "7B8EC4"
+    var deepBackground: String = "0B1026"
 }
 
 // MARK: - Palette Registry

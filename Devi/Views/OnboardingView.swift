@@ -126,13 +126,23 @@ struct OnboardingView: View {
             }
         }
         .sheet(isPresented: $showCityPicker) {
-            CityPickerView(selectedCity: vm.currentCity) { city in
+            CityPickerView(selectedCity: vm.currentCity, theme: theme) { city in
                 vm.selectCity(city)
                 showCityPicker = false
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     citySelected = true
                 }
                 triggerPreviewAnimation()
+            }
+        }
+        .alert("Location Notice", isPresented: .init(
+            get: { vm.locationError != nil },
+            set: { if !$0 { vm.locationError = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            if let error = vm.locationError {
+                Text(error)
             }
         }
     }
@@ -150,7 +160,7 @@ struct OnboardingView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Color(hex: "B8C4D8").opacity(glowPhase ? 0.25 : 0.12),
+                                    theme.lunarColor.opacity(glowPhase ? 0.25 : 0.12),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -180,7 +190,7 @@ struct OnboardingView: View {
                     .scaledFont(size: 36, weight: .regular, design: .serif)
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Color(hex: "d4a857"), Color(hex: "c49a4a")],
+                            colors: [theme.accentColor, theme.accentColor.opacity(0.85)],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
@@ -402,7 +412,7 @@ struct OnboardingView: View {
                         .fill(
                             RadialGradient(
                                 colors: [
-                                    Color(hex: "B8C4D8").opacity(glowPhase ? 0.25 : 0.12),
+                                    theme.lunarColor.opacity(glowPhase ? 0.25 : 0.12),
                                     Color.clear
                                 ],
                                 center: .center,
@@ -734,9 +744,9 @@ struct OnboardingView: View {
             width: radius * 2,
             height: radius * 2
         ))
-        context.fill(moonPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+        context.fill(moonPath, with: .color(theme.lunarColor.opacity(0.9)))
 
-        let darkColor = Color(hex: "0B1026").opacity(0.92)
+        let darkColor = theme.deepBackground.opacity(0.92)
 
         // Dark half
         var darkHalf = Path()
@@ -760,7 +770,7 @@ struct OnboardingView: View {
         let terminatorPath = Path(ellipseIn: terminatorRect)
 
         if illumination > 0.5 {
-            context.fill(terminatorPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+            context.fill(terminatorPath, with: .color(theme.lunarColor.opacity(0.9)))
         } else {
             context.fill(terminatorPath, with: .color(darkColor))
         }
@@ -875,7 +885,7 @@ struct PanchangEducationSheet: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
-                        .foregroundColor(Color(hex: "d4a857"))
+                        .foregroundColor(theme.accentColor)
                 }
             }
         }

@@ -186,7 +186,7 @@ struct VedicSkyView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color(hex: "B8C4D8").opacity(glowPhase ? 0.3 : 0.1),
+                            skyTheme.lunarColor.opacity(glowPhase ? 0.3 : 0.1),
                             Color.clear
                         ],
                         center: .center,
@@ -199,7 +199,7 @@ struct VedicSkyView: View {
             // Moon glyph
             Text("☽")
                 .font(.system(size: 48))
-                .foregroundColor(Color(hex: "B8C4D8"))
+                .foregroundColor(skyTheme.lunarColor)
         }
     }
 
@@ -327,7 +327,7 @@ struct VedicSkyView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(
-                    isCurrent ? Color(hex: "D4A040").opacity(isSelected ? 0.8 : 0.6) :
+                    isCurrent ? skyTheme.accentColor.opacity(isSelected ? 0.8 : 0.6) :
                     isSelected ? Color.white.opacity(0.5) : Color.clear,
                     lineWidth: 1
                 )
@@ -335,7 +335,7 @@ struct VedicSkyView: View {
         .background(
             RoundedRectangle(cornerRadius: 8)
                 .fill(
-                    isCurrent ? Color(hex: "D4A040").opacity(isSelected ? 0.10 : 0.06) :
+                    isCurrent ? skyTheme.accentColor.opacity(isSelected ? 0.10 : 0.06) :
                     isSelected ? Color.white.opacity(0.06) : Color.clear
                 )
         )
@@ -420,7 +420,7 @@ struct VedicSkyView: View {
         .overlay(
             RoundedRectangle(cornerRadius: 14)
                 .stroke(
-                    isMoon ? Color(hex: "D4A040").opacity(0.4) : Color.clear,
+                    isMoon ? skyTheme.accentColor.opacity(0.4) : Color.clear,
                     lineWidth: isMoon ? 1 : 0
                 )
         )
@@ -458,10 +458,10 @@ struct VedicSkyView: View {
                                 Text("Moon")
                                     .font(.system(size: 12, weight: .medium))
                             }
-                            .foregroundColor(Color(hex: "B8C4D8"))
+                            .foregroundColor(skyTheme.lunarColor)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 4)
-                            .background(Color(hex: "B8C4D8").opacity(0.15))
+                            .background(skyTheme.lunarColor.opacity(0.15))
                             .clipShape(Capsule())
                         }
                         .buttonStyle(.plain)
@@ -615,17 +615,6 @@ struct VedicSkyView: View {
     }
 
     private func planetColor(_ name: String) -> Color {
-        switch name.lowercased() {
-        case "sun", "surya":     return Color(hex: "D4A040")
-        case "moon", "chandra":  return Color(hex: "B8C4D8")
-        case "mars", "mangala":  return Color(hex: "C45050")
-        case "mercury", "budha": return Color(hex: "4AAD6E")
-        case "jupiter", "guru", "brihaspati": return Color(hex: "C9A96E")
-        case "venus", "shukra":  return Color(hex: "D47AAD")
-        case "saturn", "shani":  return Color(hex: "7B8EC4")
-        case "rahu":             return Color(hex: "5A6A8A")
-        case "ketu":             return Color(hex: "8A5A5A")
-        default:                 return Color(hex: "888888")
-        }
+        Graha.named(name)?.color ?? Color(hex: "888888")
     }
 }

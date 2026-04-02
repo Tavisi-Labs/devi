@@ -156,7 +156,7 @@ struct TithiImmersiveView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color(hex: "B8C4D8").opacity(glowPhase ? 0.3 : 0.1),
+                            theme.lunarColor.opacity(glowPhase ? 0.3 : 0.1),
                             Color.clear
                         ],
                         center: .center,
@@ -176,9 +176,9 @@ struct TithiImmersiveView: View {
                     x: center.x - radius, y: center.y - radius,
                     width: radius * 2, height: radius * 2
                 ))
-                context.fill(moonPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+                context.fill(moonPath, with: .color(theme.lunarColor.opacity(0.9)))
 
-                let darkColor = Color(hex: "0B1026").opacity(0.92)
+                let darkColor = theme.deepBackground.opacity(0.92)
                 let isWaxing = tithi.paksha == .shukla
 
                 // Dark half
@@ -202,7 +202,7 @@ struct TithiImmersiveView: View {
                 let terminatorPath = Path(ellipseIn: terminatorRect)
 
                 if illuminationFraction > 0.5 {
-                    context.fill(terminatorPath, with: .color(Color(hex: "B8C4D8").opacity(0.9)))
+                    context.fill(terminatorPath, with: .color(theme.lunarColor.opacity(0.9)))
                 } else {
                     context.fill(terminatorPath, with: .color(darkColor))
                 }
@@ -230,7 +230,7 @@ struct TithiImmersiveView: View {
                         ZStack {
                             if isCurrent {
                                 Circle()
-                                    .stroke(Color(hex: "B8C4D8").opacity(0.5), lineWidth: 1.5)
+                                    .stroke(theme.lunarColor.opacity(0.5), lineWidth: 1.5)
                                     .frame(width: 30, height: 30)
                             }
 
@@ -239,9 +239,9 @@ struct TithiImmersiveView: View {
                                 let r = min(size.width, size.height) / 2
 
                                 let disc = Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2))
-                                context.fill(disc, with: .color(Color(hex: "B8C4D8").opacity(0.85)))
+                                context.fill(disc, with: .color(theme.lunarColor.opacity(0.85)))
 
-                                let dark = Color(hex: "0B1026").opacity(0.9)
+                                let dark = theme.deepBackground.opacity(0.9)
                                 let isW = tithi.paksha == .shukla
                                 var dh = Path()
                                 if isW {
@@ -256,7 +256,7 @@ struct TithiImmersiveView: View {
                                 let tr = CGRect(x: c.x - tw / 2, y: c.y - r, width: tw, height: r * 2)
                                 let tp = Path(ellipseIn: tr)
                                 if fraction > 0.5 {
-                                    context.fill(tp, with: .color(Color(hex: "B8C4D8").opacity(0.85)))
+                                    context.fill(tp, with: .color(theme.lunarColor.opacity(0.85)))
                                 } else {
                                     context.fill(tp, with: .color(dark))
                                 }

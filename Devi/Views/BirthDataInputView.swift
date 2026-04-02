@@ -212,7 +212,7 @@ struct BirthDataInputView: View {
                 }
             }
             .sheet(isPresented: $showCityPicker) {
-                CityPickerView(selectedCity: selectedCity) { city in
+                CityPickerView(selectedCity: selectedCity, theme: theme) { city in
                     selectedCity = city
                     showCityPicker = false
                 }

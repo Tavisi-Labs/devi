@@ -12,9 +12,10 @@ struct EclipseImmersiveView: View {
     @State private var eclipseProgress: CGFloat = 0
     @State private var appeared: Bool = false
 
-    private let eclipseBlue = Color(hex: "7B8EC4")
-    private let gold = Color(hex: "D4A040")
-    private let silver = Color(hex: "B8C4D8")
+    // Semantic color aliases (from theme)
+    private var eclipseBlue: Color { theme.eclipseColor }
+    private var gold: Color { theme.solarGlow }
+    private var silver: Color { theme.lunarColor }
 
     var body: some View {
         ZStack {
@@ -193,7 +194,7 @@ struct EclipseImmersiveView: View {
 
             if isSolar {
                 // Moon is dark (silhouette) for solar eclipse
-                context.fill(Path(ellipseIn: moonRect), with: .color(Color(hex: "0B1026").opacity(0.95)))
+                context.fill(Path(ellipseIn: moonRect), with: .color(theme.deepBackground.opacity(0.95)))
             } else {
                 // Moon is silver for lunar, shadow creeps across
                 context.fill(Path(ellipseIn: moonRect), with: .color(silver.opacity(0.85)))
@@ -204,7 +205,7 @@ struct EclipseImmersiveView: View {
                     x: moonCenter.x - bodyRadius + shadowOffset, y: moonCenter.y - bodyRadius,
                     width: bodyRadius * 2, height: bodyRadius * 2
                 )
-                context.fill(Path(ellipseIn: shadowRect), with: .color(Color(hex: "0B1026").opacity(0.8)))
+                context.fill(Path(ellipseIn: shadowRect), with: .color(theme.deepBackground.opacity(0.8)))
             }
         }
         .frame(height: 180)

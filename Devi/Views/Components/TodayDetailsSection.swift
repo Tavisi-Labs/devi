@@ -184,13 +184,13 @@ struct TodayDetailsSection: View {
 
     private func varaIcon(for weekday: String) -> (icon: String, color: Color) {
         switch weekday {
-        case "Sunday":    return ("sun.max.fill", Color(hex: "D4A040"))
-        case "Monday":    return ("moon.fill", Color(hex: "B8C4D8"))
-        case "Tuesday":   return ("flame.fill", Color(hex: "C45050"))
-        case "Wednesday": return ("leaf.fill", Color(hex: "4AAD6E"))
-        case "Thursday":  return ("crown.fill", Color(hex: "C9A96E"))
-        case "Friday":    return ("heart.fill", Color(hex: "D47AAD"))
-        case "Saturday":  return ("circle.hexagonpath.fill", Color(hex: "7B8EC4"))
+        case "Sunday":    return ("sun.max.fill", Graha.sun.color)
+        case "Monday":    return ("moon.fill", Graha.moon.color)
+        case "Tuesday":   return ("flame.fill", Graha.mars.color)
+        case "Wednesday": return ("leaf.fill", Graha.mercury.color)
+        case "Thursday":  return ("crown.fill", Graha.jupiter.color)
+        case "Friday":    return ("heart.fill", Graha.venus.color)
+        case "Saturday":  return ("circle.hexagonpath.fill", Graha.saturn.color)
         default:          return ("circle.fill", Color(hex: "888888"))
         }
     }
@@ -212,13 +212,13 @@ struct TodayDetailsSection: View {
 
     private func varaAccentColor(for weekday: String) -> Color {
         switch weekday {
-        case "Sunday":    return Color(hex: "D4A040")
-        case "Monday":    return Color(hex: "B8C4D8")
-        case "Tuesday":   return Color(hex: "C45050")
-        case "Wednesday": return Color(hex: "4AAD6E")
-        case "Thursday":  return Color(hex: "C9A96E")
-        case "Friday":    return Color(hex: "D47AAD")
-        case "Saturday":  return Color(hex: "7B8EC4")
+        case "Sunday":    return Graha.sun.color
+        case "Monday":    return Graha.moon.color
+        case "Tuesday":   return Graha.mars.color
+        case "Wednesday": return Graha.mercury.color
+        case "Thursday":  return Graha.jupiter.color
+        case "Friday":    return Graha.venus.color
+        case "Saturday":  return Graha.saturn.color
         default:          return Color(hex: "888888")
         }
     }

@@ -2,7 +2,7 @@
 // Tests for PanchangCalculator: tithiIndex, nakshatraIndex, yogaIndex, karanaIndex,
 // karanaName, computeLunarMonth, computeTimeWindows.
 
-import XCTest
+import XCTest   
 @testable import Devi
 
 final class PanchangCalculatorTests: XCTestCase {
