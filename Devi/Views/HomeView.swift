@@ -333,7 +333,7 @@ struct HomeView: View {
 
                     // Image share button
                     if let cardImage = shareCardImage {
-                        ShareLink(item: cardImage, preview: SharePreview("Devi Daily Panchang")) {
+                        ShareLink(item: cardImage, preview: SharePreview("Devi — Vedic Companion")) {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 14, weight: .regular))
                                 .foregroundColor(vm.theme.secondaryText)

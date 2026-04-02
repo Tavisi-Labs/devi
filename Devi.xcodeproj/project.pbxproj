@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -84,7 +84,7 @@
 /* Begin PBXFileReference section */
 		033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GrahaImmersiveView.swift; sourceTree = "<group>"; };
 		09CCD6EC44FF0C844D532EE4 /* DailyHoroscope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHoroscope.swift; sourceTree = "<group>"; };
-		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		0E7D840F7AE864A89B21805B /* BirthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthChart.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
@@ -122,7 +122,7 @@
 		AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangIntegrationTests.swift; sourceTree = "<group>"; };
 		ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CelestialHeroView.swift; sourceTree = "<group>"; };
 		B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculatorTests.swift; sourceTree = "<group>"; };
-		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5F37171BB5BCFC490113269 /* Devi.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Devi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoghadiyaCard.swift; sourceTree = "<group>"; };
 		BA76E848BCC85F71C8F2F932 /* NavratriImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriImmersiveView.swift; sourceTree = "<group>"; };
 		C450B088E4224ABD6C00279A /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
@@ -140,7 +140,7 @@
 		E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
 		EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraImmersiveView.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculator.swift; sourceTree = "<group>"; };
 		F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeContentLibrary.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -340,7 +340,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2640;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					62CF76CE48BD90253DCD44E0 = {
 						DevelopmentTeam = KTK5RL3ZR3;
@@ -362,6 +362,7 @@
 				F59F77AF57F6B6A678C1D1E9 /* XCRemoteSwiftPackageReference "Solar" */,
 				E9F2E605191273FE3F9F2C9B /* XCRemoteSwiftPackageReference "SwissEphemeris" */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -503,7 +504,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -524,7 +524,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = minimal;
@@ -658,7 +657,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -672,7 +670,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = minimal;

@@ -63,7 +63,7 @@ struct WhatsNewSheet: View {
                             featureRow(
                                 icon: "calendar.badge.plus",
                                 title: "Festival Calendar",
-                                description: "Major Hindu festivals, regional celebrations, fasting days, and monthly observances for 60 days ahead."
+                                description: "Major Vedic festivals, regional celebrations, fasting days, and monthly observances for 60 days ahead."
                             )
                             featureRow(
                                 icon: "gyroscope",

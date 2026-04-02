@@ -84,8 +84,8 @@ struct SplashView: View {
                     .scaleEffect(showTitle ? 1.0 : 0.8)
                     .opacity(showTitle ? 1 : 0)
 
-                // "Hindu Panchang" subtitle
-                Text("HINDU PANCHANG")
+                // "Vedic Companion" subtitle
+                Text("VEDIC COMPANION")
                     .font(.system(size: 14, weight: .medium))
                     .tracking(2.0)
                     .foregroundColor(.white.opacity(0.5))
@@ -132,7 +132,7 @@ struct SplashView: View {
                 }
             }
 
-            // T=250ms: "Hindu Panchang" fades in
+            // T=250ms: "Vedic Companion" fades in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 withAnimation(.easeOut(duration: 0.4)) {
                     showSubtitle = true

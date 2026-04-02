@@ -58,9 +58,16 @@ struct BirthDataInputView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 20) {
 
+                    // MARK: — Intro guidance
+                    Text("Three quick steps for your personalized daily reading.")
+                        .deviLabel(.detail, theme: theme)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .padding(.bottom, 4)
+
                     // MARK: Section 1 — Date of Birth
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("DATE OF BIRTH")
+                        Text("STEP 1 · DATE OF BIRTH")
                             .deviLabel(.section, theme: theme)
 
                         DatePicker(
@@ -75,9 +82,20 @@ struct BirthDataInputView: View {
                     .padding(16)
                     .deviCard(theme: theme, elevation: .raised)
 
+                    // MARK: — Scroll nudge
+                    HStack(spacing: 4) {
+                        Text("Scroll down for steps 2 & 3")
+                            .scaledFont(size: 11, weight: .medium)
+                            .foregroundColor(theme.secondaryText.opacity(0.5))
+                        Image(systemName: "arrow.down")
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundColor(theme.secondaryText.opacity(0.5))
+                    }
+                    .deviEntrance(delay: 0.6)
+
                     // MARK: Section 2 — Birth Time
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("BIRTH TIME")
+                        Text("STEP 2 · BIRTH TIME (OPTIONAL)")
                             .deviLabel(.section, theme: theme)
 
                         Toggle(isOn: $birthTimeKnown) {
@@ -109,7 +127,7 @@ struct BirthDataInputView: View {
 
                     // MARK: Section 3 — Birth Place
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("BIRTH PLACE")
+                        Text("STEP 3 · BIRTH PLACE")
                             .deviLabel(.section, theme: theme)
 
                         Button {
@@ -173,7 +191,7 @@ struct BirthDataInputView: View {
                     Button {
                         saveBirthData()
                     } label: {
-                        Text(existingData != nil ? "Update Birth Details" : "Save Birth Details")
+                        Text(existingData != nil ? "Update My Reading" : "Start My Reading")
                     }
                     .deviButton(.primary)
                     .padding(.horizontal, 16)

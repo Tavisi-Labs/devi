@@ -1,10 +1,10 @@
 # Devi
 
-A Hindu Panchang app for iOS. No ads, no subscriptions, no clutter — just accurate Vedic calendar information, beautifully presented.
+A Vedic companion app for iOS. No ads, no subscriptions, no clutter — just accurate Vedic calendar information, beautifully presented.
 
 ## What It Does
 
-Devi gives you the full Hindu panchang for today, calculated for your city using the Swiss Ephemeris with Lahiri ayanamsa. Open the app and you immediately see:
+Devi gives you the full Vedic panchang for today, calculated for your city using the Swiss Ephemeris with Lahiri ayanamsa. Open the app and you immediately see:
 
 - **Tithi & Nakshatra** — today's lunar day and star, with tap-through details on ruling deities, significance, and auspicious activities
 - **Sun Arc** — a live visual tracker showing sun position, countdown to sunrise/sunset, and current time

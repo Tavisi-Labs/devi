@@ -12,7 +12,7 @@ enum ShareTextBuilder {
     static func dailySummary(panchang: DailyPanchang, city: UserCity, navratriDay: NavratriDay?) -> String {
         var lines: [String] = []
 
-        lines.append("Devi — Daily Panchang")
+        lines.append("Devi — Vedic Companion")
         lines.append("\(formattedDate(from: panchang.dateString, timezoneIdentifier: city.timezoneIdentifier)) · \(city.name)")
         lines.append("")
 
