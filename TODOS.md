@@ -49,6 +49,48 @@
   **Priority:** P4
   `min(Int(lon / (360.0 / 27.0)), 26)` appears in 3 places: `VedicSkyView.moonNakshatraIndex`, `VedicSkyView.grahaCard`, `PanchangDetailSheet` graha detail. Extracted to `GrahaSnapshot.nakshatraIndex(forLongitude:)` in PanchangData.swift.
 
+## Accessibility (from Design Review 2026-04-02)
+
+- [ ] **VoiceOver: Canvas moon phase accessibility label**
+  **Priority:** P2
+  `CelestialHeroView.moonPhaseCanvas()` and `OnboardingView.drawMoon()` render Canvas elements invisible to VoiceOver. Add `.accessibilityLabel("Shukla Panchami, 33% illuminated")` with dynamic tithi/paksha values.
+  Files: `Devi/Views/Components/CelestialHeroView.swift`, `Devi/Views/OnboardingView.swift`
+
+- [ ] **VoiceOver: Sun arc drag accessibility equivalent**
+  **Priority:** P2
+  `DragGesture` on the arc has no VoiceOver alternative. Add `.accessibilityAdjustableAction` with increment/decrement that scrubs ±30 min.
+  File: `Devi/Views/Components/CelestialHeroView.swift`
+
+- [ ] **VoiceOver: Day navigation accessibility equivalent**
+  **Priority:** P2
+  `dayNavigationGesture` (DragGesture on header) has no VoiceOver alternative. Add accessible "Previous Day" / "Next Day" actions.
+  File: `Devi/Views/HomeView.swift`
+
+- [ ] **VoiceOver: Add .accessibilityLabel to all interactive elements**
+  **Priority:** P2
+  Info bar capsules, Right Now rows, upcoming event rows, festival/fasting banners, and MantraCard lack semantic labels. VoiceOver reads "Button" without context.
+  Files: `HomeView.swift`, `RightNowCard.swift`, `MantraCard.swift`, `CelestialHeroView.swift`
+
+- [ ] **Reduce Motion: Check isReduceMotionEnabled for animations**
+  **Priority:** P2
+  `.breathing()` modifier, PhaseAnimator sun dot, `.symbolEffect(.pulse)` calls do NOT check `UIAccessibility.isReduceMotionEnabled`. iOS does not automatically suppress these for Reduce Motion users.
+  Files: `Theme.swift` (BreathingModifier), `CelestialHeroView.swift` (SunDot), `HomeView.swift`, `RightNowCard.swift`
+
+- [ ] **Color contrast audit for light mode**
+  **Priority:** P3
+  Secondary text at 55-60% opacity (`secondaryTextOpacity: 0.55`) on cream backgrounds may fail WCAG AA (4.5:1). Verify contrast ratios for all 5 light-mode palettes.
+  File: `Devi/Utils/ThemePalettes.swift`
+
+- [ ] **iPad layout consideration**
+  **Priority:** P3
+  HomeView renders as a narrow column on iPad with gradient filling the rest. No split view, sidebar, or multi-column layout. Consider `NavigationSplitView` for iPad.
+  File: `Devi/Views/HomeView.swift`
+
+- [ ] **Dynamic Type integration**
+  **Priority:** P3
+  Custom `DeviFontScale` system does not respect iOS Dynamic Type (`@ScaledMetric`). Users who set Accessibility Sizes in iOS Settings get no scaling from the system.
+  File: `Devi/Utils/Theme.swift`
+
 ## App Store Submission
 
 - [ ] **Capture App Store screenshots (including VedicSkyView hero shot)**

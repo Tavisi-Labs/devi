@@ -197,28 +197,13 @@ struct OnboardingView: View {
                     .offset(y: welcomeAppeared ? 0 : 12)
                     .animation(.easeOut(duration: 0.5).delay(0.4), value: welcomeAppeared)
 
-                // Feature pillars
-                VStack(spacing: 14) {
-                    featurePillar(
-                        icon: "moon.circle",
-                        title: "Tithi & Nakshatra",
-                        subtitle: "Know the moon's journey",
-                        delay: 0.55
-                    )
-                    featurePillar(
-                        icon: "sun.max",
-                        title: "Sacred Time Windows",
-                        subtitle: "Catch auspicious moments",
-                        delay: 0.65
-                    )
-                    featurePillar(
-                        icon: "sparkle",
-                        title: "Festivals & Reminders",
-                        subtitle: "Never miss a celebration",
-                        delay: 0.75
-                    )
+                // Verse — poetic, not a feature list
+                VStack(spacing: 16) {
+                    verseLine("Know the moon's phase", delay: 0.55)
+                    verseLine("Observe sacred hours", delay: 0.65)
+                    verseLine("Celebrate each festival", delay: 0.75)
                 }
-                .padding(.horizontal, 32)
+                .padding(.horizontal, 40)
             }
 
             Spacer()
@@ -664,29 +649,13 @@ struct OnboardingView: View {
 
     // MARK: - Subviews
 
-    private func featurePillar(icon: String, title: String, subtitle: String, delay: Double) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(theme.accentColor)
-                .frame(width: 28)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .scaledFont(size: 14, weight: .medium)
-                    .foregroundColor(theme.primaryText)
-
-                Text(subtitle)
-                    .scaledFont(size: 12, weight: .regular)
-                    .foregroundColor(theme.secondaryText)
-            }
-
-            Spacer()
-        }
-        .padding(.vertical, 6)
-        .opacity(welcomeAppeared ? 1 : 0)
-        .offset(y: welcomeAppeared ? 0 : 12)
-        .animation(.easeOut(duration: 0.5).delay(delay), value: welcomeAppeared)
+    private func verseLine(_ text: String, delay: Double) -> some View {
+        Text(text)
+            .scaledFont(size: 17, weight: .regular, design: .serif)
+            .foregroundColor(theme.secondaryText)
+            .opacity(welcomeAppeared ? 1 : 0)
+            .offset(y: welcomeAppeared ? 0 : 10)
+            .animation(.easeOut(duration: 0.6).delay(delay), value: welcomeAppeared)
     }
 
     private func presetCard(_ preset: NotificationPreset, delay: Double) -> some View {
