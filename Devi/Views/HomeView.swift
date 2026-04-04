@@ -7,12 +7,13 @@ import StoreKit
 struct HomeView: View {
     @ObservedObject var vm: PanchangViewModel
     @Environment(\.requestReview) private var requestReview
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showSettings = false
     @State private var selectedElement: PanchangElement?
     @State private var shareCardImage: ShareableCardImage?
     @State private var isRenderingCard = false
     @State private var showAllUpcoming = false
-    @State private var showMeditationMode = false
     @State private var settingsRotation = false
     @State private var dayNavDragOffset: CGFloat = 0
     @State private var cardTapCount: Int = 0
@@ -23,6 +24,14 @@ struct HomeView: View {
     @State private var showWhySheet = false
     @State private var showBirthDataInput = false
 
+    private var homeRitualMotionGate: RitualMotionGate {
+        RitualMotionGate.resolve(
+            scenePhase: scenePhase,
+            reduceMotion: reduceMotion,
+            isVisible: immersiveElement == nil
+        )
+    }
+
     var body: some View {
         ZStack {
             // Full-screen adaptive gradient + star field background
@@ -30,7 +39,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 8), value: vm.timePeriod)
 
-            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod, isPaused: immersiveElement != nil || showMeditationMode)
+            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod, isPaused: immersiveElement != nil)
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 5), value: vm.timePeriod)
 
@@ -328,15 +337,13 @@ struct HomeView: View {
         // Meditation mode
         .fullScreenCover(item: $immersiveElement) { element in
             ImmersiveDetailRouter(
+                vm: vm,
                 element: element,
                 theme: vm.theme,
                 timezoneIdentifier: vm.currentCity.timezoneIdentifier,
                 cityName: vm.currentCity.name,
                 panchangContext: vm.todayPanchang
             )
-        }
-        .fullScreenCover(isPresented: $showMeditationMode) {
-            AmbientMeditationView(vm: vm)
         }
         .sheet(isPresented: $showWhySheet) {
             if let context = vm.dailyHoroscope?.transitContext {
@@ -568,15 +575,15 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             OrnamentalDivider("TODAY", theme: vm.theme)
 
-            // Mantra card (long-press → meditation mode)
-            if let mantra = PanchangDescriptions.dailyMantra(
-                for: Calendar.current.component(.weekday, from: Date())
-            ) {
-                MantraCard(mantra: mantra, theme: vm.theme) {
+            // Living mandala teaser
+            if vm.isViewingToday, let mantra = vm.currentRitualMantra {
+                MantraCard(
+                    mantra: mantra,
+                    snapshot: vm.ritualSnapshot,
+                    theme: vm.theme,
+                    motionGate: homeRitualMotionGate
+                ) {
                     selectedElement = .mantra(mantra)
-                }
-                .onLongPressGesture(minimumDuration: 1) {
-                    showMeditationMode = true
                 }
                 .padding(.horizontal)
             }

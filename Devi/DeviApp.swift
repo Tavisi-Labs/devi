@@ -10,6 +10,8 @@ struct DeviApp: App {
     @State private var splashFinished = false
 
     init() {
+        configureUITestState()
+
         // Initialize Swiss Ephemeris singleton — sets Lahiri ayanamsa and ephemeris path.
         // Must happen before any panchang computation. The singleton is lazy, so
         // accessing .shared triggers init() which calls swe_set_sid_mode().
@@ -53,5 +55,26 @@ struct DeviApp: App {
                 }
             }
         }
+    }
+
+    private func configureUITestState() {
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        let defaults = UserDefaults.standard
+
+        if arguments.contains("UITests.SkipOnboarding") {
+            defaults.set(true, forKey: "hasCompletedOnboarding")
+            let city = UserCity.popularCities[0]
+            defaults.set(city.name, forKey: "city.name")
+            defaults.set(city.country, forKey: "city.country")
+            defaults.set(city.latitude, forKey: "city.latitude")
+            defaults.set(city.longitude, forKey: "city.longitude")
+            defaults.set(city.timezoneIdentifier, forKey: "city.timezoneIdentifier")
+        }
+
+        if arguments.contains("UITests.ResetRitualState") {
+            defaults.removeObject(forKey: "mantraRitual.state")
+        }
+        #endif
     }
 }

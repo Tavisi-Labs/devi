@@ -55,6 +55,10 @@ final class NotificationService: Sendable {
 
     /// All the data needed to compute the next 7 days of notifications.
     struct ScheduleInput {
+        struct RitualReminder: Sendable {
+            let tone: MantraRitualReminderTone
+        }
+
         let days: [DailyPanchang]
         let navratriDays: [String: NavratriDay]   // dateString → NavratriDay
         let eclipses: [EclipseEvent]
@@ -71,6 +75,7 @@ final class NotificationService: Sendable {
         let minutesBefore: Int
         let horoscope: Bool
         let horoscopeThemes: [String: String]  // dateString → theme statement
+        let ritualReminders: [String: RitualReminder]  // dateString → reminder tone
     }
 
     // MARK: - Scheduling
@@ -161,6 +166,17 @@ final class NotificationService: Sendable {
                         fire
                     ))
                 }
+            }
+
+            // -- Ritual reminder (gentle morning invitation) --
+            if let reminder = input.ritualReminders[dateStr],
+               let fire = Self.ritualReminderFireDate(for: day, timezone: tz),
+               fire > now {
+                pending.append((
+                    "devi.ritual.\(dateStr)",
+                    Self.ritualReminderContent(reminder: reminder),
+                    fire
+                ))
             }
         }
 
@@ -314,6 +330,26 @@ final class NotificationService: Sendable {
         return content
     }
 
+    private static func ritualReminderContent(reminder: ScheduleInput.RitualReminder) -> UNMutableNotificationContent {
+        let content = UNMutableNotificationContent()
+
+        switch reminder.tone {
+        case .open:
+            content.title = "Your mandala is waiting"
+            content.body = "A new segment can bloom today."
+        case .waiting:
+            content.title = "Keep the morning practice alive"
+            content.body = "Your mandala is waiting for today's chant."
+        case .beginAgain:
+            content.title = "Begin again when you're ready"
+            content.body = "A new mandala can bloom today."
+        }
+
+        content.sound = .default
+        content.categoryIdentifier = dailySummaryCategory
+        return content
+    }
+
     private static func eclipseAdvanceContent(eclipse: EclipseEvent, daysAway: Int) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         let timeLabel: String
@@ -367,5 +403,12 @@ final class NotificationService: Sendable {
         formatter.timeZone = timezone
         guard let date = formatter.date(from: dateString) else { return nil }
         return calendar.date(bySettingHour: hour, minute: minute, second: 0, of: date)
+    }
+
+    private static func ritualReminderFireDate(for day: DailyPanchang, timezone: TimeZone) -> Date? {
+        guard let morningAnchor = dateFromString(day.dateString, hour: 8, minute: 30, timezone: timezone) else {
+            return day.solar.sunrise.addingTimeInterval(45 * 60)
+        }
+        return max(morningAnchor, day.solar.sunrise.addingTimeInterval(45 * 60))
     }
 }

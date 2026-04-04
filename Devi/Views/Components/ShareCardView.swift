@@ -204,11 +204,9 @@ struct ShareCardView: View {
     }
 
     private var dayMantra: DailyMantra? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(identifier: city.timezoneIdentifier) ?? .current
-        guard let date = formatter.date(from: panchang.dateString) else { return nil }
-        let weekday = Calendar.current.component(.weekday, from: date)
-        return PanchangDescriptions.dailyMantra(for: weekday)
+        PanchangViewModel.ritualMantra(
+            for: panchang,
+            timezoneIdentifier: city.timezoneIdentifier
+        )
     }
 }

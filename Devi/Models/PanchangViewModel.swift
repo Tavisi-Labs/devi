@@ -38,6 +38,7 @@ class PanchangViewModel: ObservableObject {
     }
     @Published var samvathsaraName: String = ""
     @Published var todayFestivals: [String] = []
+    @Published private(set) var mantraRitualState: MantraRitualState = .empty
 
     // MARK: - Horoscope
     @Published var dailyHoroscope: DailyHoroscope?
@@ -135,6 +136,7 @@ class PanchangViewModel: ObservableObject {
     private var panchangCache: [String: DailyPanchang] = [:]  // city+date → panchang
     private var horoscopeCache: [String: DailyHoroscope] = [:]  // date-rashi → horoscope
     private var lastCacheCity: String = ""
+    private let ritualStateKey = "mantraRitual.state"
 
     // MARK: - Computed
 
@@ -156,6 +158,18 @@ class PanchangViewModel: ObservableObject {
 
     var isNavratriActive: Bool {
         currentNavratriDay != nil
+    }
+
+    var currentRitualDay: String {
+        Self.ritualDayString(for: Date(), timezoneIdentifier: currentCity.timezoneIdentifier)
+    }
+
+    var currentRitualMantra: DailyMantra? {
+        Self.ritualMantra(for: Date(), timezoneIdentifier: currentCity.timezoneIdentifier)
+    }
+
+    var ritualSnapshot: MantraRitualSnapshot {
+        MantraRitualPolicy.snapshot(state: mantraRitualState, currentDay: currentRitualDay)
     }
 
     // MARK: - Right Now Items (aggregates active hora + choghadiya + time windows)
@@ -263,6 +277,32 @@ class PanchangViewModel: ObservableObject {
         return grouped
     }
 
+    // MARK: - Ritual Day Helpers
+
+    static func ritualCalendar(timezoneIdentifier: String) -> Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: timezoneIdentifier) ?? .current
+        return calendar
+    }
+
+    static func ritualDayString(for date: Date, timezoneIdentifier: String) -> String {
+        let calendar = ritualCalendar(timezoneIdentifier: timezoneIdentifier)
+        let components = calendar.dateComponents([.year, .month, .day], from: date)
+        let year = components.year ?? 0
+        let month = components.month ?? 1
+        let day = components.day ?? 1
+        return String(format: "%04d-%02d-%02d", year, month, day)
+    }
+
+    static func ritualMantra(for date: Date, timezoneIdentifier: String) -> DailyMantra? {
+        let weekday = ritualCalendar(timezoneIdentifier: timezoneIdentifier).component(.weekday, from: date)
+        return PanchangDescriptions.dailyMantra(for: weekday)
+    }
+
+    static func ritualMantra(for panchang: DailyPanchang, timezoneIdentifier: String) -> DailyMantra? {
+        ritualMantra(for: panchang.solar.sunrise, timezoneIdentifier: timezoneIdentifier)
+    }
+
     // MARK: - Color Helpers (for RightNowItems)
 
     private func horaColor(_ planetName: String) -> Color {
@@ -319,6 +359,8 @@ class PanchangViewModel: ObservableObject {
            let mode = DeviAppearanceMode(rawValue: appearStr) {
             appearanceMode = mode
         }
+
+        loadMantraRitualState()
 
         // Load persisted horoscope notification preference
         if ud.object(forKey: "notif.horoscope") != nil { notifHoroscope = ud.bool(forKey: "notif.horoscope") }
@@ -522,6 +564,58 @@ class PanchangViewModel: ObservableObject {
         if let panchang = todayPanchang {
             fetchCosmicSignature(panchang: panchang)
         }
+    }
+
+    private func loadMantraRitualState() {
+        guard let data = UserDefaults.standard.data(forKey: ritualStateKey) else {
+            mantraRitualState = .empty
+            return
+        }
+
+        do {
+            mantraRitualState = try JSONDecoder().decode(MantraRitualState.self, from: data)
+        } catch {
+            mantraRitualState = .empty
+            UserDefaults.standard.removeObject(forKey: ritualStateKey)
+        }
+    }
+
+    private func persistMantraRitualState() {
+        do {
+            let data = try JSONEncoder().encode(mantraRitualState)
+            UserDefaults.standard.set(data, forKey: ritualStateKey)
+        } catch {
+            UserDefaults.standard.removeObject(forKey: ritualStateKey)
+        }
+    }
+
+    func ritualSnapshot(for date: Date) -> MantraRitualSnapshot {
+        let day = Self.ritualDayString(for: date, timezoneIdentifier: currentCity.timezoneIdentifier)
+        return MantraRitualPolicy.snapshot(state: mantraRitualState, currentDay: day)
+    }
+
+    @discardableResult
+    func completeTodayRitual() -> MantraRitualCompletionResult {
+        let result = MantraRitualPolicy.complete(
+            state: mantraRitualState,
+            on: currentRitualDay,
+            completedAt: Date()
+        )
+
+        guard result.completedNewDay else { return result }
+
+        mantraRitualState = result.state
+        persistMantraRitualState()
+        scheduleNotificationReschedule()
+        return result
+    }
+
+    func markRitualMilestoneSeen(_ milestone: MantraRitualMilestone) {
+        mantraRitualState = MantraRitualPolicy.markMilestoneSeen(
+            state: mantraRitualState,
+            milestone: milestone
+        )
+        persistMantraRitualState()
     }
 
     private func fetchCosmicSignature(panchang: DailyPanchang, forceRefresh: Bool = false) {
@@ -941,6 +1035,12 @@ class PanchangViewModel: ObservableObject {
             }
         }
 
+        var ritualReminders: [String: NotificationService.ScheduleInput.RitualReminder] = [:]
+        for day in days {
+            guard let tone = ritualSnapshot(for: day.solar.sunrise).reminderTone else { continue }
+            ritualReminders[day.dateString] = NotificationService.ScheduleInput.RitualReminder(tone: tone)
+        }
+
         let input = NotificationService.ScheduleInput(
             days: days,
             navratriDays: navratriDays,
@@ -956,7 +1056,8 @@ class PanchangViewModel: ObservableObject {
             eclipse: notifEclipseAlert,
             minutesBefore: notifMinutesBefore,
             horoscope: notifHoroscope && natalChart != nil,
-            horoscopeThemes: horoscopeThemes
+            horoscopeThemes: horoscopeThemes,
+            ritualReminders: ritualReminders
         )
 
         await notificationService.reschedule(input)

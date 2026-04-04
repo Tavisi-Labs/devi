@@ -16,6 +16,7 @@
 		1328185EC8FD8AC59073DB65 /* GrahaImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033869502105F00F9E8AD897 /* GrahaImmersiveView.swift */; };
 		1A6F1196F35937BD46F24956 /* NakshatraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDD40FACCCF7C25BDCE9C32 /* NakshatraImmersiveView.swift */; };
 		1AC16C7E8847CB31A16E24A3 /* HoraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3628C62ABE084D82A65819 /* HoraCard.swift */; };
+		31F667B523D8DA5A629D6AC9 /* LivingMandalaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A4B24F6B8DF656A37167ED /* LivingMandalaView.swift */; };
 		36D7022F3BA3131431CD28EF /* PanchangData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53B0314E4356EEF4A77BBA /* PanchangData.swift */; };
 		3860A0C5E7E8EBDDE33BE0A0 /* BirthDataInputView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */; };
 		3A67F38F63892ACD824B97F5 /* HoraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */; };
@@ -32,10 +33,13 @@
 		564484D212F09B3E5AC53B18 /* PanchangDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */; };
 		56B0C67F081E750289818964 /* ChoghadiyaCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F55DE47D220CB33FB2A79C /* ChoghadiyaCard.swift */; };
 		5EB599C9AC45D7298D64A3E3 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C450B088E4224ABD6C00279A /* SplashView.swift */; };
+		61629C79293C5B181B706DBC /* MantraRitualView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C20C61B6EEF9EDEBD30BBAF /* MantraRitualView.swift */; };
 		624E5AF00F42EDA4A17ECE19 /* HoroscopeEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */; };
 		6417150C3CC2E6CF46A87DF7 /* DailyHoroscopeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */; };
 		708E7940DAE93761EEE03CB1 /* NavratriImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA76E848BCC85F71C8F2F932 /* NavratriImmersiveView.swift */; };
+		70C40DCF0FA0E20F35E858FB /* RitualMotionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3CF612C734C87408187F38 /* RitualMotionGate.swift */; };
 		71D519F2868C2EE0819D0FE4 /* CosmicSignatureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */; };
+		74F59ED4639AC905BFC18998 /* LivingMandalaFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102F1EE678200B59D8C321CF /* LivingMandalaFlowUITests.swift */; };
 		791512C664A793D2A7BC135F /* ImmersiveDetailRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */; };
 		7B0E9795A87EF475225A63D0 /* BirthChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D840F7AE864A89B21805B /* BirthChart.swift */; };
 		7B6A8BF3CFA9E14750B5DB44 /* FestivalEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */; };
@@ -52,6 +56,8 @@
 		A20E1A93693D62D9AF07E596 /* CelestialHeroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACAB8461D43AB162015FE466 /* CelestialHeroView.swift */; };
 		A3EE7BD1825D0870F742AFDA /* SwissEphemeris in Frameworks */ = {isa = PBXBuildFile; productRef = DC9406F18B90AF0917117B76 /* SwissEphemeris */; };
 		AA4D0C1B39373B58E3EFECA2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2ED73DBA852A3A4BC9C00E5E /* Theme.swift */; };
+		B07211B7DD0C7E4208542FC7 /* MantraRitualStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67BDA0FAAD80FC098970ED19 /* MantraRitualStateTests.swift */; };
+		B2590C6ED2CF051B9EDD9128 /* RitualShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81974180778ED08EBDF7FC0F /* RitualShareCardView.swift */; };
 		B2970D3963ED8B84FDA27A19 /* DeviApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B8C38CD9EF16A21F9BB145F /* DeviApp.swift */; };
 		B78F3AB26D72C5A1F22739BD /* VedicSkyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28501AFF246A728A4B21023D /* VedicSkyView.swift */; };
 		B982EA76D203C242C49853BC /* MantraCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = D81FA1582C6CC8D435E75D30 /* MantraCard.swift */; };
@@ -65,7 +71,9 @@
 		D562F95BC00B2CF62F1AA3D1 /* CitySearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8671B2E2810F5DB127BCD949 /* CitySearchService.swift */; };
 		D676D0BFEE9487FA96C77D34 /* ShareCardRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652253D394F54C12ED04608E /* ShareCardRenderer.swift */; };
 		D694479C65408F156F68ED12 /* OrnamentalDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */; };
+		D745EDF5932863F46ABB5201 /* PanchangRitualViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BA6A319A6F8B14F0C9075A /* PanchangRitualViewModelTests.swift */; };
 		E215CE28308DE6ED3D867351 /* UpcomingEventsSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C4E430092A2D5C0DA704CB /* UpcomingEventsSheet.swift */; };
+		E4F8886C56598F9B84413325 /* MantraRitualState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9A21652F47D818692414FED /* MantraRitualState.swift */; };
 		E574296E06EE9C16B5996C00 /* ShareCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */; };
 		E64B749D9006963AA44B0B38 /* MantraImmersiveView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */; };
 		F1C112891FF7594EBF4F781B /* FestivalEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C48727AA41391F93867A785C /* FestivalEngine.swift */; };
@@ -75,6 +83,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		09D880B117CD98E22BB1D6D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FB09475CAD690A281AA404CC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 62CF76CE48BD90253DCD44E0;
+			remoteInfo = Devi;
+		};
 		E89FBE02644D777C27239152 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = FB09475CAD690A281AA404CC /* Project object */;
@@ -90,11 +105,13 @@
 		0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0A2CCFB51601FBCF86B313 /* OrnamentalDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrnamentalDivider.swift; sourceTree = "<group>"; };
 		0E7D840F7AE864A89B21805B /* BirthChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthChart.swift; sourceTree = "<group>"; };
+		102F1EE678200B59D8C321CF /* LivingMandalaFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivingMandalaFlowUITests.swift; sourceTree = "<group>"; };
 		13E2CCC23013BC63EFAECA6C /* EclipseImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EclipseImmersiveView.swift; sourceTree = "<group>"; };
 		1E7E356D4E4BDC02BFBCB1FB /* WhatsNewSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewSheet.swift; sourceTree = "<group>"; };
 		28501AFF246A728A4B21023D /* VedicSkyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyView.swift; sourceTree = "<group>"; };
 		2AA5417195DA25327519394C /* AmbientMeditationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientMeditationView.swift; sourceTree = "<group>"; };
 		2B3628C62ABE084D82A65819 /* HoraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoraCard.swift; sourceTree = "<group>"; };
+		2E3CF612C734C87408187F38 /* RitualMotionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualMotionGate.swift; sourceTree = "<group>"; };
 		2ED73DBA852A3A4BC9C00E5E /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		35629CE298DF0383287A6AFB /* CosmicSignatureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureService.swift; sourceTree = "<group>"; };
 		35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeWhySheet.swift; sourceTree = "<group>"; };
@@ -105,21 +122,25 @@
 		443E05B8B65D4E3900BC0BDE /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		463C6BC7EA5612F2261721C5 /* VedicCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculatorTests.swift; sourceTree = "<group>"; };
 		4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangCalculator.swift; sourceTree = "<group>"; };
+		548F791E3F939DF2F4500A73 /* DeviUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DeviUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImmersiveDetailRouter.swift; sourceTree = "<group>"; };
 		56C2BFC5808A41D6DF080131 /* CosmicSignatureCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CosmicSignatureCard.swift; sourceTree = "<group>"; };
 		5BFFEFAC4ECFCFF619FFCF22 /* DailyHoroscopeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyHoroscopeCard.swift; sourceTree = "<group>"; };
+		5C20C61B6EEF9EDEBD30BBAF /* MantraRitualView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraRitualView.swift; sourceTree = "<group>"; };
 		5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoroscopeEngine.swift; sourceTree = "<group>"; };
 		5F7892AF693605110687FAE6 /* TimeWindowsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeWindowsCard.swift; sourceTree = "<group>"; };
 		61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavratriCard.swift; sourceTree = "<group>"; };
 		6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightNowCard.swift; sourceTree = "<group>"; };
 		63C7B6002EF5479EF8874719 /* BirthDataInputView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthDataInputView.swift; sourceTree = "<group>"; };
 		652253D394F54C12ED04608E /* ShareCardRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardRenderer.swift; sourceTree = "<group>"; };
+		67BDA0FAAD80FC098970ED19 /* MantraRitualStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraRitualStateTests.swift; sourceTree = "<group>"; };
 		78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicSkyMotionManager.swift; sourceTree = "<group>"; };
 		7A1815747C232A6F55E52048 /* CollapsibleSectionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollapsibleSectionCard.swift; sourceTree = "<group>"; };
 		7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalEngineTests.swift; sourceTree = "<group>"; };
 		7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		7C7B4F42CE90C7CF3CC7A487 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareCardView.swift; sourceTree = "<group>"; };
+		81974180778ED08EBDF7FC0F /* RitualShareCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RitualShareCardView.swift; sourceTree = "<group>"; };
 		8671B2E2810F5DB127BCD949 /* CitySearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitySearchService.swift; sourceTree = "<group>"; };
 		8682C218AD656AE031131FD5 /* ThemePalettes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePalettes.swift; sourceTree = "<group>"; };
 		994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDetailSheet.swift; sourceTree = "<group>"; };
@@ -134,17 +155,20 @@
 		C450B088E4224ABD6C00279A /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		C48727AA41391F93867A785C /* FestivalEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FestivalEngine.swift; sourceTree = "<group>"; };
 		C558AC5E79C219207B15B07C /* TithiImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TithiImmersiveView.swift; sourceTree = "<group>"; };
+		C9BA6A319A6F8B14F0C9075A /* PanchangRitualViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangRitualViewModelTests.swift; sourceTree = "<group>"; };
 		CCDD40FACCCF7C25BDCE9C32 /* NakshatraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NakshatraImmersiveView.swift; sourceTree = "<group>"; };
 		D33BA4315AD962E2C697C3D0 /* PanchangViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangViewModel.swift; sourceTree = "<group>"; };
 		D40FE13768033F483BCEA6DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D6C4E430092A2D5C0DA704CB /* UpcomingEventsSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingEventsSheet.swift; sourceTree = "<group>"; };
 		D81FA1582C6CC8D435E75D30 /* MantraCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraCard.swift; sourceTree = "<group>"; };
 		D841F44870521127345B2497 /* TodayDetailsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayDetailsSection.swift; sourceTree = "<group>"; };
+		D9A21652F47D818692414FED /* MantraRitualState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraRitualState.swift; sourceTree = "<group>"; };
 		DE53B0314E4356EEF4A77BBA /* PanchangData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangData.swift; sourceTree = "<group>"; };
 		E09C4017C2811FC941DD4451 /* StarFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarFieldView.swift; sourceTree = "<group>"; };
 		E30F9801D12E0EBBD9D1065B /* PanchangElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangElement.swift; sourceTree = "<group>"; };
 		E9A91B6E41687DAADFF2808B /* PanchangDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanchangDescriptions.swift; sourceTree = "<group>"; };
 		EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MantraImmersiveView.swift; sourceTree = "<group>"; };
+		F5A4B24F6B8DF656A37167ED /* LivingMandalaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivingMandalaView.swift; sourceTree = "<group>"; };
 		F7D21D4B060787531B830527 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		F8EE27063D3384EA028D4F87 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F93559BC3A2F9EC4D6744F33 /* VedicCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VedicCalculator.swift; sourceTree = "<group>"; };
@@ -185,12 +209,22 @@
 			path = Devi;
 			sourceTree = "<group>";
 		};
+		3082AD127E7564669C54DEA8 /* DeviUITests */ = {
+			isa = PBXGroup;
+			children = (
+				102F1EE678200B59D8C321CF /* LivingMandalaFlowUITests.swift */,
+			);
+			path = DeviUITests;
+			sourceTree = "<group>";
+		};
 		35751FBC4DDE6B3BD69E451D /* DeviTests */ = {
 			isa = PBXGroup;
 			children = (
 				7BE3D31BB01F6DA3D5B4372B /* FestivalEngineTests.swift */,
+				67BDA0FAAD80FC098970ED19 /* MantraRitualStateTests.swift */,
 				B36CAC10BFF43C5390079499 /* PanchangCalculatorTests.swift */,
 				AC5F1E15A52C127B0FBCD4BC /* PanchangIntegrationTests.swift */,
+				C9BA6A319A6F8B14F0C9075A /* PanchangRitualViewModelTests.swift */,
 				A3CD313ECBD6E3B4210C728D /* PanchangViewModelTests.swift */,
 				463C6BC7EA5612F2261721C5 /* VedicCalculatorTests.swift */,
 			);
@@ -213,8 +247,10 @@
 				4010091F8B703329D6507FB9 /* HoraImmersiveView.swift */,
 				35B1C0538646A285D24251B7 /* HoroscopeWhySheet.swift */,
 				567039FD002DEB88A49D03AA /* ImmersiveDetailRouter.swift */,
+				F5A4B24F6B8DF656A37167ED /* LivingMandalaView.swift */,
 				D81FA1582C6CC8D435E75D30 /* MantraCard.swift */,
 				EA0A089BC8417CC0FA724DB6 /* MantraImmersiveView.swift */,
+				5C20C61B6EEF9EDEBD30BBAF /* MantraRitualView.swift */,
 				CCDD40FACCCF7C25BDCE9C32 /* NakshatraImmersiveView.swift */,
 				61C53B0839CC8F81A3E5C419 /* NavratriCard.swift */,
 				BA76E848BCC85F71C8F2F932 /* NavratriImmersiveView.swift */,
@@ -222,6 +258,7 @@
 				994447445F8414E27DDFED04 /* PanchangDetailSheet.swift */,
 				38B2F0E2D69E31D81A8EF4F0 /* PanchangSkeletonView.swift */,
 				6394B45CE3D7C5A2A58F48E9 /* RightNowCard.swift */,
+				81974180778ED08EBDF7FC0F /* RitualShareCardView.swift */,
 				7FED11A4877FFCD9F0FEE0BD /* ShareCardView.swift */,
 				C450B088E4224ABD6C00279A /* SplashView.swift */,
 				E09C4017C2811FC941DD4451 /* StarFieldView.swift */,
@@ -245,6 +282,7 @@
 				C48727AA41391F93867A785C /* FestivalEngine.swift */,
 				F98DE8EE21C51D78BA8CB591 /* HoroscopeContentLibrary.swift */,
 				5C8D19DE43AC54E5B52BC369 /* HoroscopeEngine.swift */,
+				D9A21652F47D818692414FED /* MantraRitualState.swift */,
 				7BF35E9FB2B731D95A2F6834 /* NotificationService.swift */,
 				4CB9250793BFE09DD61B0383 /* PanchangCalculator.swift */,
 				DE53B0314E4356EEF4A77BBA /* PanchangData.swift */,
@@ -273,6 +311,7 @@
 		AFAA87FA2E7674A778B7F622 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				2E3CF612C734C87408187F38 /* RitualMotionGate.swift */,
 				2ED73DBA852A3A4BC9C00E5E /* Theme.swift */,
 				8682C218AD656AE031131FD5 /* ThemePalettes.swift */,
 				78BC5A60A663162A67C89A2A /* VedicSkyMotionManager.swift */,
@@ -285,6 +324,7 @@
 			children = (
 				24431773675F89C667CBFE20 /* Devi */,
 				35751FBC4DDE6B3BD69E451D /* DeviTests */,
+				3082AD127E7564669C54DEA8 /* DeviUITests */,
 				FF301D0F60B60F4F9D9C4B95 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -294,6 +334,7 @@
 			children = (
 				B5F37171BB5BCFC490113269 /* Devi.app */,
 				0C8B38CEF48597D3EBE6B61E /* DeviTests.xctest */,
+				548F791E3F939DF2F4500A73 /* DeviUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -342,6 +383,24 @@
 			productReference = B5F37171BB5BCFC490113269 /* Devi.app */;
 			productType = "com.apple.product-type.application";
 		};
+		FFAA434B06C4F722D8A3A0F3 /* DeviUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3E308D1C8DBE49AF1539D46 /* Build configuration list for PBXNativeTarget "DeviUITests" */;
+			buildPhases = (
+				30CC402A622E29379C49B168 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5D130242D1CBC784FD0A5644 /* PBXTargetDependency */,
+			);
+			name = DeviUITests;
+			packageProductDependencies = (
+			);
+			productName = DeviUITests;
+			productReference = 548F791E3F939DF2F4500A73 /* DeviUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -354,6 +413,9 @@
 					62CF76CE48BD90253DCD44E0 = {
 						DevelopmentTeam = KTK5RL3ZR3;
 						ProvisioningStyle = Automatic;
+					};
+					FFAA434B06C4F722D8A3A0F3 = {
+						TestTargetID = 62CF76CE48BD90253DCD44E0;
 					};
 				};
 			};
@@ -377,6 +439,7 @@
 			targets = (
 				62CF76CE48BD90253DCD44E0 /* Devi */,
 				106544B20154815168C30CEC /* DeviTests */,
+				FFAA434B06C4F722D8A3A0F3 /* DeviUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -394,6 +457,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		30CC402A622E29379C49B168 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				74F59ED4639AC905BFC18998 /* LivingMandalaFlowUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BA73B945ED4921F1409CAEB0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -421,8 +492,11 @@
 				624E5AF00F42EDA4A17ECE19 /* HoroscopeEngine.swift in Sources */,
 				8048089370A230E90252292D /* HoroscopeWhySheet.swift in Sources */,
 				791512C664A793D2A7BC135F /* ImmersiveDetailRouter.swift in Sources */,
+				31F667B523D8DA5A629D6AC9 /* LivingMandalaView.swift in Sources */,
 				B982EA76D203C242C49853BC /* MantraCard.swift in Sources */,
 				E64B749D9006963AA44B0B38 /* MantraImmersiveView.swift in Sources */,
+				E4F8886C56598F9B84413325 /* MantraRitualState.swift in Sources */,
+				61629C79293C5B181B706DBC /* MantraRitualView.swift in Sources */,
 				1A6F1196F35937BD46F24956 /* NakshatraImmersiveView.swift in Sources */,
 				45B68F4C1727771AC5545D32 /* NavratriCard.swift in Sources */,
 				708E7940DAE93761EEE03CB1 /* NavratriImmersiveView.swift in Sources */,
@@ -437,6 +511,8 @@
 				CA126CEA7A3B889CD64DA13F /* PanchangSkeletonView.swift in Sources */,
 				892B00AE998EA6A17EA6BC39 /* PanchangViewModel.swift in Sources */,
 				042795BD186B3F379E603971 /* RightNowCard.swift in Sources */,
+				70C40DCF0FA0E20F35E858FB /* RitualMotionGate.swift in Sources */,
+				B2590C6ED2CF051B9EDD9128 /* RitualShareCardView.swift in Sources */,
 				90EE3123362AF50864DDE71C /* SettingsView.swift in Sources */,
 				D676D0BFEE9487FA96C77D34 /* ShareCardRenderer.swift in Sources */,
 				E574296E06EE9C16B5996C00 /* ShareCardView.swift in Sources */,
@@ -461,8 +537,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B6A8BF3CFA9E14750B5DB44 /* FestivalEngineTests.swift in Sources */,
+				B07211B7DD0C7E4208542FC7 /* MantraRitualStateTests.swift in Sources */,
 				CB25FABBF7A538EBB8428BEB /* PanchangCalculatorTests.swift in Sources */,
 				0F6D605D5B1D6E6D380D3770 /* PanchangIntegrationTests.swift in Sources */,
+				D745EDF5932863F46ABB5201 /* PanchangRitualViewModelTests.swift in Sources */,
 				8DBED32007EB0171D49C0960 /* PanchangViewModelTests.swift in Sources */,
 				FAD1BCA1A51DFC533472ED90 /* VedicCalculatorTests.swift in Sources */,
 			);
@@ -471,6 +549,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5D130242D1CBC784FD0A5644 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 62CF76CE48BD90253DCD44E0 /* Devi */;
+			targetProxy = 09D880B117CD98E22BB1D6D7 /* PBXContainerItemProxy */;
+		};
 		A5FA6C48DF2EDEE799A47C3E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 62CF76CE48BD90253DCD44E0 /* Devi */;
@@ -558,6 +641,23 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Devi.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Devi";
+			};
+			name = Release;
+		};
+		6CAAAC7BB91114685A503C1D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.DeviUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Devi;
 			};
 			name = Release;
 		};
@@ -690,6 +790,23 @@
 			};
 			name = Release;
 		};
+		BF7A57CF93DA0DFAC05E9ADF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.hareeshnagaraj.devi.DeviUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Devi;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -707,6 +824,15 @@
 			buildConfigurations = (
 				90424D97263C7A3AB342E7DA /* Debug */,
 				96982CE975652EFB1A51832D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D3E308D1C8DBE49AF1539D46 /* Build configuration list for PBXNativeTarget "DeviUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF7A57CF93DA0DFAC05E9ADF /* Debug */,
+				6CAAAC7BB91114685A503C1D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

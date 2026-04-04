@@ -4,6 +4,7 @@
 import SwiftUI
 
 struct ImmersiveDetailRouter: View {
+    @ObservedObject var vm: PanchangViewModel
     let element: PanchangElement
     let theme: DeviTheme
     let timezoneIdentifier: String
@@ -47,7 +48,8 @@ struct ImmersiveDetailRouter: View {
                 timezoneIdentifier: timezoneIdentifier
             )
         case .mantra(let mantra):
-            MantraImmersiveView(
+            MantraRitualView(
+                vm: vm,
                 mantra: mantra,
                 theme: theme
             )

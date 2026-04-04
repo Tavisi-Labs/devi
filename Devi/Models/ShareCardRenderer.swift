@@ -52,6 +52,53 @@ enum ShareCardRenderer {
               let pngData = uiImage.pngData() else { return nil }
         return ShareableCardImage(pngData: pngData)
     }
+
+    static func renderRitualCard(
+        panchang: DailyPanchang,
+        city: UserCity,
+        mantra: DailyMantra,
+        ritualSnapshot: MantraRitualSnapshot,
+        theme: DeviTheme
+    ) -> Image? {
+        let view = RitualShareCardView(
+            panchang: panchang,
+            city: city,
+            mantra: mantra,
+            ritualSnapshot: ritualSnapshot,
+            theme: theme
+        )
+
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 1.0
+        renderer.proposedSize = .init(width: 1080, height: 1920)
+
+        guard let uiImage = renderer.uiImage else { return nil }
+        return Image(uiImage: uiImage)
+    }
+
+    static func renderRitualCardAsTransferable(
+        panchang: DailyPanchang,
+        city: UserCity,
+        mantra: DailyMantra,
+        ritualSnapshot: MantraRitualSnapshot,
+        theme: DeviTheme
+    ) -> ShareableCardImage? {
+        let view = RitualShareCardView(
+            panchang: panchang,
+            city: city,
+            mantra: mantra,
+            ritualSnapshot: ritualSnapshot,
+            theme: theme
+        )
+
+        let renderer = ImageRenderer(content: view)
+        renderer.scale = 1.0
+        renderer.proposedSize = .init(width: 1080, height: 1920)
+
+        guard let uiImage = renderer.uiImage,
+              let pngData = uiImage.pngData() else { return nil }
+        return ShareableCardImage(pngData: pngData)
+    }
 }
 
 /// Transferable wrapper for sharing card images via ShareLink.
