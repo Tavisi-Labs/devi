@@ -91,6 +91,20 @@
   Custom `DeviFontScale` system does not respect iOS Dynamic Type (`@ScaledMetric`). Users who set Accessibility Sizes in iOS Settings get no scaling from the system.
   File: `Devi/Utils/Theme.swift`
 
+## Motion & Performance
+
+### Broader ambient motion audit beyond ritual surfaces
+
+**What:** Audit and normalize always-on motion outside the mantra ritual lane, especially repeated glow, pulse, symbol-effect, and breathing patterns on existing Home support surfaces.
+
+**Why:** The mantra ritual plan now includes a shared motion gate for touched ritual surfaces, but unrelated ambient effects can still drift into inconsistent behavior if they keep their own local animation rules.
+
+**Context:** Existing motion hotspots already visible in the code include `Devi/Views/Components/RightNowCard.swift`, `Devi/Views/HomeView.swift`, and `Devi/Utils/Theme.swift`. This was explicitly deferred during `/plan-eng-review` on 2026-04-03 when scope was reduced to mantra ritual plus directly affected motion surfaces.
+
+**Effort:** M
+**Priority:** P3
+**Depends on:** Land the mantra ritual shared motion gate first, then reuse that policy instead of inventing a second one.
+
 ## App Store Submission
 
 - [ ] **Capture App Store screenshots (including VedicSkyView hero shot)**
@@ -100,5 +114,51 @@
 - [ ] **Draft App Store description and keywords**
   **Priority:** P2
   Deferred from plan: VedicSkyView design doc (2026-03-30)
+
+## Touch Target Compliance (from Design Review 2026-04-04)
+
+- [ ] **Audit all immersive view close buttons for 44x44 minimum**
+  **Priority:** P2
+  MantraRitualView close button was 40x40 (fixed in ritual redesign). Other immersive views (TithiImmersiveView, NakshatraImmersiveView, EclipseImmersiveView, NavratriImmersiveView, HoraImmersiveView, MantraImmersiveView, VedicSkyView) likely have the same issue. Each close button should be at least 44x44pt per Apple HIG and WCAG touch target guidelines.
+  Files: `Devi/Views/Components/TithiImmersiveView.swift`, `Devi/Views/Components/NakshatraImmersiveView.swift`, `Devi/Views/Components/EclipseImmersiveView.swift`, `Devi/Views/Components/NavratriImmersiveView.swift`, `Devi/Views/Components/HoraImmersiveView.swift`, `Devi/Views/Components/VedicSkyView.swift`
+
+## Ritual Tests (from Eng Review 2026-04-04)
+
+- [ ] **MantraRitualState: complete after pause resumes same mandala**
+  **Priority:** P2
+  Create state with 4 completed days + 2-day gap, complete on gap+2, verify completedCount is 5 (no reset). Verifies graceful resume behavior.
+  File: `DeviTests/MantraRitualStateTests.swift`
+
+- [ ] **MantraRitualState: milestone suppression after markMilestoneSeen**
+  **Priority:** P2
+  Complete day 7, mark milestone seen, re-snapshot — verify shouldElevateSharePrompt is false.
+  File: `DeviTests/MantraRitualStateTests.swift`
+
+- [ ] **MantraRitualState: day 21 share elevation**
+  **Priority:** P2
+  Complete 21 days, verify milestone == .ceremonialCompletion and shouldElevateSharePrompt == true.
+  File: `DeviTests/MantraRitualStateTests.swift`
+
+- [ ] **MantraRitualState: shareStyle .invited persists days 8-20**
+  **Priority:** P3
+  Verify shareStyle == .invited for completedCount in range 8...20, not just exactly 7.
+  File: `DeviTests/MantraRitualStateTests.swift`
+
+- [ ] **PanchangViewModel: corrupt UserDefaults data fallback**
+  **Priority:** P2
+  Write garbage bytes to mantraRitual.state, create new VM, verify state == .empty.
+  File: `DeviTests/PanchangRitualViewModelTests.swift`
+
+- [ ] **RitualMotionGate: state matrix test**
+  **Priority:** P3
+  Verify resolve() outputs for .active/.background/.inactive x reduceMotion true/false combos.
+  File: `DeviTests/MantraRitualStateTests.swift` or new file
+
+## Dead Code Cleanup (from Eng Review 2026-04-04)
+
+- [ ] **Remove unused ShareCardRenderer.renderRitualCard (Image-returning variant)**
+  **Priority:** P3
+  Only `renderRitualCardAsTransferable` is called. The `Image`-returning `renderRitualCard` is dead code.
+  File: `Devi/Models/ShareCardRenderer.swift`
 
 ## Completed
