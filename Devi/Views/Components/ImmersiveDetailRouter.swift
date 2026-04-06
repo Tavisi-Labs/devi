@@ -47,12 +47,6 @@ struct ImmersiveDetailRouter: View {
                 theme: theme,
                 timezoneIdentifier: timezoneIdentifier
             )
-        case .mantra(let mantra):
-            MantraRitualView(
-                vm: vm,
-                mantra: mantra,
-                theme: theme
-            )
         case .vedicSky:
             VedicSkyView(
                 theme: theme,

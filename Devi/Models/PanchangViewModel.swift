@@ -40,6 +40,9 @@ class PanchangViewModel: ObservableObject {
     @Published var todayFestivals: [String] = []
     @Published private(set) var mantraRitualState: MantraRitualState = .empty
 
+    // MARK: - Navigation
+    @Published var activeTab: Int = 0
+
     // MARK: - Horoscope
     @Published var dailyHoroscope: DailyHoroscope?
     @Published var birthData: BirthData?
@@ -645,6 +648,14 @@ class PanchangViewModel: ObservableObject {
         cosmicSignatureError = false
         if let panchang = todayPanchang {
             fetchCosmicSignature(panchang: panchang, forceRefresh: true)
+        }
+    }
+
+    // MARK: - Navigation
+
+    func deepLinkToRitual() {
+        withAnimation(.easeInOut(duration: 0.3)) {
+            activeTab = 1
         }
     }
 

@@ -6,10 +6,9 @@ import UIKit
 
 struct MantraRitualView: View {
     @ObservedObject var vm: PanchangViewModel
-    let mantra: DailyMantra
-    let theme: DeviTheme
 
-    @Environment(\.dismiss) private var dismiss
+    private var theme: DeviTheme { vm.theme }
+
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
@@ -29,8 +28,8 @@ struct MantraRitualView: View {
         vm.ritualSnapshot
     }
 
-    private var activeMantra: DailyMantra {
-        vm.currentRitualMantra ?? mantra
+    private var activeMantra: DailyMantra? {
+        vm.currentRitualMantra
     }
 
     private var prefersDirectCompletionAction: Bool {
@@ -49,66 +48,76 @@ struct MantraRitualView: View {
             )
             .ignoresSafeArea()
 
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 28) {
-                    header
+            if let activeMantra {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 28) {
+                        header
 
-                    LivingMandalaView(
-                        snapshot: snapshot,
-                        theme: theme,
-                        diameter: 286,
-                        motionGate: motionGate,
-                        bloomTrigger: bloomTrigger,
-                        emphasis: .ritual
-                    )
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(snapshot.accessibilitySummary)
+                        LivingMandalaView(
+                            snapshot: snapshot,
+                            theme: theme,
+                            diameter: 286,
+                            motionGate: motionGate,
+                            bloomTrigger: bloomTrigger,
+                            emphasis: .ritual
+                        )
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(snapshot.accessibilitySummary)
 
-                    VStack(spacing: 10) {
-                        if let dayLabel = snapshot.dayLabel {
-                            Text(dayLabel)
-                                .deviLabel(.caption, theme: theme)
+                        VStack(spacing: 10) {
+                            if let dayLabel = snapshot.dayLabel {
+                                Text(dayLabel)
+                                    .deviLabel(.caption, theme: theme)
+                            }
+
+                            Text(snapshot.continuityText)
+                                .scaledFont(size: 15, weight: .medium, design: .serif)
+                                .foregroundColor(theme.secondaryText)
+                                .multilineTextAlignment(.center)
+
+                            if let milestone = activeMilestone ?? snapshot.milestone,
+                               snapshot.shareStyle == .invited {
+                                Text(milestone.title)
+                                    .scaledFont(size: 13, weight: .semibold, design: .serif)
+                                    .foregroundColor(theme.accentColor.opacity(0.9))
+                            }
                         }
 
-                        Text(snapshot.continuityText)
-                            .scaledFont(size: 15, weight: .medium, design: .serif)
-                            .foregroundColor(theme.secondaryText)
-                            .multilineTextAlignment(.center)
+                        VStack(spacing: 14) {
+                            Text(activeMantra.devanagari)
+                                .scaledFont(size: 34, design: .serif)
+                                .foregroundColor(theme.primaryText)
+                                .multilineTextAlignment(.center)
+                                .lineSpacing(5)
 
-                        if let milestone = activeMilestone ?? snapshot.milestone,
-                           snapshot.shareStyle == .invited {
-                            Text(milestone.title)
-                                .scaledFont(size: 13, weight: .semibold, design: .serif)
-                                .foregroundColor(theme.accentColor.opacity(0.9))
+                            Text(activeMantra.transliteration)
+                                .scaledFont(size: 18, weight: .regular, design: .serif)
+                                .foregroundColor(theme.secondaryText)
+                                .italic()
+                                .multilineTextAlignment(.center)
+
+                            Text(activeMantra.meaning)
+                                .deviLabel(.detail, theme: theme)
+                                .multilineTextAlignment(.center)
+                                .lineSpacing(4)
+                                .padding(.top, 4)
                         }
+                        .padding(.horizontal, 30)
+
+                        mantraDetailStrip(activeMantra)
                     }
-
-                    VStack(spacing: 14) {
-                        Text(activeMantra.devanagari)
-                            .scaledFont(size: 34, design: .serif)
-                            .foregroundColor(theme.primaryText)
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(5)
-
-                        Text(activeMantra.transliteration)
-                            .scaledFont(size: 18, weight: .regular, design: .serif)
-                            .foregroundColor(theme.secondaryText)
-                            .italic()
-                            .multilineTextAlignment(.center)
-
-                        Text(activeMantra.meaning)
-                            .deviLabel(.detail, theme: theme)
-                            .multilineTextAlignment(.center)
-                            .lineSpacing(4)
-                            .padding(.top, 4)
-                    }
-                    .padding(.horizontal, 30)
-
-                    mantraDetailStrip
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+                    .padding(.bottom, 220)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
-                .padding(.bottom, 220)
+            } else {
+                VStack {
+                    header
+                    Spacer()
+                    ProgressView()
+                        .tint(theme.secondaryText)
+                    Spacer()
+                }
             }
         }
         .safeAreaInset(edge: .bottom) {
@@ -148,9 +157,9 @@ struct MantraRitualView: View {
     private var header: some View {
         HStack {
             Button {
-                dismiss()
+                withAnimation(.easeInOut(duration: 0.3)) { vm.activeTab = 0 }
             } label: {
-                Image(systemName: "xmark")
+                Image(systemName: "chevron.left")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(theme.secondaryText)
                     .frame(width: 44, height: 44)
@@ -172,11 +181,11 @@ struct MantraRitualView: View {
         }
     }
 
-    private var mantraDetailStrip: some View {
+    private func mantraDetailStrip(_ mantra: DailyMantra) -> some View {
         HStack(spacing: 12) {
-            ritualFact(title: "DEITY", value: activeMantra.deity)
-            ritualFact(title: "REPETITIONS", value: "\(activeMantra.repetitions)")
-            ritualFact(title: "BEST TIME", value: activeMantra.bestTimeToChant)
+            ritualFact(title: "DEITY", value: mantra.deity)
+            ritualFact(title: "REPETITIONS", value: "\(mantra.repetitions)")
+            ritualFact(title: "BEST TIME", value: mantra.bestTimeToChant)
         }
     }
 
@@ -390,14 +399,14 @@ struct MantraRitualView: View {
     }
 
     private func renderShareCard() {
-        guard let panchang = vm.todayPanchang else { return }
+        guard let panchang = vm.todayPanchang, let mantra = activeMantra else { return }
         isRenderingShare = true
 
         Task { @MainActor in
             shareCardImage = ShareCardRenderer.renderRitualCardAsTransferable(
                 panchang: panchang,
                 city: vm.currentCity,
-                mantra: activeMantra,
+                mantra: mantra,
                 ritualSnapshot: vm.ritualSnapshot,
                 theme: theme
             )

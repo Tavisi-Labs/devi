@@ -78,6 +78,13 @@ final class PanchangRitualViewModelTests: XCTestCase {
         XCTAssertTrue(reloaded.ritualSnapshot.completedToday)
     }
 
+    func testDeepLinkToRitualSetsActiveTab() {
+        let vm = PanchangViewModel()
+        XCTAssertEqual(vm.activeTab, 0)
+        vm.deepLinkToRitual()
+        XCTAssertEqual(vm.activeTab, 1)
+    }
+
     private func isoDate(_ value: String) -> Date {
         ISO8601DateFormatter().date(from: value) ?? Date.distantPast
     }

@@ -24,14 +24,6 @@ struct HomeView: View {
     @State private var showWhySheet = false
     @State private var showBirthDataInput = false
 
-    private var homeRitualMotionGate: RitualMotionGate {
-        RitualMotionGate.resolve(
-            scenePhase: scenePhase,
-            reduceMotion: reduceMotion,
-            isVisible: immersiveElement == nil
-        )
-    }
-
     var body: some View {
         ZStack {
             // Full-screen adaptive gradient + star field background
@@ -39,7 +31,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 8), value: vm.timePeriod)
 
-            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod, isPaused: immersiveElement != nil)
+            StarFieldView(isDaytime: vm.isDaytime, timePeriod: vm.timePeriod, isPaused: immersiveElement != nil || vm.activeTab != 0)
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 5), value: vm.timePeriod)
 
@@ -272,7 +264,6 @@ struct HomeView: View {
         }
         .onAppear {
             vm.loadData()
-            vm.startTimer()
             vm.recordUsageDay()
         }
         .task {
@@ -283,7 +274,6 @@ struct HomeView: View {
             }
         }
         .onDisappear {
-            vm.stopTimer()
             sheetSwitchTask?.cancel()
         }
         .sheet(isPresented: $showSettings) {
@@ -326,7 +316,7 @@ struct HomeView: View {
                 try? await Task.sleep(for: .seconds(0.4))
                 guard !Task.isCancelled else { return }
                 switch el {
-                case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .mantra, .vedicSky:
+                case .tithi, .nakshatra, .eclipse, .navratriDay, .hora, .vedicSky:
                     immersiveElement = el
                 default:
                     sheetElement = el
@@ -574,19 +564,6 @@ struct HomeView: View {
     private var todayDetails: some View {
         VStack(alignment: .leading, spacing: 16) {
             OrnamentalDivider("TODAY", theme: vm.theme)
-
-            // Living mandala teaser
-            if vm.isViewingToday, let mantra = vm.currentRitualMantra {
-                MantraCard(
-                    mantra: mantra,
-                    snapshot: vm.ritualSnapshot,
-                    theme: vm.theme,
-                    motionGate: homeRitualMotionGate
-                ) {
-                    selectedElement = .mantra(mantra)
-                }
-                .padding(.horizontal)
-            }
 
             // Three distinct visual groups: Vara, Yoga+Karana, Moon arc
             if let panchang = vm.todayPanchang {

@@ -12,6 +12,7 @@ final class NotificationService: Sendable {
     static let dailySummaryCategory = "DEVI_DAILY_SUMMARY"
     static let eventAlertCategory = "DEVI_EVENT_ALERT"
     static let eclipseAlertCategory = "DEVI_ECLIPSE_ALERT"
+    static let ritualReminderCategory = "DEVI_RITUAL_REMINDER"
 
     // MARK: - Permission
 
@@ -46,6 +47,7 @@ final class NotificationService: Sendable {
             UNNotificationCategory(identifier: Self.dailySummaryCategory, actions: [viewAction], intentIdentifiers: []),
             UNNotificationCategory(identifier: Self.eventAlertCategory, actions: [viewAction], intentIdentifiers: []),
             UNNotificationCategory(identifier: Self.eclipseAlertCategory, actions: [viewAction], intentIdentifiers: []),
+            UNNotificationCategory(identifier: Self.ritualReminderCategory, actions: [viewAction], intentIdentifiers: []),
         ]
 
         UNUserNotificationCenter.current().setNotificationCategories(categories)
@@ -346,7 +348,7 @@ final class NotificationService: Sendable {
         }
 
         content.sound = .default
-        content.categoryIdentifier = dailySummaryCategory
+        content.categoryIdentifier = ritualReminderCategory
         return content
     }
 

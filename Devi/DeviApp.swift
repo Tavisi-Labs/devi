@@ -2,12 +2,14 @@
 // App entry point — routes between onboarding and main view
 
 import SwiftUI
+import UserNotifications
 
 @main
 struct DeviApp: App {
     @StateObject private var vm = PanchangViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @State private var splashFinished = false
+    @State private var notificationDelegate = DeviNotificationDelegate()
 
     init() {
         configureUITestState()
@@ -24,7 +26,13 @@ struct DeviApp: App {
                 // Real content loads immediately behind splash
                 Group {
                     if vm.hasCompletedOnboarding {
-                        HomeView(vm: vm)
+                        TabView(selection: $vm.activeTab) {
+                            HomeView(vm: vm)
+                                .tag(0)
+                            MantraRitualView(vm: vm)
+                                .tag(1)
+                        }
+                        .tabViewStyle(.page(indexDisplayMode: .never))
                     } else {
                         OnboardingView(vm: vm)
                     }
@@ -41,17 +49,22 @@ struct DeviApp: App {
             }
             .task {
                 // One-time setup on first appearance
+                notificationDelegate.vm = vm
+                UNUserNotificationCenter.current().delegate = notificationDelegate
                 vm.notificationService.registerCategories()
                 await vm.checkNotificationAuthorization()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
+                    vm.startTimer()
                     vm.loadData()
                     vm.recordUsageDay()
                     Task {
                         await vm.checkNotificationAuthorization()
                         await vm.rescheduleNotifications()
                     }
+                } else if newPhase == .background {
+                    vm.stopTimer()
                 }
             }
         }
