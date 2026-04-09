@@ -23,6 +23,7 @@ struct HomeView: View {
     @State private var sheetSwitchTask: Task<Void, Never>?
     @State private var showWhySheet = false
     @State private var showBirthDataInput = false
+    @State private var isArchivePresented = false
 
     var body: some View {
         ZStack {
@@ -74,7 +75,8 @@ struct HomeView: View {
                         DailyHoroscopeCard(
                             horoscope: horoscope,
                             theme: vm.theme,
-                            onTapWhy: { showWhySheet = true }
+                            onTapWhy: { showWhySheet = true },
+                            onTapArchive: { isArchivePresented = true }
                         )
                         .padding(.horizontal)
                         .padding(.top, 16)
@@ -327,7 +329,6 @@ struct HomeView: View {
         // Meditation mode
         .fullScreenCover(item: $immersiveElement) { element in
             ImmersiveDetailRouter(
-                vm: vm,
                 element: element,
                 theme: vm.theme,
                 timezoneIdentifier: vm.currentCity.timezoneIdentifier,
@@ -339,6 +340,12 @@ struct HomeView: View {
             if let context = vm.dailyHoroscope?.transitContext {
                 HoroscopeWhySheet(transitContext: context, theme: vm.theme)
             }
+        }
+        .sheet(isPresented: $isArchivePresented) {
+            YourDayArchiveView(
+                snapshots: vm.allDaySnapshots(),
+                theme: vm.theme
+            )
         }
         .sheet(isPresented: $showBirthDataInput) {
             BirthDataInputView(

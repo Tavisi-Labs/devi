@@ -17,8 +17,11 @@ class CosmicSignatureService {
         UserDefaults.standard.set(text, forKey: cosmicCacheKey(city: city, dateString: dateString))
     }
 
+    /// Cache namespace — bump the suffix (e.g. `cosmic.v3.`) whenever the
+    /// offline composer changes shape so users on previously-visited days
+    /// see the new prose on their next visit. Orphaned old keys are harmless.
     private func cosmicCacheKey(city: String, dateString: String) -> String {
-        "cosmic.\(city).\(dateString)"
+        "cosmic.v2.\(city).\(dateString)"
     }
 
     // MARK: - API Key
@@ -142,8 +145,65 @@ class CosmicSignatureService {
 
     // MARK: - Offline Fallback
 
-    /// Composes a meaningful signature from existing PanchangDescriptions data
+    /// Composes a meaningful signature for the day with no network round-trip.
+    ///
+    /// Strategy:
+    /// 1. Try the bundled fragment library (`cosmic_signature_library.json`)
+    ///    — pick one fragment from each of the tithi / nakshatra / yoga pools
+    ///    using a date-derived hash. This is the primary path and produces
+    ///    essentially non-repeating prose across any realistic user horizon.
+    /// 2. If any lookup misses (library gap or schema drift), fall through to
+    ///    the legacy `PanchangDescriptions`-based composer so the user still
+    ///    sees something meaningful instead of a blank card.
     private func offlineFallback(panchang: DailyPanchang) -> String {
+        if let composed = composedFragmentSignature(panchang: panchang) {
+            return composed
+        }
+        return legacyPanchangDescriptionsSignature(panchang: panchang)
+    }
+
+    // MARK: - Fragment Composer
+
+    /// Fragment-composition path. Returns `nil` when any of the three pools
+    /// has no entry for the day's panchang (letting the caller fall through
+    /// to the legacy composer).
+    ///
+    /// The selection hash uses three coprime primes so the index shuffles
+    /// broadly across the fragment space even when one field is constant:
+    ///
+    ///   hash = tithi.number * 1009
+    ///        + nakshatra.number * 751
+    ///        + yoga.number * 433
+    private func composedFragmentSignature(panchang: DailyPanchang) -> String? {
+        guard let library = Self.cosmicLibrary else { return nil }
+
+        let tithiPool     = library.tithiFragments[panchang.tithi.displayName] ?? []
+        let nakshatraPool = library.nakshatraFragments[panchang.nakshatra.name] ?? []
+        let yogaPool      = library.yogaFragments[panchang.yoga.name] ?? []
+
+        guard !tithiPool.isEmpty, !nakshatraPool.isEmpty, !yogaPool.isEmpty else {
+            return nil
+        }
+
+        let hash = (panchang.tithi.number * 1009)
+                 + (panchang.nakshatra.number * 751)
+                 + (panchang.yoga.number * 433)
+        let safeHash = abs(hash)
+
+        let tithiFragment     = tithiPool[safeHash % tithiPool.count]
+        let nakshatraFragment = nakshatraPool[safeHash % nakshatraPool.count]
+        let yogaFragment      = yogaPool[safeHash % yogaPool.count]
+
+        return [tithiFragment, nakshatraFragment, yogaFragment]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+    }
+
+    /// Legacy composer — kept as a graceful fallback for panchang values that
+    /// the fragment library doesn't cover. Builds a 2-3 sentence prose block
+    /// from the existing `PanchangDescriptions` lookup tables.
+    private func legacyPanchangDescriptionsSignature(panchang: DailyPanchang) -> String {
         var parts: [String] = []
 
         // Tithi significance
@@ -168,6 +228,28 @@ class CosmicSignatureService {
         // Take first 2-3 parts for conciseness
         return parts.prefix(3).joined(separator: " ")
     }
+
+    // MARK: - Cosmic Signature Library Loader
+
+    /// Lazy-loaded fragment library. Decoded exactly once at first access.
+    /// Returns `nil` when the JSON is missing or malformed — the offline
+    /// fallback then uses the legacy `PanchangDescriptions` path.
+    private static let cosmicLibrary: CosmicSignatureLibraryData? = {
+        guard let url = Bundle.main.url(
+            forResource: "cosmic_signature_library",
+            withExtension: "json"
+        ),
+              let data = try? Data(contentsOf: url) else {
+            assertionFailure("cosmic_signature_library.json missing from bundle")
+            return nil
+        }
+        do {
+            return try JSONDecoder().decode(CosmicSignatureLibraryData.self, from: data)
+        } catch {
+            assertionFailure("cosmic_signature_library.json decode failed: \(error)")
+            return nil
+        }
+    }()
 }
 
 // MARK: - Simple Keychain Helper

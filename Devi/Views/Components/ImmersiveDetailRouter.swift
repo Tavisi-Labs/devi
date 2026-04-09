@@ -4,7 +4,6 @@
 import SwiftUI
 
 struct ImmersiveDetailRouter: View {
-    @ObservedObject var vm: PanchangViewModel
     let element: PanchangElement
     let theme: DeviTheme
     let timezoneIdentifier: String

@@ -38,7 +38,7 @@ struct DeviApp: App {
                     }
                 }
                 .environment(\.deviFontScale, vm.fontScale)
-                .preferredColorScheme(vm.isLightMode ? .light : .dark)
+                .preferredColorScheme(vm.activeTab == 1 ? .dark : (vm.isLightMode ? .light : .dark))
 
                 // Splash overlay — always dark, dissolves after ~1.8s
                 if !splashFinished {
@@ -52,6 +52,8 @@ struct DeviApp: App {
                 notificationDelegate.vm = vm
                 UNUserNotificationCenter.current().delegate = notificationDelegate
                 vm.notificationService.registerCategories()
+                vm.startTimer()
+                vm.loadData()
                 await vm.checkNotificationAuthorization()
             }
             .onChange(of: scenePhase) { _, newPhase in

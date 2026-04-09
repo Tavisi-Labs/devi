@@ -43,12 +43,15 @@ enum HoroscopeEngine {
     /// - Parameters:
     ///   - natalChart: The user's birth chart (Moon rashi, nakshatra, graha positions)
     ///   - todaySnapshot: Current transit positions of all 9 grahas
+    ///   - panchang: The day's panchang — tithi, nakshatra, and yoga feed the
+    ///     variant seed so the reading rotates daily through the content library.
     ///   - date: The date for this reading (used for variant selection)
     ///   - timezoneIdentifier: User's timezone for consistent day boundary
     /// - Returns: A fully populated `DailyHoroscope`
     static func generateReading(
         natalChart: NatalChart,
         todaySnapshot: GrahaSnapshot,
+        panchang: DailyPanchang,
         date: Date,
         timezoneIdentifier: String
     ) -> DailyHoroscope {
@@ -72,18 +75,29 @@ enum HoroscopeEngine {
         let saturnRashi = Rashi.from(siderealLongitude: saturnLon)
         let saturnHouse = Rashi.moonHouse(birthRashi: natalChart.birthRashi, transitRashi: saturnRashi)
 
-        // --- 4. Variant selection (stable daily hash) ---
+        // --- 4. Variant selection (enriched daily hash) ---
+        //
+        // The seed mixes day-of-year, birth rashi, and the day's panchang signals
+        // (tithi number, nakshatra index, yoga number) so adjacent days in the
+        // same Moon house diverge, and the large content library is sampled broadly.
+        // Coprime multipliers (31, 73, 137) spread the hash across variant counts.
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TimeZone(identifier: timezoneIdentifier) ?? .current
-        let dayOfYear = cal.ordinality(of: .day, in: .year, for: date) ?? 1
-        let variantSeed = dayOfYear + natalChart.birthRashi.rawValue
+        let dayOfYear: Int = cal.ordinality(of: .day, in: .year, for: date) ?? 1
+        let rashiSeed: Int = natalChart.birthRashi.rawValue
+        let tithiSeed: Int = panchang.tithi.number * 31
+        let nakshatraSeed: Int = transitNakshatraIdx * 73
+        let yogaSeed: Int = panchang.yoga.number * 137
+        let variantSeed: Int = dayOfYear + rashiSeed + tithiSeed + nakshatraSeed + yogaSeed
 
         // --- 5. Theme statement and supporting text ---
         let themes = HoroscopeContentLibrary.themes
         // themes is indexed by house (index 0 = house 1)
         let houseThemes = themes[moonHouse - 1]
-        let themeVariantIndex = variantSeed % houseThemes.count
-        let selectedTheme = houseThemes[themeVariantIndex]
+        let themeVariantIndex = houseThemes.isEmpty ? 0 : abs(variantSeed) % houseThemes.count
+        let selectedTheme = houseThemes.isEmpty
+            ? fallbackTheme()
+            : houseThemes[themeVariantIndex]
 
         // Apply Jupiter/Saturn modifiers to supporting text
         let jupiterFlavor = jupiterModifierText(house: jupiterHouse)
@@ -186,14 +200,21 @@ enum HoroscopeEngine {
     }
 
     /// Build the four category readings (love, work, spirituality, health)
-    /// using the content library's house-indexed category data.
+    /// by sampling a variant from the content library's array for each slot.
+    /// The variant seed comes from the enriched daily hash in `generateReading`,
+    /// so adjacent days with different panchang signals pick different variants
+    /// even when the Moon stays in the same house.
     private static func buildCategoryReadings(
         moonHouse: Int,
         variantSeed: Int
     ) -> [CategoryReading] {
         return HoroscopeCategory.allCases.map { category in
             if let houseReadings = HoroscopeContentLibrary.categoryReadings[moonHouse],
-               let reading = houseReadings[category] {
+               let variants = houseReadings[category],
+               !variants.isEmpty {
+                // `abs()` guards against negative seeds after multiplicative mixing.
+                let idx = abs(variantSeed) % variants.count
+                let reading = variants[idx]
                 return CategoryReading(
                     category: category,
                     summary: reading.summary,
@@ -207,6 +228,18 @@ enum HoroscopeEngine {
                 intensity: 3
             )
         }
+    }
+
+    /// Neutral theme used only when the content library returns an empty
+    /// variant array for the current Moon house (shouldn't happen in practice,
+    /// but keeps the engine total).
+    private static func fallbackTheme() -> HoroscopeContentLibrary.HouseTheme {
+        HoroscopeContentLibrary.HouseTheme(
+            themeStatement: "A steady, grounded day awaits.",
+            supportingText: "Honor what is in front of you with presence. Small actions, done with care, matter more than you know.",
+            doList: ["Be kind to yourself", "Move your body gently", "Pause before reacting"],
+            dontList: ["Force outcomes", "Ignore your needs", "Compare yourself to others"]
+        )
     }
 
     /// Compose the supporting text paragraph by appending planetary modifier flavor.

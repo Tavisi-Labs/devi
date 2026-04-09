@@ -1,1 +1,2 @@
 pyswisseph
+anthropic>=0.40

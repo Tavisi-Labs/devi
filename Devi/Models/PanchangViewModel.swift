@@ -140,6 +140,7 @@ class PanchangViewModel: ObservableObject {
     private var horoscopeCache: [String: DailyHoroscope] = [:]  // date-rashi → horoscope
     private var lastCacheCity: String = ""
     private let ritualStateKey = "mantraRitual.state"
+    private let snapshotStore = DaySnapshotStore()
 
     // MARK: - Computed
 
@@ -567,6 +568,14 @@ class PanchangViewModel: ObservableObject {
         if let panchang = todayPanchang {
             fetchCosmicSignature(panchang: panchang)
         }
+
+        // Archive today's snapshot for the "Your Day Archive" sheet. We only
+        // record real days (not scrubbed past/future views), and we upsert —
+        // so the second write from `fetchCosmicSignature` completion simply
+        // overwrites the row with the freshly-loaded signature.
+        if isViewingToday, let panchang = todayPanchang {
+            recordDaySnapshot(panchang: panchang, dateString: targetString)
+        }
     }
 
     private func loadMantraRitualState() {
@@ -640,7 +649,51 @@ class PanchangViewModel: ObservableObject {
             if cosmicService.lastFetchAPIFailed {
                 cosmicSignatureError = true
             }
+            // Re-archive the day now that the cosmic signature is loaded.
+            // Upsert-by-id overwrites the row we wrote from `loadData`,
+            // so the archive picks up the freshly-composed signature.
+            if isViewingToday {
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let dateString = dateFormatter.string(from: displayDate)
+                recordDaySnapshot(panchang: panchang, dateString: dateString)
+            }
         }
+    }
+
+    /// All archived day snapshots, newest → oldest. Called by the
+    /// `YourDayArchiveView` sheet when it appears.
+    func allDaySnapshots() -> [DaySnapshot] {
+        snapshotStore.all()
+    }
+
+    /// Build a `DaySnapshot` from the current view-model state and record it
+    /// in the persistent archive. Safe to call multiple times per day — the
+    /// store upserts by `(cityName, dateString)`.
+    private func recordDaySnapshot(panchang: DailyPanchang, dateString: String) {
+        let horoscope = dailyHoroscope
+        var categorySummaries: [String: String] = [:]
+        if let horoscope {
+            for reading in horoscope.categories {
+                categorySummaries[reading.category.rawValue] = reading.summary
+            }
+        }
+        let snapshot = DaySnapshot(
+            dateString: dateString,
+            cityName: currentCity.name,
+            themeStatement: horoscope?.themeStatement,
+            supportingText: horoscope?.supportingText,
+            categorySummaries: categorySummaries,
+            mantraSanskrit: horoscope?.mantra.sanskrit,
+            mantraTranslation: horoscope?.mantra.translation,
+            tithiDisplayName: panchang.tithi.displayName,
+            nakshatraName: panchang.nakshatra.name,
+            yogaName: panchang.yoga.name,
+            festivals: todayFestivals,
+            cosmicSignature: cosmicSignature,
+            ritualCompleted: mantraRitualState.completedDates.contains(currentRitualDay)
+        )
+        snapshotStore.record(snapshot)
     }
 
     /// Retry cosmic signature fetch after an error
@@ -836,10 +889,15 @@ class PanchangViewModel: ObservableObject {
         let jd = VedicCalculator.shared.julianDay(from: targetDate)
         let todaySnapshot = PanchangCalculator.computeGrahaSnapshot(julianDay: jd)
 
+        // Panchang feeds the variant seed so the reading rotates daily
+        // through the content library even when the Moon stays in the same house.
+        let panchang = cachedPanchang(for: targetDate, dateString: dateString)
+
         // Generate reading
         let horoscope = HoroscopeEngine.generateReading(
             natalChart: natal,
             todaySnapshot: todaySnapshot,
+            panchang: panchang,
             date: targetDate,
             timezoneIdentifier: currentCity.timezoneIdentifier
         )
@@ -1039,6 +1097,7 @@ class PanchangViewModel: ObservableObject {
                 let reading = HoroscopeEngine.generateReading(
                     natalChart: natal,
                     todaySnapshot: snapshot,
+                    panchang: day,
                     date: day.solar.sunrise,
                     timezoneIdentifier: currentCity.timezoneIdentifier
                 )

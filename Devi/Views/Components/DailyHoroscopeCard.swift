@@ -7,6 +7,7 @@ struct DailyHoroscopeCard: View {
     let horoscope: DailyHoroscope
     let theme: DeviTheme
     let onTapWhy: () -> Void
+    let onTapArchive: () -> Void
 
     @State private var expandedCategory: HoroscopeCategory? = nil
     @State private var isTextExpanded = false
@@ -38,10 +39,25 @@ struct DailyHoroscopeCard: View {
     // MARK: - 1. Header
 
     private var headerSection: some View {
-        Text("YOUR DAY")
-            .scaledFont(size: 11, weight: .bold)
-            .foregroundColor(theme.secondaryText)
-            .tracking(2)
+        HStack(spacing: 10) {
+            Text("YOUR DAY")
+                .scaledFont(size: 11, weight: .bold)
+                .foregroundColor(theme.secondaryText)
+                .tracking(2)
+
+            Spacer(minLength: 8)
+
+            Button(action: onTapArchive) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(theme.secondaryText)
+                    .padding(6)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Your day archive")
+            .accessibilityHint("Browse past daily readings")
+        }
     }
 
     // MARK: - 2. Theme Statement
@@ -541,7 +557,8 @@ struct DailyHoroscopeCard: View {
         DailyHoroscopeCard(
             horoscope: sampleHoroscope,
             theme: DeviTheme.forPeriod(.evening),
-            onTapWhy: {}
+            onTapWhy: {},
+            onTapArchive: {}
         )
         .padding(.horizontal)
     }

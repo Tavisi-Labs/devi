@@ -7,7 +7,15 @@ import UIKit
 struct MantraRitualView: View {
     @ObservedObject var vm: PanchangViewModel
 
-    private var theme: DeviTheme { vm.theme }
+    // Forced-dark theme for the ritual screen
+    private var ritualTheme: DeviTheme {
+        DeviTheme.forPeriod(.night, style: vm.themeStyle, appearance: .alwaysDark)
+    }
+
+    // One gold for the entire ritual — the mandala gains depth from geometry
+    // and line weight, not color diversity. Theme accents are too muted on the
+    // forced-dark night sky, so we pin a warm, vivid gold here.
+    private let ritualGold = Color(hex: "E8B252")
 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -19,6 +27,8 @@ struct MantraRitualView: View {
     @State private var shareCardImage: ShareableCardImage?
     @State private var isRenderingShare = false
     @State private var activeMilestone: MantraRitualMilestone?
+    @State private var completionFlash: Double = 0
+    @State private var breathingGlowOpacity: Double = 0.5
 
     private var motionGate: RitualMotionGate {
         RitualMotionGate.resolve(scenePhase: scenePhase, reduceMotion: reduceMotion)
@@ -38,96 +48,87 @@ struct MantraRitualView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
+            ritualTheme.backgroundGradient
                 .ignoresSafeArea()
 
             StarFieldView(
-                isDaytime: vm.isDaytime,
-                timePeriod: vm.timePeriod,
+                isDaytime: false,
+                timePeriod: .night,
                 isPaused: !motionGate.allowsAmbientMotion
             )
             .ignoresSafeArea()
 
             if let activeMantra {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 28) {
-                        header
+                VStack(spacing: 0) {
+                    header
+                        .deviReveal(delay: 0.0, direction: .fadeUp)
+
+                    Spacer(minLength: 8)
+
+                    // Mandala with ambient celestial glow backdrop
+                    ZStack {
+                        // Large ambient aura — single warm gold so the mandala
+                        // feels like it's radiating one unified light source.
+                        Circle()
+                            .fill(
+                                RadialGradient(
+                                    colors: [
+                                        ritualGold.opacity(0.14),
+                                        ritualGold.opacity(0.05),
+                                        Color.clear
+                                    ],
+                                    center: .center,
+                                    startRadius: 40,
+                                    endRadius: 220
+                                )
+                            )
+                            .frame(width: 440, height: 440)
+                            .blur(radius: 30)
 
                         LivingMandalaView(
                             snapshot: snapshot,
-                            theme: theme,
-                            diameter: 286,
+                            theme: ritualTheme,
+                            diameter: 320,
                             motionGate: motionGate,
                             bloomTrigger: bloomTrigger,
-                            emphasis: .ritual
+                            emphasis: .ritual,
+                            goldColor: ritualGold
                         )
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(snapshot.accessibilitySummary)
-
-                        VStack(spacing: 10) {
-                            if let dayLabel = snapshot.dayLabel {
-                                Text(dayLabel)
-                                    .deviLabel(.caption, theme: theme)
-                            }
-
-                            Text(snapshot.continuityText)
-                                .scaledFont(size: 15, weight: .medium, design: .serif)
-                                .foregroundColor(theme.secondaryText)
-                                .multilineTextAlignment(.center)
-
-                            if let milestone = activeMilestone ?? snapshot.milestone,
-                               snapshot.shareStyle == .invited {
-                                Text(milestone.title)
-                                    .scaledFont(size: 13, weight: .semibold, design: .serif)
-                                    .foregroundColor(theme.accentColor.opacity(0.9))
-                            }
-                        }
-
-                        VStack(spacing: 14) {
-                            Text(activeMantra.devanagari)
-                                .scaledFont(size: 34, design: .serif)
-                                .foregroundColor(theme.primaryText)
-                                .multilineTextAlignment(.center)
-                                .lineSpacing(5)
-
-                            Text(activeMantra.transliteration)
-                                .scaledFont(size: 18, weight: .regular, design: .serif)
-                                .foregroundColor(theme.secondaryText)
-                                .italic()
-                                .multilineTextAlignment(.center)
-
-                            Text(activeMantra.meaning)
-                                .deviLabel(.detail, theme: theme)
-                                .multilineTextAlignment(.center)
-                                .lineSpacing(4)
-                                .padding(.top, 4)
-                        }
-                        .padding(.horizontal, 30)
-
-                        mantraDetailStrip(activeMantra)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 10)
-                    .padding(.bottom, 220)
+                    .deviReveal(delay: 0.3, direction: .scale)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(snapshot.accessibilitySummary)
+
+                    Spacer(minLength: 12)
+
+                    mantraTextSection(activeMantra)
+                        .deviEntrance(delay: 1.0)
+
+                    Spacer()
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 10)
             } else {
                 VStack {
                     header
                     Spacer()
                     ProgressView()
-                        .tint(theme.secondaryText)
+                        .tint(ritualTheme.secondaryText)
                     Spacer()
                 }
             }
+
+            // Golden completion flash overlay
+            ritualGold.opacity(completionFlash)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
         }
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 12) {
                 if let milestone = activeMilestone ?? (snapshot.shouldElevateSharePrompt ? snapshot.milestone : nil) {
                     milestoneRow(milestone)
                 }
-
                 completionWell
-                shareRow
             }
             .padding(.horizontal, 20)
             .padding(.top, 12)
@@ -136,14 +137,15 @@ struct MantraRitualView: View {
                 LinearGradient(
                     colors: [
                         Color.clear,
-                        theme.deepBackground.opacity(0.78),
-                        theme.deepBackground.opacity(0.94)
+                        ritualTheme.deepBackground.opacity(0.88),
+                        ritualTheme.deepBackground
                     ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 .ignoresSafeArea()
             )
+            .deviEntrance(delay: 1.2)
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: completionFeedbackTrigger)
         .onAppear {
@@ -151,8 +153,11 @@ struct MantraRitualView: View {
                 activeMilestone = milestone
                 vm.markRitualMilestoneSeen(milestone)
             }
+            startBreathingGlow()
         }
     }
+
+    // MARK: - Header
 
     private var header: some View {
         HStack {
@@ -161,7 +166,7 @@ struct MantraRitualView: View {
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(theme.secondaryText)
+                    .foregroundColor(ritualTheme.secondaryText)
                     .frame(width: 44, height: 44)
                     .background(.ultraThinMaterial)
                     .clipShape(Circle())
@@ -172,39 +177,126 @@ struct MantraRitualView: View {
             Spacer()
 
             Text("RITUAL")
-                .deviLabel(.caption, theme: theme)
+                .deviLabel(.caption, theme: ritualTheme)
 
             Spacer()
 
-            Color.clear
-                .frame(width: 44, height: 44)
+            // Share button
+            if let shareCardImage {
+                ShareLink(
+                    item: shareCardImage,
+                    preview: SharePreview("Devi Living Mandala")
+                ) {
+                    headerShareIcon
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("ritual.shareAction")
+            } else {
+                Button {
+                    renderShareCard()
+                } label: {
+                    headerShareIcon
+                }
+                .buttonStyle(.plain)
+                .disabled(isRenderingShare)
+                .accessibilityIdentifier("ritual.shareAction")
+            }
         }
     }
 
-    private func mantraDetailStrip(_ mantra: DailyMantra) -> some View {
-        HStack(spacing: 12) {
-            ritualFact(title: "DEITY", value: mantra.deity)
-            ritualFact(title: "REPETITIONS", value: "\(mantra.repetitions)")
-            ritualFact(title: "BEST TIME", value: mantra.bestTimeToChant)
-        }
+    private var headerShareIcon: some View {
+        Image(systemName: isRenderingShare ? "hourglass" : "square.and.arrow.up")
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundColor(ritualTheme.secondaryText)
+            .frame(width: 44, height: 44)
+            .background(.ultraThinMaterial)
+            .clipShape(Circle())
     }
 
-    private func ritualFact(title: String, value: String) -> some View {
-        VStack(spacing: 5) {
-            Text(title)
-                .deviLabel(.caption, theme: theme)
-            Text(value)
-                .scaledFont(size: 13, weight: .medium, design: .serif)
-                .foregroundColor(theme.primaryText)
+    // MARK: - Sacred Mantra Text
+
+    @ViewBuilder
+    private func mantraTextSection(_ mantra: DailyMantra) -> some View {
+        VStack(spacing: 14) {
+            // Day label
+            if let dayLabel = snapshot.dayLabel {
+                Text(dayLabel)
+                    .deviLabel(.sacredTitle, theme: ritualTheme)
+            }
+
+            // Deity context banner
+            deityContextBanner(mantra)
+
+            // Devanagari with breathing gold glow
+            ZStack {
+                // Wide glow halo (blurred duplicate) — actually visible
+                Text(mantra.devanagari)
+                    .scaledFont(size: 38, design: .serif)
+                    .foregroundColor(ritualGold.opacity(breathingGlowOpacity * 0.4))
+                    .blur(radius: 20)
+                    .allowsHitTesting(false)
+
+                // Main text
+                Text(mantra.devanagari)
+                    .scaledFont(size: 38, design: .serif)
+                    .foregroundColor(ritualTheme.primaryText)
+            }
+            .multilineTextAlignment(.center)
+            .lineSpacing(5)
+
+            // Transliteration
+            Text(mantra.transliteration)
+                .scaledFont(size: 17, weight: .regular, design: .serif)
+                .italic()
+                .foregroundColor(ritualTheme.secondaryText.opacity(0.7))
+                .tracking(0.5)
                 .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
+
+            // Meaning
+            Text(mantra.meaning)
+                .deviLabel(.sacredBody, theme: ritualTheme)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.top, 4)
         }
-        .frame(maxWidth: .infinity, minHeight: 74)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 12)
-        .deviCard(theme: theme, elevation: .flat, cornerRadius: 14)
+        .padding(.horizontal, 30)
     }
+
+    private func deityContextBanner(_ mantra: DailyMantra) -> some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(ritualGold)
+                .frame(width: 5, height: 5)
+
+            Text(mantra.deity.uppercased())
+                .deviLabel(.caption, theme: ritualTheme)
+
+            if let milestone = activeMilestone ?? snapshot.milestone,
+               snapshot.shareStyle == .invited {
+                Text("\u{00B7}")
+                    .foregroundColor(ritualTheme.secondaryText)
+                Text(milestone.title)
+                    .scaledFont(size: 12, weight: .semibold, design: .serif)
+                    .foregroundColor(ritualTheme.accentColor.opacity(0.9))
+            }
+        }
+    }
+
+    // MARK: - Breathing Glow
+
+    private func startBreathingGlow() {
+        guard !motionGate.prefersReducedMotion else {
+            breathingGlowOpacity = 0.5  // Static
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.easeInOut(duration: 4).repeatForever(autoreverses: true)) {
+                breathingGlowOpacity = 1.0
+            }
+        }
+    }
+
+    // MARK: - Completion Well
 
     private var completionWell: some View {
         VStack(spacing: 10) {
@@ -238,11 +330,11 @@ struct MantraRitualView: View {
 
             if snapshot.status == .paused {
                 Text("The geometry stays with you. One chant resumes the same mandala.")
-                    .deviLabel(.detail, theme: theme)
+                    .deviLabel(.detail, theme: ritualTheme)
                     .multilineTextAlignment(.center)
             } else if snapshot.status == .archived {
                 Text("The previous mandala has settled. Begin again when you are ready.")
-                    .deviLabel(.detail, theme: theme)
+                    .deviLabel(.detail, theme: ritualTheme)
                     .multilineTextAlignment(.center)
             }
         }
@@ -252,114 +344,88 @@ struct MantraRitualView: View {
         HStack(spacing: 14) {
             ZStack {
                 Circle()
-                    .stroke(theme.primaryText.opacity(0.10), lineWidth: 2)
-                    .frame(width: 44, height: 44)
+                    .stroke(ritualTheme.primaryText.opacity(0.10), lineWidth: 2)
+                    .frame(width: 64, height: 64)
 
                 Circle()
                     .trim(from: 0, to: holdProgress)
                     .stroke(
-                        theme.accentColor,
-                        style: StrokeStyle(lineWidth: 3, lineCap: .round)
+                        ritualGold,
+                        style: StrokeStyle(lineWidth: 3.5, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
-                    .frame(width: 44, height: 44)
+                    .frame(width: 64, height: 64)
 
-                Image(systemName: icon)
-                    .font(.system(size: 17, weight: .medium))
-                    .foregroundColor(snapshot.canCompleteToday ? theme.accentColor : theme.primaryText.opacity(0.65))
+                // Golden halo during hold
+                if holdProgress > 0 {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    ritualGold.opacity(0.45 * holdProgress),
+                                    ritualGold.opacity(0.0)
+                                ],
+                                center: .center,
+                                startRadius: 20,
+                                endRadius: 48
+                            )
+                        )
+                        .frame(width: 96, height: 96)
+                }
+
+                // Icon with gold glow when completed
+                ZStack {
+                    if snapshot.completedToday {
+                        Image(systemName: icon)
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(ritualGold.opacity(0.5))
+                            .blur(radius: 8)
+                    }
+                    Image(systemName: icon)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundColor(snapshot.canCompleteToday ? ritualGold :
+                                         snapshot.completedToday ? ritualGold :
+                                         ritualTheme.primaryText.opacity(0.65))
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(snapshot.actionTitle)
                     .scaledFont(size: 16, weight: .semibold, design: .serif)
-                    .foregroundColor(theme.primaryText)
+                    .foregroundColor(ritualTheme.primaryText)
 
                 Text(prefersDirectCompletionAction ? "Accessible direct action" : "Press and hold to complete")
                     .scaledFont(size: 12, weight: .medium)
-                    .foregroundColor(theme.secondaryText)
+                    .foregroundColor(ritualTheme.secondaryText)
             }
 
             Spacer()
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 18)
-        .background(theme.accentColor.opacity(snapshot.canCompleteToday ? 0.08 : 0.05))
-        .deviCard(theme: theme, elevation: .raised, cornerRadius: 24)
+        .background(ritualGold.opacity(snapshot.canCompleteToday ? 0.08 : 0.04))
+        .deviCard(theme: ritualTheme, elevation: .prominent, cornerRadius: 24)
     }
+
+    // MARK: - Milestone
 
     private func milestoneRow(_ milestone: MantraRitualMilestone) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "sparkles")
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(theme.accentColor)
+                .foregroundColor(ritualTheme.accentColor)
             Text(milestone.title)
                 .scaledFont(size: 13, weight: .semibold, design: .serif)
-                .foregroundColor(theme.primaryText)
+                .foregroundColor(ritualTheme.primaryText)
             Spacer()
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
-        .background(theme.accentColor.opacity(0.09))
-        .deviCard(theme: theme, elevation: .flat, cornerRadius: 16)
+        .background(ritualTheme.accentColor.opacity(0.09))
+        .deviCard(theme: ritualTheme, elevation: .flat, cornerRadius: 16)
     }
 
-    @ViewBuilder
-    private var shareRow: some View {
-        let invited = snapshot.shareStyle == .invited
-
-        HStack(spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(invited ? "Share this mandala" : "Quiet share")
-                    .scaledFont(size: 13, weight: .semibold)
-                    .foregroundColor(theme.primaryText)
-
-                Text(invited ? "A poster version is ready." : "Available whenever you want it.")
-                    .scaledFont(size: 12)
-                    .foregroundColor(theme.secondaryText)
-            }
-
-            Spacer()
-
-            if let shareCardImage {
-                ShareLink(
-                    item: shareCardImage,
-                    preview: SharePreview("Devi Living Mandala")
-                ) {
-                    shareActionLabel(invited: invited, isLoading: false)
-                }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier("ritual.shareAction")
-            } else {
-                Button {
-                    renderShareCard()
-                } label: {
-                    shareActionLabel(invited: invited, isLoading: isRenderingShare)
-                }
-                .buttonStyle(.plain)
-                .disabled(isRenderingShare)
-                .accessibilityIdentifier("ritual.shareAction")
-            }
-        }
-        .padding(.horizontal, 2)
-    }
-
-    private func shareActionLabel(invited: Bool, isLoading: Bool) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: isLoading ? "hourglass" : "square.and.arrow.up")
-                .font(.system(size: 12, weight: .semibold))
-            Text(invited ? "Share" : "Export")
-                .scaledFont(size: 12, weight: .semibold)
-        }
-        .foregroundColor(invited ? theme.accentColor : theme.secondaryText)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 9)
-        .background((invited ? theme.accentColor.opacity(0.11) : .clear))
-        .overlay {
-            Capsule()
-                .stroke(invited ? theme.accentColor.opacity(0.26) : theme.primaryText.opacity(0.12), lineWidth: 1)
-        }
-        .clipShape(Capsule())
-    }
+    // MARK: - Actions
 
     private func updateHoldProgress(_ isPressing: Bool) {
         guard snapshot.canCompleteToday, !prefersDirectCompletionAction else {
@@ -392,6 +458,14 @@ struct MantraRitualView: View {
         bloomTrigger += 1
         completionFeedbackTrigger += 1
 
+        // Golden flash (skip if reduced motion)
+        if !motionGate.prefersReducedMotion {
+            completionFlash = 0.25
+            withAnimation(.easeOut(duration: 0.6)) {
+                completionFlash = 0
+            }
+        }
+
         if let milestone = result.milestone {
             activeMilestone = milestone
             vm.markRitualMilestoneSeen(milestone)
@@ -408,12 +482,14 @@ struct MantraRitualView: View {
                 city: vm.currentCity,
                 mantra: mantra,
                 ritualSnapshot: vm.ritualSnapshot,
-                theme: theme
+                theme: vm.theme
             )
             isRenderingShare = false
         }
     }
 }
+
+// MARK: - RitualLongPressCaptureView (UIViewRepresentable)
 
 private struct RitualLongPressCaptureView: UIViewRepresentable {
     let minimumDuration: TimeInterval
@@ -466,6 +542,7 @@ private struct RitualLongPressCaptureView: UIViewRepresentable {
 
             switch gesture.state {
             case .began:
+                completionWorkItem?.cancel()
                 parent.onPressingChanged(true)
 
                 let workItem = DispatchWorkItem { [weak self] in
