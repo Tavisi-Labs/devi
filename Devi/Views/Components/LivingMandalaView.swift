@@ -90,6 +90,7 @@ struct LivingMandalaView: View {
     let diameter: CGFloat
     let motionGate: RitualMotionGate
     var bloomTrigger: Int = 0
+    var replayTrigger: Int = 0
     var emphasis: LivingMandalaEmphasis = .teaser
 
     /// Optional override for the single gold accent. When nil, the teaser tints
@@ -101,6 +102,8 @@ struct LivingMandalaView: View {
     @State private var outerRotation: Double = 0
     @State private var outerBreathing: Bool = false
     @State private var haloBreath: CGFloat = 0.98
+    @State private var isReplaying = false
+    @State private var replayProgress: CGFloat = 1.0
 
     private var gold: Color {
         goldColor ?? theme.accentColor
@@ -136,6 +139,15 @@ struct LivingMandalaView: View {
         snapshot.completedCount >= MantraRitualState.cycleLength
     }
 
+    /// During replay, petals stagger back from 0 to completedCount.
+    /// Outside replay, returns the real count.
+    private var effectiveCompletedCount: Int {
+        if isReplaying {
+            return Int(replayProgress * CGFloat(snapshot.completedCount))
+        }
+        return snapshot.completedCount
+    }
+
     // MARK: Body
 
     var body: some View {
@@ -144,7 +156,7 @@ struct LivingMandalaView: View {
 
             petalsLayer(
                 ringIndex: 0,
-                revealedCount: min(snapshot.completedCount, 7),
+                revealedCount: min(effectiveCompletedCount, 7),
                 radius: diameter * 0.18,
                 petalLength: diameter * 0.20,
                 petalWidth: diameter * 0.08,
@@ -156,7 +168,7 @@ struct LivingMandalaView: View {
 
             petalsLayer(
                 ringIndex: 1,
-                revealedCount: min(max(snapshot.completedCount - 7, 0), 7),
+                revealedCount: min(max(effectiveCompletedCount - 7, 0), 7),
                 radius: diameter * 0.30,
                 petalLength: diameter * 0.22,
                 petalWidth: diameter * 0.07,
@@ -168,7 +180,7 @@ struct LivingMandalaView: View {
 
             petalsLayer(
                 ringIndex: 2,
-                revealedCount: min(max(snapshot.completedCount - 14, 0), 7),
+                revealedCount: min(max(effectiveCompletedCount - 14, 0), 7),
                 radius: diameter * 0.42,
                 petalLength: diameter * 0.24,
                 petalWidth: diameter * 0.06,
@@ -183,10 +195,12 @@ struct LivingMandalaView: View {
         }
         .frame(width: diameter, height: diameter)
         .scaleEffect(bloomScale)
+        .drawingGroup()
         .accessibilityHidden(true)
         .onAppear { syncAmbientMotion() }
         .onChange(of: motionGate) { _, _ in syncAmbientMotion() }
         .onChange(of: bloomTrigger) { _, _ in triggerBloom() }
+        .onChange(of: replayTrigger) { _, _ in triggerReplay() }
     }
 
     // MARK: Halo
@@ -400,6 +414,32 @@ struct LivingMandalaView: View {
             withAnimation(.spring(response: 0.62, dampingFraction: 0.74)) {
                 bloomScale = 1.0
             }
+        }
+    }
+
+    // MARK: Replay
+
+    private func triggerReplay() {
+        guard snapshot.completedCount > 0, !isReplaying else { return }
+        guard !motionGate.prefersReducedMotion else { return }
+
+        isReplaying = true
+
+        // Collapse all petals
+        withAnimation(.easeIn(duration: 0.4)) {
+            replayProgress = 0
+        }
+
+        // Re-bloom staggered over 1.8s
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
+            withAnimation(.easeOut(duration: 1.8)) {
+                replayProgress = 1.0
+            }
+        }
+
+        // Mark replay done
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            isReplaying = false
         }
     }
 }

@@ -23,6 +23,7 @@ struct MantraRitualView: View {
 
     @State private var holdProgress: CGFloat = 0
     @State private var bloomTrigger = 0
+    @State private var replayTrigger = 0
     @State private var completionFeedbackTrigger = 0
     @State private var shareCardImage: ShareableCardImage?
     @State private var isRenderingShare = false
@@ -30,8 +31,10 @@ struct MantraRitualView: View {
     @State private var completionFlash: Double = 0
     @State private var breathingGlowOpacity: Double = 0.5
 
+    // Fix 1b: Pass isVisible so motionGate pauses all mandala animations
+    // when the ritual tab is off-screen during a page swipe.
     private var motionGate: RitualMotionGate {
-        RitualMotionGate.resolve(scenePhase: scenePhase, reduceMotion: reduceMotion)
+        RitualMotionGate.resolve(scenePhase: scenePhase, reduceMotion: reduceMotion, isVisible: vm.activeTab == 1)
     }
 
     private var snapshot: MantraRitualSnapshot {
@@ -51,63 +54,73 @@ struct MantraRitualView: View {
             ritualTheme.backgroundGradient
                 .ignoresSafeArea()
 
+            // Fix 1b: Explicitly pause StarField when ritual tab not visible
             StarFieldView(
                 isDaytime: false,
                 timePeriod: .night,
-                isPaused: !motionGate.allowsAmbientMotion
+                isPaused: !motionGate.allowsAmbientMotion || vm.activeTab != 1
             )
             .ignoresSafeArea()
 
             if let activeMantra {
-                VStack(spacing: 0) {
-                    header
-                        .deviReveal(delay: 0.0, direction: .fadeUp)
+                // Fix 4: Wrap in ScrollView so meaning text is fully readable
+                // on shorter devices. Spacers become fixed heights (required
+                // because ScrollView has infinite proposed height).
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 0) {
+                        header
+                            .deviReveal(delay: 0.0, direction: .fadeUp)
 
-                    Spacer(minLength: 8)
+                        Spacer().frame(height: 16)
 
-                    // Mandala with ambient celestial glow backdrop
-                    ZStack {
-                        // Large ambient aura — single warm gold so the mandala
-                        // feels like it's radiating one unified light source.
-                        Circle()
-                            .fill(
-                                RadialGradient(
-                                    colors: [
-                                        ritualGold.opacity(0.14),
-                                        ritualGold.opacity(0.05),
-                                        Color.clear
-                                    ],
-                                    center: .center,
-                                    startRadius: 40,
-                                    endRadius: 220
+                        // Mandala with ambient celestial glow backdrop
+                        ZStack {
+                            // Large ambient aura — single warm gold so the mandala
+                            // feels like it's radiating one unified light source.
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        colors: [
+                                            ritualGold.opacity(0.14),
+                                            ritualGold.opacity(0.05),
+                                            Color.clear
+                                        ],
+                                        center: .center,
+                                        startRadius: 40,
+                                        endRadius: 220
+                                    )
                                 )
+                                .frame(width: 440, height: 440)
+                                .blur(radius: 30)
+
+                            LivingMandalaView(
+                                snapshot: snapshot,
+                                theme: ritualTheme,
+                                diameter: 320,
+                                motionGate: motionGate,
+                                bloomTrigger: bloomTrigger,
+                                replayTrigger: replayTrigger,
+                                emphasis: .ritual,
+                                goldColor: ritualGold
                             )
-                            .frame(width: 440, height: 440)
-                            .blur(radius: 30)
+                        }
+                        // Fix 3: Tap mandala to replay bloom sequence
+                        .onTapGesture { replayTrigger += 1 }
+                        .deviReveal(delay: 0.3, direction: .scale)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(snapshot.accessibilitySummary)
+                        .accessibilityAction(named: "Replay mandala bloom") { replayTrigger += 1 }
 
-                        LivingMandalaView(
-                            snapshot: snapshot,
-                            theme: ritualTheme,
-                            diameter: 320,
-                            motionGate: motionGate,
-                            bloomTrigger: bloomTrigger,
-                            emphasis: .ritual,
-                            goldColor: ritualGold
-                        )
+                        Spacer().frame(height: 20)
+
+                        mantraTextSection(activeMantra)
+                            .deviEntrance(delay: 1.0)
+
+                        Spacer().frame(height: 24)
                     }
-                    .deviReveal(delay: 0.3, direction: .scale)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(snapshot.accessibilitySummary)
-
-                    Spacer(minLength: 12)
-
-                    mantraTextSection(activeMantra)
-                        .deviEntrance(delay: 1.0)
-
-                    Spacer()
+                    .padding(.horizontal, 20)
+                    .padding(.top, 4)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
             } else {
                 VStack {
                     header
@@ -148,6 +161,7 @@ struct MantraRitualView: View {
             .deviEntrance(delay: 1.2)
         }
         .sensoryFeedback(.impact(weight: .medium), trigger: completionFeedbackTrigger)
+        .sensoryFeedback(.impact(weight: .light), trigger: replayTrigger)
         .onAppear {
             if let milestone = snapshot.shouldElevateSharePrompt ? snapshot.milestone : nil {
                 activeMilestone = milestone
@@ -155,10 +169,15 @@ struct MantraRitualView: View {
             }
             startBreathingGlow()
         }
+        .onChange(of: vm.activeTab) { _, newTab in
+            if newTab == 1 { startBreathingGlow() }
+        }
     }
 
     // MARK: - Header
 
+    // Fix 2: Replace .ultraThinMaterial with solid dark background to
+    // eliminate frosted-glass bleeding at device corners.
     private var header: some View {
         HStack {
             Button {
@@ -168,7 +187,7 @@ struct MantraRitualView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(ritualTheme.secondaryText)
                     .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial)
+                    .background(ritualTheme.deepBackground.opacity(0.6))
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
@@ -209,7 +228,7 @@ struct MantraRitualView: View {
             .font(.system(size: 14, weight: .semibold))
             .foregroundColor(ritualTheme.secondaryText)
             .frame(width: 44, height: 44)
-            .background(.ultraThinMaterial)
+            .background(ritualTheme.deepBackground.opacity(0.6))
             .clipShape(Circle())
     }
 
@@ -318,7 +337,7 @@ struct MantraRitualView: View {
                         maximumDistance: 36,
                         isEnabled: snapshot.canCompleteToday,
                         accessibilityLabel: snapshot.actionTitle,
-                        accessibilityHint: "Press and hold to complete today's ritual."
+                        accessibilityHint: "Press and hold to seal today\u{2019}s ritual."
                     ) { isPressing in
                         updateHoldProgress(isPressing)
                     } onCompleted: {
@@ -340,21 +359,27 @@ struct MantraRitualView: View {
         }
     }
 
+    // Fix 5: Redesigned action well — centered VStack, gold gradient border,
+    // layered background, shadow aura. Sacred aesthetic.
     private func actionWellLabel(icon: String) -> some View {
-        HStack(spacing: 14) {
+        VStack(spacing: 12) {
+            // Progress ring (smaller 56pt, angular gradient sweep)
             ZStack {
                 Circle()
                     .stroke(ritualTheme.primaryText.opacity(0.10), lineWidth: 2)
-                    .frame(width: 64, height: 64)
+                    .frame(width: 56, height: 56)
 
                 Circle()
                     .trim(from: 0, to: holdProgress)
                     .stroke(
-                        ritualGold,
+                        AngularGradient(
+                            colors: [ritualGold.opacity(0.6), ritualGold, ritualGold.opacity(0.6)],
+                            center: .center
+                        ),
                         style: StrokeStyle(lineWidth: 3.5, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
-                    .frame(width: 64, height: 64)
+                    .frame(width: 56, height: 56)
 
                 // Golden halo during hold
                 if holdProgress > 0 {
@@ -366,45 +391,80 @@ struct MantraRitualView: View {
                                     ritualGold.opacity(0.0)
                                 ],
                                 center: .center,
-                                startRadius: 20,
-                                endRadius: 48
+                                startRadius: 16,
+                                endRadius: 40
                             )
                         )
-                        .frame(width: 96, height: 96)
+                        .frame(width: 80, height: 80)
                 }
 
                 // Icon with gold glow when completed
                 ZStack {
                     if snapshot.completedToday {
                         Image(systemName: icon)
-                            .font(.system(size: 20, weight: .medium))
+                            .font(.system(size: 18, weight: .medium))
                             .foregroundColor(ritualGold.opacity(0.5))
                             .blur(radius: 8)
                     }
                     Image(systemName: icon)
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundColor(snapshot.canCompleteToday ? ritualGold :
                                          snapshot.completedToday ? ritualGold :
                                          ritualTheme.primaryText.opacity(0.65))
                 }
             }
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(snapshot.actionTitle)
-                    .scaledFont(size: 16, weight: .semibold, design: .serif)
-                    .foregroundColor(ritualTheme.primaryText)
+            // Title
+            Text(snapshot.actionTitle)
+                .scaledFont(size: 16, weight: .semibold, design: .serif)
+                .foregroundColor(ritualTheme.primaryText)
 
-                Text(prefersDirectCompletionAction ? "Accessible direct action" : "Press and hold to complete")
-                    .scaledFont(size: 12, weight: .medium)
-                    .foregroundColor(ritualTheme.secondaryText)
-            }
-
-            Spacer()
+            // Subtitle — sacred language
+            Text(snapshot.completedToday ? "The day\u{2019}s light is sealed" :
+                 prefersDirectCompletionAction ? "Accessible direct action" :
+                 "Press and hold to seal")
+                .scaledFont(size: 12, weight: .medium)
+                .foregroundColor(ritualTheme.secondaryText)
         }
+        .frame(maxWidth: .infinity)
         .padding(.horizontal, 18)
-        .padding(.vertical, 18)
-        .background(ritualGold.opacity(snapshot.canCompleteToday ? 0.08 : 0.04))
-        .deviCard(theme: ritualTheme, elevation: .prominent, cornerRadius: 24)
+        .padding(.vertical, 20)
+        .background(
+            ZStack {
+                // Base gradient
+                LinearGradient(
+                    colors: [
+                        ritualGold.opacity(snapshot.canCompleteToday ? 0.10 : 0.05),
+                        ritualGold.opacity(snapshot.canCompleteToday ? 0.04 : 0.02)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                // Radial warmth from top center
+                RadialGradient(
+                    colors: [
+                        ritualGold.opacity(0.06),
+                        Color.clear
+                    ],
+                    center: .top,
+                    startRadius: 0,
+                    endRadius: 200
+                )
+            }
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(
+                    LinearGradient(
+                        colors: [ritualGold.opacity(0.35), ritualGold.opacity(0.10)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: 1
+                )
+        )
+        .shadow(color: ritualGold.opacity(0.12), radius: 12, x: 0, y: 4)
     }
 
     // MARK: - Milestone

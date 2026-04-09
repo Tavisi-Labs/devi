@@ -10,6 +10,7 @@ struct DeviApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var splashFinished = false
     @State private var notificationDelegate = DeviNotificationDelegate()
+    @State private var ritualColorSchemeActive = false
 
     init() {
         configureUITestState()
@@ -38,7 +39,7 @@ struct DeviApp: App {
                     }
                 }
                 .environment(\.deviFontScale, vm.fontScale)
-                .preferredColorScheme(vm.activeTab == 1 ? .dark : (vm.isLightMode ? .light : .dark))
+                .preferredColorScheme(ritualColorSchemeActive ? .dark : (vm.isLightMode ? .light : .dark))
 
                 // Splash overlay — always dark, dissolves after ~1.8s
                 if !splashFinished {
@@ -68,6 +69,9 @@ struct DeviApp: App {
                 } else if newPhase == .background {
                     vm.stopTimer()
                 }
+            }
+            .onChange(of: vm.activeTab) { _, newTab in
+                ritualColorSchemeActive = newTab == 1
             }
         }
     }

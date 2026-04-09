@@ -262,6 +262,7 @@ struct HomeView: View {
 
                 }
                 .padding(.bottom, 80)
+                .drawingGroup()
             }
         }
         .onAppear {
