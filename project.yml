@@ -32,8 +32,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.hareeshnagaraj.devi
         DEVELOPMENT_TEAM: KTK5RL3ZR3
         CODE_SIGN_STYLE: Automatic
-        MARKETING_VERSION: "1.2"
-        CURRENT_PROJECT_VERSION: "10"
+        MARKETING_VERSION: "1.2.1"
+        CURRENT_PROJECT_VERSION: "11"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         INFOPLIST_KEY_UIRequiresFullScreen: true
