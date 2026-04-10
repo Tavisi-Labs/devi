@@ -82,7 +82,7 @@ final class PanchangRitualViewModelTests: XCTestCase {
         let vm = PanchangViewModel()
         XCTAssertEqual(vm.activeTab, 0)
         vm.deepLinkToRitual()
-        XCTAssertEqual(vm.activeTab, 1)
+        XCTAssertEqual(vm.activeTab, DeviFeatureFlags.ritualEnabled ? 1 : 0)
     }
 
     private func isoDate(_ value: String) -> Date {

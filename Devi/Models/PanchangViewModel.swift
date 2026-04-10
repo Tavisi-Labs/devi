@@ -7,6 +7,20 @@ import Combine
 
 @MainActor
 class PanchangViewModel: ObservableObject {
+    enum CitySelectionSource: Equatable {
+        case manual
+        case currentLocationExact
+        case currentLocationFallback
+
+        var isResolvedFromLocation: Bool {
+            switch self {
+            case .manual:
+                return false
+            case .currentLocationExact, .currentLocationFallback:
+                return true
+            }
+        }
+    }
 
     // MARK: - Published State
 
@@ -71,6 +85,7 @@ class PanchangViewModel: ObservableObject {
     @Published var hintLaunchCount: Int = 0
     /// True when the user should see gesture discovery hints (first 3 launches)
     var shouldShowHints: Bool { hintLaunchCount < 3 }
+    var shouldShowPageNavigationHint: Bool { !hasDiscoveredPageNavigation }
 
     // MARK: - Transition Pill ("What Changed")
     /// Set when the tithi has changed since the user last opened the app
@@ -79,6 +94,10 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Location Error
     /// Set when geocoding fails and nearest-city fallback is used
     @Published var locationError: String?
+    @Published var locationResolutionSucceeded: Bool = false
+    @Published var locationResolutionMessage: String?
+    @Published var isUsingApproximateLocation: Bool = false
+    @Published private(set) var hasDiscoveredPageNavigation: Bool = false
 
     /// The effective "now" — either real time or scrubbed virtual time
     var effectiveNow: Date {
@@ -132,7 +151,9 @@ class PanchangViewModel: ObservableObject {
 
     // MARK: - Private
 
-    private let locationManager = LocationManager()
+    private let locationManager: any LocationManaging
+    private let reverseGeocode: (CLLocation) async throws -> ReverseGeocodedLocation
+    private let locationResolutionTimeout: Duration
     private var locationResolutionTimeoutTask: Task<Void, Never>?
     private var timerCancellable: AnyCancellable?
     private let dataStore = PanchangDataStore() // Kept for eclipse data (separate concern)
@@ -331,7 +352,15 @@ class PanchangViewModel: ObservableObject {
 
     // MARK: - Init
 
-    init() {
+    init(
+        locationManager: any LocationManaging = LocationManager(),
+        reverseGeocode: @escaping (CLLocation) async throws -> ReverseGeocodedLocation = PanchangViewModel.liveReverseGeocode,
+        locationResolutionTimeout: Duration = .seconds(10)
+    ) {
+        self.locationManager = locationManager
+        self.reverseGeocode = reverseGeocode
+        self.locationResolutionTimeout = locationResolutionTimeout
+
         hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
 
         // Load persisted notification preferences
@@ -377,6 +406,7 @@ class PanchangViewModel: ObservableObject {
 
         // Load hint launch counter for gesture discovery
         hintLaunchCount = ud.integer(forKey: "hintLaunchCount")
+        hasDiscoveredPageNavigation = ud.bool(forKey: "hasDiscoveredPageNavigation")
 
         // Load persisted city (if user previously selected one)
         if let cityName = ud.string(forKey: "city.name"),
@@ -707,9 +737,16 @@ class PanchangViewModel: ObservableObject {
     // MARK: - Navigation
 
     func deepLinkToRitual() {
+        guard DeviFeatureFlags.ritualEnabled else { return }
         withAnimation(.easeInOut(duration: 0.3)) {
             activeTab = 1
         }
+    }
+
+    func markPageNavigationDiscovered() {
+        guard !hasDiscoveredPageNavigation else { return }
+        hasDiscoveredPageNavigation = true
+        UserDefaults.standard.set(true, forKey: "hasDiscoveredPageNavigation")
     }
 
     // MARK: - Day Navigation
@@ -931,12 +968,18 @@ class PanchangViewModel: ObservableObject {
     func requestLocation() {
         guard !isResolvingLocation else { return }
         isResolvingLocation = true
+        locationError = nil
+        locationResolutionSucceeded = false
+        locationResolutionMessage = nil
+        isUsingApproximateLocation = false
 
         locationResolutionTimeoutTask?.cancel()
         locationResolutionTimeoutTask = Task { [weak self] in
-            try? await Task.sleep(for: .seconds(10))
-            guard let self, !Task.isCancelled, self.isResolvingLocation else { return }
-            self.selectCity(UserCity.popularCities[0])
+            guard let self else { return }
+            try? await Task.sleep(for: self.locationResolutionTimeout)
+            guard !Task.isCancelled, self.isResolvingLocation else { return }
+            self.locationError = "We couldn’t determine your location. Choose a city manually or try again."
+            self.finishLocationResolution()
         }
 
         locationManager.requestPermission { [weak self] authorized in
@@ -944,13 +987,20 @@ class PanchangViewModel: ObservableObject {
                 guard let self else { return }
                 self.isLocationAuthorized = authorized
                 guard authorized else {
+                    self.locationError = "Location access is turned off. Choose your city manually or enable location in Settings."
                     self.finishLocationResolution()
                     return
                 }
 
-                self.locationManager.getCurrentLocation { location in
+                self.locationManager.getCurrentLocation { result in
                     Task { @MainActor in
-                        await self.resolveLocationToCity(location)
+                        switch result {
+                        case .success(let location):
+                            await self.resolveLocationToCity(location)
+                        case .failure:
+                            self.locationError = "We couldn’t read your current location. Choose a city manually or try again."
+                            self.finishLocationResolution()
+                        }
                     }
                 }
             }
@@ -962,40 +1012,38 @@ class PanchangViewModel: ObservableObject {
     private func resolveLocationToCity(_ location: CLLocation) async {
         guard isResolvingLocation else { return }
 
-        let geocoder = CLGeocoder()
         do {
-            let placemarks = try await geocoder.reverseGeocodeLocation(location)
-            if let placemark = placemarks.first {
-                let name = placemark.locality
-                    ?? placemark.name
-                    ?? placemark.administrativeArea
-                    ?? "Unknown"
-                let country = placemark.isoCountryCode ?? "??"
-                let tz = placemark.timeZone ?? TimeZone.current
-
-                let city = UserCity(
-                    name: name,
-                    country: country,
-                    latitude: location.coordinate.latitude,
-                    longitude: location.coordinate.longitude,
-                    timezoneIdentifier: tz.identifier
-                )
-                selectCity(city)
-                return
-            }
+            let place = try await reverseGeocode(location)
+            let city = UserCity(
+                name: place.name,
+                country: place.country,
+                latitude: location.coordinate.latitude,
+                longitude: location.coordinate.longitude,
+                timezoneIdentifier: place.timezoneIdentifier
+            )
+            selectCity(city, source: .currentLocationExact)
+            return
         } catch {
             // Geocoding failed (no network, etc.) — fall through to nearest popular city
         }
 
         // Offline fallback: snap to nearest popular city
         let nearest = UserCity.nearest(to: location)
-        selectCity(nearest)
-        // Set error after selectCity (which clears locationError) so the message persists
-        locationError = "Could not determine exact location. Using nearest city."
+        selectCity(nearest, source: .currentLocationFallback)
     }
 
-    func selectCity(_ city: UserCity) {
+    func selectCity(_ city: UserCity, source: CitySelectionSource = .manual) {
         locationError = nil
+        locationResolutionSucceeded = source.isResolvedFromLocation
+        isUsingApproximateLocation = source == .currentLocationFallback
+        switch source {
+        case .manual:
+            locationResolutionMessage = nil
+        case .currentLocationExact:
+            locationResolutionMessage = "Detected from your device."
+        case .currentLocationFallback:
+            locationResolutionMessage = "Using nearest supported city: \(city.name)."
+        }
         currentCity = city
         persistCity(city)
         loadData()
@@ -1017,6 +1065,20 @@ class PanchangViewModel: ObservableObject {
         ud.set(city.latitude, forKey: "city.latitude")
         ud.set(city.longitude, forKey: "city.longitude")
         ud.set(city.timezoneIdentifier, forKey: "city.timezoneIdentifier")
+    }
+
+    private static func liveReverseGeocode(_ location: CLLocation) async throws -> ReverseGeocodedLocation {
+        let geocoder = CLGeocoder()
+        let placemarks = try await geocoder.reverseGeocodeLocation(location)
+        guard let placemark = placemarks.first else {
+            throw CLError(.geocodeFoundNoResult)
+        }
+
+        return ReverseGeocodedLocation(
+            name: placemark.locality ?? placemark.name ?? placemark.administrativeArea ?? "Unknown",
+            country: placemark.isoCountryCode ?? "??",
+            timezoneIdentifier: (placemark.timeZone ?? TimeZone.current).identifier
+        )
     }
 
     // MARK: - Onboarding
@@ -1185,12 +1247,23 @@ class PanchangViewModel: ObservableObject {
 // MARK: - TimePeriod Equatable
 extension TimePeriod: Equatable {}
 
-// MARK: - Placeholder Location Manager
+struct ReverseGeocodedLocation {
+    let name: String
+    let country: String
+    let timezoneIdentifier: String
+}
 
-class LocationManager: NSObject, CLLocationManagerDelegate {
+protocol LocationManaging {
+    func requestPermission(completion: @escaping (Bool) -> Void)
+    func getCurrentLocation(completion: @escaping (Result<CLLocation, Error>) -> Void)
+}
+
+// MARK: - Live Location Manager
+
+final class LocationManager: NSObject, CLLocationManagerDelegate, LocationManaging {
     private let manager = CLLocationManager()
     private var permissionCallback: ((Bool) -> Void)?
-    private var locationCallback: ((CLLocation) -> Void)?
+    private var locationCallback: ((Result<CLLocation, Error>) -> Void)?
 
     override init() {
         super.init()
@@ -1199,30 +1272,44 @@ class LocationManager: NSObject, CLLocationManagerDelegate {
 
     func requestPermission(completion: @escaping (Bool) -> Void) {
         permissionCallback = completion
-        manager.requestWhenInUseAuthorization()
+
+        switch manager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            permissionCallback?(true)
+            permissionCallback = nil
+        case .denied, .restricted:
+            permissionCallback?(false)
+            permissionCallback = nil
+        case .notDetermined:
+            manager.requestWhenInUseAuthorization()
+        @unknown default:
+            permissionCallback?(false)
+            permissionCallback = nil
+        }
     }
 
-    func getCurrentLocation(completion: @escaping (CLLocation) -> Void) {
+    func getCurrentLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
         locationCallback = completion
         manager.requestLocation()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
-            locationCallback?(location)
+            locationCallback?(.success(location))
+            locationCallback = nil
         }
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // Fallback: use first popular city's coordinates (no hardcoded values)
-        let fallback = UserCity.popularCities[0]
-        locationCallback?(CLLocation(latitude: fallback.latitude, longitude: fallback.longitude))
+        locationCallback?(.failure(error))
+        locationCallback = nil
     }
 
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         let authorized = manager.authorizationStatus == .authorizedWhenInUse ||
                          manager.authorizationStatus == .authorizedAlways
         permissionCallback?(authorized)
+        permissionCallback = nil
     }
 }
 

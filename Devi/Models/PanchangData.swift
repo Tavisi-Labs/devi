@@ -545,6 +545,7 @@ struct UserCity: Codable, Identifiable, Hashable {
         UserCity(name: "Houston", country: "US", latitude: 29.7604, longitude: -95.3698, timezoneIdentifier: "America/Chicago"),
         UserCity(name: "San Francisco", country: "US", latitude: 37.7749, longitude: -122.4194, timezoneIdentifier: "America/Los_Angeles"),
         UserCity(name: "Dallas", country: "US", latitude: 32.7767, longitude: -96.7970, timezoneIdentifier: "America/Chicago"),
+        UserCity(name: "Washington", country: "US", latitude: 38.9072, longitude: -77.0369, timezoneIdentifier: "America/New_York"),
         UserCity(name: "Edison", country: "US", latitude: 40.5187, longitude: -74.4121, timezoneIdentifier: "America/New_York"),
         // India cities
         UserCity(name: "Mumbai", country: "IN", latitude: 19.0760, longitude: 72.8777, timezoneIdentifier: "Asia/Kolkata"),

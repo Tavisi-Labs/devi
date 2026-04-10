@@ -117,7 +117,7 @@ struct OnboardingView: View {
             }
         }
         .onChange(of: vm.isResolvingLocation) { _, isResolving in
-            if !isResolving && currentPage == 1 && !citySelected {
+            if !isResolving && currentPage == 1 && !citySelected && vm.locationResolutionSucceeded {
                 // Location resolved — show preview
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                     citySelected = true
@@ -316,6 +316,7 @@ struct OnboardingView: View {
                 }
             }
             .deviButton(.primary)
+            .accessibilityIdentifier("onboarding.useLocation")
             .padding(.horizontal, 32)
             .disabled(vm.isResolvingLocation)
             .opacity(cityPageAppeared ? 1 : 0)
@@ -396,8 +397,44 @@ struct OnboardingView: View {
                     .scaledFont(size: 17, weight: .semibold)
                     .foregroundColor(theme.primaryText)
             }
+            .accessibilityIdentifier("onboarding.detectedCity")
             .opacity(previewAppeared ? 1 : 0)
             .animation(.easeOut(duration: 0.4), value: previewAppeared)
+
+            if let message = vm.locationResolutionMessage {
+                HStack(spacing: 8) {
+                    Image(systemName: vm.isUsingApproximateLocation ? "location.slash.fill" : "location.circle.fill")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(vm.isUsingApproximateLocation ? theme.cautionColor : theme.auspiciousColor)
+
+                    Text(message)
+                        .scaledFont(size: 12, weight: .medium)
+                        .foregroundColor(theme.secondaryText)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(
+                            (vm.isUsingApproximateLocation ? theme.cautionColor : theme.auspiciousColor)
+                                .opacity(0.12)
+                        )
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(
+                            (vm.isUsingApproximateLocation ? theme.cautionColor : theme.auspiciousColor)
+                                .opacity(0.25),
+                            lineWidth: 0.5
+                        )
+                )
+                .padding(.horizontal, 24)
+                .accessibilityIdentifier("onboarding.locationResolutionMessage")
+                .opacity(previewAppeared ? 1 : 0)
+                .offset(y: previewAppeared ? 0 : 8)
+                .animation(.easeOut(duration: 0.4).delay(0.15), value: previewAppeared)
+            }
 
             // Moon medallion — actual phase for user's city
             if let panchang = vm.todayPanchang {

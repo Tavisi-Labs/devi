@@ -24,6 +24,7 @@ struct HomeView: View {
     @State private var showWhySheet = false
     @State private var showBirthDataInput = false
     @State private var isArchivePresented = false
+    @State private var helpTopic: HomeHelpTopic?
 
     var body: some View {
         ZStack {
@@ -159,16 +160,21 @@ struct HomeView: View {
                         // Gesture discovery hint (first 3 launches)
                         if vm.shouldShowHints {
                             Text("Tap the arc to scrub time \u{00B7} Swipe header for days")
-                                .scaledFont(size: 11, weight: .regular)
-                                .foregroundColor(vm.theme.secondaryText.opacity(0.5))
-                                .padding(.top, 8)
-                                .transition(.opacity)
+                            .scaledFont(size: 11, weight: .regular)
+                            .foregroundColor(vm.theme.secondaryText.opacity(0.5))
+                            .padding(.top, 8)
+                            .accessibilityIdentifier("home.gestureHint")
+                            .transition(.opacity)
                         }
                     } else {
                         // Loading skeleton — shown while panchang computes
                         PanchangSkeletonView(theme: vm.theme)
                             .padding(.top, 24)
                     }
+
+                    glossaryPromptCard
+                        .padding(.horizontal)
+                        .padding(.top, 20)
 
                     // (Info bar removed — tithi/nakshatra already in CelestialHeroView)
 
@@ -262,9 +268,10 @@ struct HomeView: View {
 
                 }
                 .padding(.bottom, 80)
-                .drawingGroup()
             }
         }
+        .accessibilityIdentifier("home.screen")
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             vm.loadData()
             vm.recordUsageDay()
@@ -360,6 +367,9 @@ struct HomeView: View {
                 onCancel: { showBirthDataInput = false }
             )
         }
+        .sheet(item: $helpTopic) { topic in
+            HomeGlossarySheet(topic: topic, theme: vm.theme)
+        }
     }
 
     // MARK: - Header
@@ -431,6 +441,17 @@ struct HomeView: View {
                 .scaledFont(size: 16, weight: .medium)
                 .foregroundColor(vm.theme.primaryText)
 
+            if vm.isUsingApproximateLocation, let message = vm.locationResolutionMessage {
+                Text(message)
+                    .scaledFont(size: 11, weight: .medium)
+                    .foregroundColor(vm.theme.cautionColor)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(vm.theme.cautionColor.opacity(0.12))
+                    .clipShape(Capsule())
+                    .transition(.opacity)
+            }
+
             // "What changed" transition pill (tap to dismiss)
             if let changed = vm.tithiChangedMessage {
                 Text(changed)
@@ -459,6 +480,7 @@ struct HomeView: View {
                         .contentTransition(.interpolate)
                 }
             }
+
         }
         .animation(.easeInOut(duration: 0.3), value: vm.dayOffset)
     }
@@ -586,6 +608,58 @@ struct HomeView: View {
             }
         }
         .deviEntrance(delay: 0.16)
+    }
+
+    private var glossaryPromptCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "questionmark.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundColor(vm.theme.accentColor)
+                Text("NEW TO THESE TERMS?")
+                    .scaledFont(size: 11, weight: .bold)
+                    .tracking(1.8)
+                    .foregroundColor(vm.theme.secondaryText)
+            }
+
+            Text("Quick explainers for the concepts that show up throughout Devi.")
+                .scaledFont(size: 13, weight: .regular)
+                .foregroundColor(vm.theme.secondaryText)
+
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 110), spacing: 8)],
+                alignment: .leading,
+                spacing: 8
+            ) {
+                ForEach(HomeHelpTopic.allCases) { topic in
+                    Button {
+                        helpTopic = topic
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: topic.icon)
+                                .font(.system(size: 11, weight: .semibold))
+                            Text(topic.shortTitle)
+                                .scaledFont(size: 12, weight: .semibold)
+                        }
+                        .foregroundColor(vm.theme.primaryText)
+                        .frame(maxWidth: .infinity)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 10)
+                        .background(vm.theme.primaryText.opacity(0.05))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(topic.title)
+                    .accessibilityHint("Opens a quick explainer")
+                    .accessibilityIdentifier("home.help.\(topic.rawValue)")
+                }
+            }
+        }
+        .padding(18)
+        .deviCard(theme: vm.theme, elevation: .raised, cornerRadius: 18)
+        .accessibilityIdentifier("home.resourcesCard")
     }
 
     // MARK: - Upcoming Events (capped + "Show All")
@@ -856,6 +930,127 @@ struct HomeView: View {
                     }
                 }
             }
+    }
+}
+
+private enum HomeHelpTopic: String, CaseIterable, Identifiable {
+    case tithi
+    case nakshatra
+    case hora
+    case choghadiya
+    case timeWindows
+
+    var id: String { rawValue }
+
+    var shortTitle: String {
+        switch self {
+        case .tithi: return "Tithi"
+        case .nakshatra: return "Nakshatra"
+        case .hora: return "Hora"
+        case .choghadiya: return "Choghadiya"
+        case .timeWindows: return "Time Windows"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .tithi: return "moon.circle.fill"
+        case .nakshatra: return "sparkles"
+        case .hora: return "clock.fill"
+        case .choghadiya: return "square.grid.2x2.fill"
+        case .timeWindows: return "sunrise.fill"
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .tithi:
+            return "Tithi"
+        case .nakshatra:
+            return "Nakshatra"
+        case .hora:
+            return "Hora"
+        case .choghadiya:
+            return "Choghadiya"
+        case .timeWindows:
+            return "Time Windows"
+        }
+    }
+
+    var summary: String {
+        switch self {
+        case .tithi:
+            return "The lunar day. Tithi tracks the angular relationship between the Sun and Moon, which is why Devi uses it to shape the emotional and ritual tone of the day."
+        case .nakshatra:
+            return "The Moon’s constellation. Nakshatra describes the part of the sky the Moon is moving through, adding a more specific flavor to the day than the tithi alone."
+        case .hora:
+            return "Planetary hours. Each hora is ruled by a graha, giving the day a repeating cadence of planetary emphasis from sunrise onward."
+        case .choghadiya:
+            return "An eight-part day/night rhythm used for timing activities. Devi highlights which segments are favorable, mixed, or best avoided."
+        case .timeWindows:
+            return "Named muhurta and kalam periods such as Brahma Muhurta, Abhijit Muhurta, and Rahu Kalam. These windows help you notice especially supportive or cautionary intervals."
+        }
+    }
+}
+
+private struct HomeGlossarySheet: View {
+    let topic: HomeHelpTopic
+    let theme: DeviTheme
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
+                    Label(topic.title, systemImage: topic.icon)
+                        .font(.system(size: 28, weight: .regular, design: .serif))
+                        .foregroundColor(theme.primaryText)
+                        .padding(.top, 8)
+
+                    Text(topic.summary)
+                        .deviLabel(.body, theme: theme)
+                        .lineSpacing(4)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("How to use it in Devi")
+                            .deviLabel(.section, theme: theme)
+
+                        Text(usageCopy)
+                            .deviLabel(.detail, theme: theme)
+                            .lineSpacing(4)
+                    }
+                    .padding(16)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .deviCard(theme: theme, elevation: .raised)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 32)
+            }
+            .background(theme.backgroundGradient.ignoresSafeArea())
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                        .foregroundColor(theme.accentColor)
+                }
+            }
+        }
+    }
+
+    private var usageCopy: String {
+        switch topic {
+        case .tithi:
+            return "The moon medallion and your daily reading both depend on the current tithi. Tap the moon in the celestial arc when you want the deeper explanation."
+        case .nakshatra:
+            return "Nakshatra appears beside Live Sky and in your daily context. It is most useful when you want a more specific texture for the day than a broad horoscope summary."
+        case .hora:
+            return "Use Hora when you want a quick planetary read on the next few hours. The active hora expands automatically so you can see the current ruler at a glance."
+        case .choghadiya:
+            return "Choghadiya is a simpler timing layer for day and night. The current segment is expanded, and the ribbon below shows how the quality changes over time."
+        case .timeWindows:
+            return "Time windows are the highest-signal periods for practice and planning. The timeline card shows which windows are active now, upcoming soon, or already passed."
+        }
     }
 }
 

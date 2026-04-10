@@ -3,17 +3,25 @@
 
 import SwiftUI
 import UserNotifications
+import UIKit
+
+enum DeviFeatureFlags {
+    static let ritualEnabled = false
+}
 
 @main
 struct DeviApp: App {
-    @StateObject private var vm = PanchangViewModel()
+    @StateObject private var vm: PanchangViewModel
     @Environment(\.scenePhase) private var scenePhase
-    @State private var splashFinished = false
+    @State private var splashFinished: Bool
     @State private var notificationDelegate = DeviNotificationDelegate()
     @State private var ritualColorSchemeActive = false
 
     init() {
-        configureUITestState()
+        Self.configureUITestState()
+        Self.configureAppearance()
+        _vm = StateObject(wrappedValue: PanchangViewModel())
+        _splashFinished = State(initialValue: ProcessInfo.processInfo.arguments.contains("UITests.SkipSplash"))
 
         // Initialize Swiss Ephemeris singleton — sets Lahiri ayanamsa and ephemeris path.
         // Must happen before any panchang computation. The singleton is lazy, so
@@ -27,13 +35,32 @@ struct DeviApp: App {
                 // Real content loads immediately behind splash
                 Group {
                     if vm.hasCompletedOnboarding {
-                        TabView(selection: $vm.activeTab) {
+                        if DeviFeatureFlags.ritualEnabled {
+                            ZStack {
+                                Group {
+                                    if vm.activeTab == 1 {
+                                        DeviTheme.forPeriod(.night, style: vm.themeStyle, appearance: .alwaysDark)
+                                            .backgroundGradient
+                                    } else {
+                                        vm.theme.backgroundGradient
+                                    }
+                                }
+                                .ignoresSafeArea()
+
+                                TabView(selection: $vm.activeTab) {
+                                    HomeView(vm: vm)
+                                        .tag(0)
+                                    MantraRitualView(vm: vm)
+                                        .tag(1)
+                                }
+                                .background(Color.clear)
+                                .tabViewStyle(.page(indexDisplayMode: .never))
+                            }
+                            .ignoresSafeArea()
+                        } else {
                             HomeView(vm: vm)
-                                .tag(0)
-                            MantraRitualView(vm: vm)
-                                .tag(1)
+                                .background(vm.theme.backgroundGradient.ignoresSafeArea())
                         }
-                        .tabViewStyle(.page(indexDisplayMode: .never))
                     } else {
                         OnboardingView(vm: vm)
                     }
@@ -76,7 +103,12 @@ struct DeviApp: App {
         }
     }
 
-    private func configureUITestState() {
+    private static func configureAppearance() {
+        UIScrollView.appearance(whenContainedInInstancesOf: [UIPageViewController.self]).backgroundColor = .clear
+        UIView.appearance(whenContainedInInstancesOf: [UIPageViewController.self]).backgroundColor = .clear
+    }
+
+    private static func configureUITestState() {
         #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
         let defaults = UserDefaults.standard
@@ -93,6 +125,13 @@ struct DeviApp: App {
 
         if arguments.contains("UITests.ResetRitualState") {
             defaults.removeObject(forKey: "mantraRitual.state")
+        }
+
+        if arguments.contains("UITests.ResetSessionState") {
+            defaults.removeObject(forKey: "hasDiscoveredPageNavigation")
+            defaults.removeObject(forKey: "usageDays")
+            defaults.set(0, forKey: "hintLaunchCount")
+            defaults.set(false, forKey: "hasRequestedReview")
         }
         #endif
     }

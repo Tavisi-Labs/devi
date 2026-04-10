@@ -5,45 +5,48 @@ final class LivingMandalaFlowUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    func testSwipeToRitualAndCompleteTodayPractice() throws {
+    private func makeApp() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["UITests.SkipOnboarding", "UITests.ResetRitualState"]
-        app.launch()
-
-        // Swipe left on Home to reach the ritual page
-        let homeView = app.otherElements.firstMatch
-        XCTAssertTrue(homeView.waitForExistence(timeout: 20))
-        homeView.swipeLeft()
-
-        let closeButton = app.buttons["ritual.close"]
-        XCTAssertTrue(closeButton.waitForExistence(timeout: 10))
-
-        let completionWell = app.descendants(matching: .any).matching(identifier: "ritual.completionWell").firstMatch
-        XCTAssertTrue(completionWell.waitForExistence(timeout: 10))
-        completionWell.press(forDuration: 1.1)
-
-        XCTAssertTrue(app.staticTexts["Today's practice is complete"].waitForExistence(timeout: 5))
+        app.launchArguments += [
+            "UITests.SkipOnboarding",
+            "UITests.ResetSessionState",
+            "UITests.SkipSplash"
+        ]
+        return app
     }
 
-    func testSwipeBackFromRitualReturnsToHome() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["UITests.SkipOnboarding", "UITests.ResetRitualState"]
+    private func waitForHome(in app: XCUIApplication, timeout: TimeInterval = 20) {
+        XCTAssertTrue(app.staticTexts["Live Sky"].waitForExistence(timeout: timeout))
+    }
+
+    func testHomeLoadsOnSmallerPhone() throws {
+        let app = makeApp()
         app.launch()
 
-        let homeView = app.otherElements.firstMatch
-        XCTAssertTrue(homeView.waitForExistence(timeout: 20))
+        waitForHome(in: app)
+        XCTAssertTrue(app.staticTexts["Sunrise"].exists)
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "home.openRitual").firstMatch.exists)
+    }
 
-        // Swipe to ritual
-        homeView.swipeLeft()
-        let closeButton = app.buttons["ritual.close"]
-        XCTAssertTrue(closeButton.waitForExistence(timeout: 10))
+    func testResourcesCardShowsQuickExplainers() throws {
+        let app = makeApp()
+        app.launch()
 
-        // Swipe back to Home
-        homeView.swipeRight()
+        waitForHome(in: app)
+        XCTAssertTrue(app.staticTexts["NEW TO THESE TERMS?"].waitForExistence(timeout: 10))
+        XCTAssertTrue(
+            app.staticTexts["Quick explainers for the concepts that show up throughout Devi."].waitForExistence(timeout: 5)
+        )
+    }
 
-        // Verify we're back on Home (settings gear should be visible)
-        let settingsButton = app.buttons.matching(identifier: "gearshape").firstMatch
-        // Home content should be accessible
-        XCTAssertTrue(app.staticTexts.element(boundBy: 0).waitForExistence(timeout: 5))
+    func testCaptureHomeScreen() throws {
+        let app = makeApp()
+        app.launch()
+
+        waitForHome(in: app)
+        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+        attachment.name = "home-iphone"
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 }

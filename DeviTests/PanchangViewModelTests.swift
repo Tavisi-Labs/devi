@@ -2,6 +2,7 @@
 // Tests for PanchangViewModel: tithi change detection, hint counter, cosmic retry, location error.
 
 import XCTest
+import CoreLocation
 @testable import Devi
 
 @MainActor
@@ -16,7 +17,7 @@ final class PanchangViewModelTests: XCTestCase {
         "hasCompletedOnboarding", "fontScale", "themeStyle", "appearanceMode",
         "notif.dailySummary", "notif.sunrise", "notif.sunset", "notif.rahuKalam",
         "notif.abhijit", "notif.brahma", "notif.navratri", "notif.eclipse", "notif.minutesBefore",
-        "notif.horoscope", "hasRequestedReview"
+        "notif.horoscope", "hasRequestedReview", "hasDiscoveredPageNavigation"
     ]
 
     override func tearDown() {
@@ -153,6 +154,93 @@ final class PanchangViewModelTests: XCTestCase {
         XCTAssertEqual(vm.currentCity.name, "Mumbai")
     }
 
+    func testRequestLocation_permissionDeniedShowsManualFallbackError() async {
+        let vm = makeVM(
+            locationManager: LocationManagerStub(permissionGranted: false, locationResult: nil)
+        )
+
+        vm.requestLocation()
+        await waitUntil {
+            !vm.isResolvingLocation && vm.locationError != nil
+        }
+
+        XCTAssertFalse(vm.isResolvingLocation)
+        XCTAssertFalse(vm.locationResolutionSucceeded)
+        XCTAssertTrue(vm.locationError?.contains("Location access is turned off") == true)
+    }
+
+    func testRequestLocation_timeoutDoesNotSilentlySnapToNewYork() async {
+        let originalCity = UserCity(name: "Chicago", country: "US", latitude: 41.8781, longitude: -87.6298, timezoneIdentifier: "America/Chicago")
+        let vm = makeVM(
+            locationManager: LocationManagerStub(permissionGranted: true, locationResult: nil),
+            locationResolutionTimeout: .milliseconds(10)
+        )
+        vm.selectCity(originalCity)
+
+        vm.requestLocation()
+        await waitUntil {
+            !vm.isResolvingLocation && vm.locationError != nil
+        }
+
+        XCTAssertEqual(vm.currentCity.name, "Chicago")
+        XCTAssertFalse(vm.locationResolutionSucceeded)
+        XCTAssertTrue(vm.locationError?.contains("couldn’t determine your location") == true)
+    }
+
+    func testRequestLocation_reverseGeocodeFailureFallsBackToNearestSupportedCity() async {
+        let dc = CLLocation(latitude: 38.9072, longitude: -77.0369)
+        let vm = makeVM(
+            locationManager: LocationManagerStub(permissionGranted: true, locationResult: .success(dc)),
+            reverseGeocode: { _ in throw CLError(.geocodeFoundNoResult) }
+        )
+
+        vm.requestLocation()
+        await waitUntil {
+            vm.locationResolutionSucceeded && vm.locationResolutionMessage != nil
+        }
+
+        XCTAssertEqual(vm.currentCity.name, "Washington")
+        XCTAssertTrue(vm.locationResolutionSucceeded)
+        XCTAssertTrue(vm.isUsingApproximateLocation)
+        XCTAssertEqual(vm.locationResolutionMessage, "Using nearest supported city: Washington.")
+        XCTAssertNil(vm.locationError)
+    }
+
+    func testRequestLocation_dcCoordinateResolvesToWashingtonInsteadOfNewYork() async {
+        let dc = CLLocation(latitude: 38.9072, longitude: -77.0369)
+        let vm = makeVM(
+            locationManager: LocationManagerStub(permissionGranted: true, locationResult: .success(dc)),
+            reverseGeocode: { _ in
+                ReverseGeocodedLocation(
+                    name: "Washington",
+                    country: "US",
+                    timezoneIdentifier: "America/New_York"
+                )
+            }
+        )
+
+        vm.requestLocation()
+        await waitUntil {
+            vm.locationResolutionSucceeded && vm.locationResolutionMessage != nil
+        }
+
+        XCTAssertEqual(vm.currentCity.name, "Washington")
+        XCTAssertNotEqual(vm.currentCity.name, "New York")
+        XCTAssertTrue(vm.locationResolutionSucceeded)
+        XCTAssertEqual(vm.locationResolutionMessage, "Detected from your device.")
+        XCTAssertFalse(vm.isUsingApproximateLocation)
+    }
+
+    func testMarkPageNavigationDiscovered_persistsAndHidesHint() {
+        let vm = makeVM()
+
+        XCTAssertTrue(vm.shouldShowPageNavigationHint)
+        vm.markPageNavigationDiscovered()
+
+        XCTAssertFalse(vm.shouldShowPageNavigationHint)
+        XCTAssertTrue(UserDefaults.standard.bool(forKey: "hasDiscoveredPageNavigation"))
+    }
+
     // MARK: - Graha Named Lookup
 
     func testGrahaNamed_englishName() {
@@ -186,11 +274,50 @@ final class PanchangViewModelTests: XCTestCase {
     // MARK: - Helpers
 
     /// Creates a fresh VM with clean UserDefaults state.
-    private func makeVM() -> PanchangViewModel {
+    private func makeVM(
+        locationManager: any LocationManaging = LocationManagerStub(permissionGranted: true, locationResult: nil),
+        reverseGeocode: @escaping (CLLocation) async throws -> ReverseGeocodedLocation = { _ in
+            ReverseGeocodedLocation(name: "New York", country: "US", timezoneIdentifier: "America/New_York")
+        },
+        locationResolutionTimeout: Duration = .seconds(10)
+    ) -> PanchangViewModel {
         let ud = UserDefaults.standard
         for key in testKeys {
             ud.removeObject(forKey: key)
         }
-        return PanchangViewModel()
+        return PanchangViewModel(
+            locationManager: locationManager,
+            reverseGeocode: reverseGeocode,
+            locationResolutionTimeout: locationResolutionTimeout
+        )
+    }
+
+    private func waitUntil(
+        timeout: Duration = .seconds(2),
+        pollInterval: Duration = .milliseconds(25),
+        condition: @escaping @MainActor () -> Bool
+    ) async {
+        let deadline = ContinuousClock.now + timeout
+        while ContinuousClock.now < deadline {
+            if await condition() {
+                return
+            }
+            try? await Task.sleep(for: pollInterval)
+        }
+    }
+}
+
+private struct LocationManagerStub: LocationManaging {
+    let permissionGranted: Bool
+    let locationResult: Result<CLLocation, Error>?
+
+    func requestPermission(completion: @escaping (Bool) -> Void) {
+        completion(permissionGranted)
+    }
+
+    func getCurrentLocation(completion: @escaping (Result<CLLocation, Error>) -> Void) {
+        if let locationResult {
+            completion(locationResult)
+        }
     }
 }

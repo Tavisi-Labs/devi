@@ -62,6 +62,10 @@ struct CelestialHeroView: View {
         return sunrise.addingTimeInterval(total * scrubProgress)
     }
 
+    private var scrubPillStrokeColor: Color {
+        scrubTime < Date() ? theme.accentColor.opacity(0.35) : theme.lunarColor.opacity(0.35)
+    }
+
     // Moon illumination fraction: 0 = new moon, 1 = full moon
     private var illuminationFraction: CGFloat {
         guard let tithi else { return 0.5 }
@@ -118,8 +122,10 @@ struct CelestialHeroView: View {
                 if isScrubbing {
                     let angle = Angle.degrees(180 + (scrubProgress * 180))
                     let radius = arcSize / 2
-                    let cx = arcSize / 2 + radius * CGFloat(cos(angle.radians))
-                    let cy = arcSize / 2 + radius * CGFloat(sin(angle.radians))
+                    let rawX = arcSize / 2 + radius * CGFloat(cos(angle.radians))
+                    let rawY = arcSize / 2 + radius * CGFloat(sin(angle.radians))
+                    let cx = min(max(rawX, 44), arcSize - 44)
+                    let cy = max(rawY - 30, 18)
 
                     Text(formatTime(scrubTime))
                         .scaledFont(size: 12, weight: .semibold)
@@ -127,9 +133,17 @@ struct CelestialHeroView: View {
                         .monospacedDigit()
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(.ultraThinMaterial)
+                        .background(
+                            Capsule()
+                                .fill(theme.isLight ? Color.white.opacity(0.92) : theme.deepBackground.opacity(0.88))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(scrubPillStrokeColor, lineWidth: 0.75)
+                        )
                         .clipShape(Capsule())
-                        .position(x: cx, y: cy - 30)
+                        .shadow(color: theme.deepBackground.opacity(theme.isLight ? 0.08 : 0.22), radius: 8, x: 0, y: 4)
+                        .position(x: cx, y: cy)
                         .transition(.opacity)
                 }
 
