@@ -99,14 +99,13 @@ enum HoroscopeEngine {
             ? fallbackTheme()
             : houseThemes[themeVariantIndex]
 
-        // Apply Jupiter/Saturn modifiers to supporting text
-        let jupiterFlavor = jupiterModifierText(house: jupiterHouse)
-        let saturnFlavor = saturnModifierText(house: saturnHouse, birthRashi: natalChart.birthRashi)
-        let supportingText = composeSupportingText(
-            baseText: selectedTheme.supportingText,
-            jupiterFlavor: jupiterFlavor,
-            saturnFlavor: saturnFlavor
-        )
+        // Supporting text is the theme blurb on its own. Jupiter and Saturn
+        // house transits are still surfaced through TransitContext.significantAspects
+        // (built below) and through the public jupiterModifierText / saturnModifierText
+        // helpers, which the "Why?" detail panel may consume. They are intentionally
+        // not concatenated into the body prose because the slow planet houses change
+        // on month-to-year cadence, which made the daily reading visibly repeat.
+        let supportingText = selectedTheme.supportingText
 
         // --- 6. Category readings ---
         let categoryReadings = buildCategoryReadings(
@@ -240,24 +239,6 @@ enum HoroscopeEngine {
             doList: ["Be kind to yourself", "Move your body gently", "Pause before reacting"],
             dontList: ["Force outcomes", "Ignore your needs", "Compare yourself to others"]
         )
-    }
-
-    /// Compose the supporting text paragraph by appending planetary modifier flavor.
-    private static func composeSupportingText(
-        baseText: String,
-        jupiterFlavor: String?,
-        saturnFlavor: String?
-    ) -> String {
-        var text = baseText
-
-        if let jupiter = jupiterFlavor {
-            text += " " + jupiter
-        }
-        if let saturn = saturnFlavor {
-            text += " " + saturn
-        }
-
-        return text
     }
 
     /// Build the significant aspects array for the TransitContext "Why?" sheet.

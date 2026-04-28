@@ -154,4 +154,88 @@ final class HoroscopeEngineVariantTests: XCTestCase {
             XCTAssertLessThanOrEqual(category.intensity, 5)
         }
     }
+
+    // MARK: - Supporting Text Excludes Static Planet Modifiers
+    //
+    // Regression guard for the duplicate-prediction bug. Before this fix,
+    // composeSupportingText concatenated jupiterModifiers[house] and
+    // saturnModifiers[house] onto every body paragraph. Because Jupiter
+    // and Saturn change houses on month-to-year cadences, those static
+    // strings repeated byte-for-byte across hundreds of consecutive days
+    // and dominated the visible body. The test asserts that supportingText
+    // no longer contains any of the static modifier strings.
+
+    func testSupportingTextDoesNotContainStaticPlanetModifiers() {
+        // Pick a date where Jupiter and Saturn are in well-defined houses
+        // so the static modifier strings would have been triggered under
+        // the old composeSupportingText path.
+        let testDate = date(year: 2026, month: 4, day: 27)
+        let panchang = PanchangCalculator.panchang(for: testDate, city: delhi)
+        let snapshot = makeGrahaSnapshot(moonLongitude: 30.0)
+        let natal = makeNatalChart(rashi: .vrishchika)
+
+        let reading = HoroscopeEngine.generateReading(
+            natalChart: natal,
+            todaySnapshot: snapshot,
+            panchang: panchang,
+            date: testDate,
+            timezoneIdentifier: delhi.timezoneIdentifier
+        )
+
+        // None of the 12 static Jupiter modifier strings should appear in
+        // the body prose. Same for Saturn. The helpers themselves remain
+        // callable for the "Why?" detail panel; only the body must stay clean.
+        for house in 1...12 {
+            if let jupiterText = HoroscopeContentLibrary.jupiterModifiers[house] {
+                XCTAssertFalse(
+                    reading.supportingText.contains(jupiterText),
+                    "supportingText must not contain the static Jupiter modifier for house \(house). " +
+                    "If it does, the body-prose append has been re-introduced and the daily " +
+                    "reading will repeat byte-for-byte for ~12 months while Jupiter stays in this house."
+                )
+            }
+            if let saturnText = HoroscopeContentLibrary.saturnModifiers[house] {
+                XCTAssertFalse(
+                    reading.supportingText.contains(saturnText),
+                    "supportingText must not contain the static Saturn modifier for house \(house). " +
+                    "If it does, the body-prose append has been re-introduced and the daily " +
+                    "reading will repeat byte-for-byte for ~2.5 years while Saturn stays in this house."
+                )
+            }
+        }
+    }
+
+    // The supportingText must equal the chosen theme's supportingText verbatim
+    // (no prefix, no suffix, no whitespace concatenation). This pins the body
+    // composition to exactly one source — the rotating theme pool — so future
+    // regressions that splice in a new fixed string get caught immediately.
+    func testSupportingTextEqualsThemeSupportingTextVerbatim() {
+        let testDate = date(year: 2026, month: 4, day: 27)
+        let panchang = PanchangCalculator.panchang(for: testDate, city: delhi)
+        let snapshot = makeGrahaSnapshot(moonLongitude: 30.0)
+        let natal = makeNatalChart(rashi: .mesha)
+
+        let reading = HoroscopeEngine.generateReading(
+            natalChart: natal,
+            todaySnapshot: snapshot,
+            panchang: panchang,
+            date: testDate,
+            timezoneIdentifier: delhi.timezoneIdentifier
+        )
+
+        // The body should match one of the theme variants exactly. We don't
+        // know which variant the seed picked, but exactly one of the variants
+        // for this Moon house must equal the body. A failure here means the
+        // body has been mutated by a concat/prefix/suffix op that bypasses
+        // the theme pool, which is precisely the regression we are guarding.
+        let moonHouse = reading.transitContext.moonHouse
+        let themeVariants = HoroscopeContentLibrary.themes[moonHouse - 1]
+        let matchingVariant = themeVariants.first { $0.supportingText == reading.supportingText }
+        XCTAssertNotNil(
+            matchingVariant,
+            "supportingText does not equal any theme variant verbatim. " +
+            "Some component is mutating the body outside the theme pool — " +
+            "this is how the static-modifier append regressed last time."
+        )
+    }
 }
