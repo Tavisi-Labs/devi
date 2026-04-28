@@ -17,7 +17,8 @@ final class PanchangViewModelTests: XCTestCase {
         "hasCompletedOnboarding", "fontScale", "themeStyle", "appearanceMode",
         "notif.dailySummary", "notif.sunrise", "notif.sunset", "notif.rahuKalam",
         "notif.abhijit", "notif.brahma", "notif.navratri", "notif.eclipse", "notif.minutesBefore",
-        "notif.horoscope", "hasRequestedReview", "hasDiscoveredPageNavigation"
+        "notif.horoscope", "hasRequestedReview", "hasDiscoveredPageNavigation",
+        DaySnapshotStore.daySnapshotStoreKey
     ]
 
     override func tearDown() {
@@ -229,6 +230,108 @@ final class PanchangViewModelTests: XCTestCase {
         XCTAssertTrue(vm.locationResolutionSucceeded)
         XCTAssertEqual(vm.locationResolutionMessage, "Detected from your device.")
         XCTAssertFalse(vm.isUsingApproximateLocation)
+    }
+
+    // MARK: - Day Archive Pre-Onboarding Leak (regression for duplicate-date rows)
+    //
+    // Before the fix, init() defaulted currentCity to popularCities[0] (New York)
+    // and immediately called loadData() → recordDaySnapshot(), writing a snapshot
+    // under "New York" before the user had picked any city. When the user then
+    // selected (e.g.) Mumbai, a second snapshot for the same date was written.
+    // The archive sheet rendered both rows with the same date label (city is
+    // hidden in the header) — visible as "duplicate dates."
+    //
+    // The three tests below pin the gate behavior:
+    //  1. Pre-onboarding writes are no-ops.
+    //  2. completeOnboarding() clears any pre-existing leaked snapshots.
+    //  3. Returning users (hasCompletedOnboarding already true) keep recording.
+
+    func testRecordDaySnapshot_isNoOpBeforePreOnboarding() {
+        // Fresh state — testKeys cleanup ran in tearDown. No persisted city,
+        // hasCompletedOnboarding == false. Construct VM, which runs init → loadData.
+        let vm = makeVM()
+
+        XCTAssertFalse(vm.hasCompletedOnboarding,
+                       "Test fixture invariant: VM should start pre-onboarding.")
+        XCTAssertEqual(vm.allDaySnapshots().count, 0,
+                       "Pre-onboarding loadData() must not record any snapshots — " +
+                       "doing so leaks a stray entry under the fallback city the " +
+                       "user never explicitly chose.")
+
+        // Force a second loadData() to confirm the gate also holds on subsequent calls.
+        vm.loadData()
+        XCTAssertEqual(vm.allDaySnapshots().count, 0,
+                       "Repeated pre-onboarding loadData() calls must remain no-ops.")
+    }
+
+    func testCompleteOnboarding_clearsPreOnboardingSnapshots() {
+        // Construct the VM first. makeVM() wipes UserDefaults (including the
+        // snapshot store key), so any leftover snapshots from a prior test
+        // suite are gone. The VM's init runs loadData(), which under the new
+        // gate is a no-op pre-onboarding — so the store starts truly empty.
+        let vm = makeVM()
+        XCTAssertEqual(vm.allDaySnapshots().count, 0,
+                       "Test fixture invariant: VM should see an empty store " +
+                       "after construction (gate prevents init writes pre-onboarding).")
+
+        // Now seed two stray snapshots directly via a peer DaySnapshotStore.
+        // Both stores read/write the same UserDefaults key, so the VM's
+        // private store sees the seeded data on next access.
+        let peerStore = DaySnapshotStore()
+        let strayA = DaySnapshot(
+            dateString: "2026-04-26", cityName: "New York",
+            themeStatement: nil, supportingText: nil, categorySummaries: [:],
+            mantraSanskrit: nil, mantraTranslation: nil,
+            tithiDisplayName: "Shukla Dashami", nakshatraName: "Magha",
+            yogaName: "Vyatipata", festivals: [],
+            cosmicSignature: nil, ritualCompleted: false
+        )
+        let strayB = DaySnapshot(
+            dateString: "2026-04-27", cityName: "New York",
+            themeStatement: nil, supportingText: nil, categorySummaries: [:],
+            mantraSanskrit: nil, mantraTranslation: nil,
+            tithiDisplayName: "Shukla Ekadashi", nakshatraName: "Purva Phalguni",
+            yogaName: "Variyana", festivals: [],
+            cosmicSignature: nil, ritualCompleted: false
+        )
+        peerStore.record(strayA)
+        peerStore.record(strayB)
+        XCTAssertEqual(vm.allDaySnapshots().count, 2,
+                       "VM must see the seeded stray snapshots before completion.")
+
+        // Completing onboarding should wipe the stray snapshots.
+        vm.completeOnboarding()
+        XCTAssertEqual(vm.allDaySnapshots().count, 0,
+                       "completeOnboarding must clear pre-onboarding stray snapshots.")
+        XCTAssertTrue(vm.hasCompletedOnboarding)
+    }
+
+    func testReturningUser_recordsSnapshotsImmediately() {
+        // Pre-set onboarding-complete state plus a persisted city so init() takes
+        // the returning-user branch.
+        let ud = UserDefaults.standard
+        ud.set(true, forKey: "hasCompletedOnboarding")
+        ud.set("Delhi", forKey: "city.name")
+        ud.set("IN", forKey: "city.country")
+        ud.set(28.7041, forKey: "city.latitude")
+        ud.set(77.1025, forKey: "city.longitude")
+        ud.set("Asia/Kolkata", forKey: "city.timezoneIdentifier")
+
+        // Construct VM directly (bypass makeVM, which would clear the UserDefaults
+        // we just set as part of its testKeys reset).
+        let vm = PanchangViewModel()
+
+        XCTAssertTrue(vm.hasCompletedOnboarding,
+                      "Returning user fixture: flag should be loaded from UserDefaults.")
+        XCTAssertEqual(vm.currentCity.name, "Delhi",
+                       "Returning user fixture: persisted city should be loaded.")
+
+        // init's loadData() should have recorded today's snapshot for Delhi.
+        let snapshots = vm.allDaySnapshots()
+        XCTAssertGreaterThanOrEqual(snapshots.count, 1,
+                                    "Returning user must record at least today's snapshot on init.")
+        XCTAssertTrue(snapshots.allSatisfy { $0.cityName == "Delhi" },
+                      "All recorded snapshots must be under the user's actual city.")
     }
 
     func testMarkPageNavigationDiscovered_persistsAndHidesHint() {

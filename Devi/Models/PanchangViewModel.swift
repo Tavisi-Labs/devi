@@ -701,6 +701,13 @@ class PanchangViewModel: ObservableObject {
     /// in the persistent archive. Safe to call multiple times per day — the
     /// store upserts by `(cityName, dateString)`.
     private func recordDaySnapshot(panchang: DailyPanchang, dateString: String) {
+        // Pre-onboarding the default `currentCity` is a UI fallback
+        // (popularCities[0] = New York), not a user-confirmed selection.
+        // Writing under that fallback would leak a "New York" diary entry
+        // the user never viewed and surface it as a duplicate-date row in
+        // Your Day Archive. Wait until onboarding has actually completed.
+        guard hasCompletedOnboarding else { return }
+
         let horoscope = dailyHoroscope
         var categorySummaries: [String: String] = [:]
         if let horoscope {
@@ -1094,6 +1101,14 @@ class PanchangViewModel: ObservableObject {
     }
 
     func completeOnboarding() {
+        // Clear any snapshots written under the pre-onboarding default city
+        // before this point. Anything in the store right now was written by
+        // recordDaySnapshot under a UI fallback the user never explicitly
+        // chose. Once we flip the flag and start recording for real, those
+        // would surface as duplicate-date rows in Your Day Archive.
+        if !hasCompletedOnboarding {
+            snapshotStore.clear()
+        }
         hasCompletedOnboarding = true
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
     }
