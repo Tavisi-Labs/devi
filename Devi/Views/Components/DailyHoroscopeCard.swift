@@ -12,7 +12,6 @@ struct DailyHoroscopeCard: View {
     @State private var expandedCategory: HoroscopeCategory? = nil
     @State private var isTextExpanded = false
     @State private var isDosDontsExpanded = false
-    @State private var dosDontsGlowPhase: Bool = false
 
     // MARK: - Constants
 
@@ -94,272 +93,162 @@ struct DailyHoroscopeCard: View {
         }
     }
 
-    // MARK: - 4. Do / Don't — Sacred Duality Tablet
+    // MARK: - 4. Yama / Niyama — Manuscript Section
+    //
+    // Vedic framing: Niyama = positive observances (the day's "do" practices),
+    // Yama = restraints (the day's cautions). Stacked vertically as a single
+    // manuscript page, no green/red color blocking, no symmetric two-column
+    // layout. Roman numeral markers in serif italic, gold accent. The entire
+    // section is collapsed by default behind a quiet header.
 
     private var doAndDontSection: some View {
         VStack(spacing: 0) {
-            dualTintedHeader
+            yamaNiyamaHeader
 
             if isDosDontsExpanded {
-                expandedGuidanceContent
+                manuscriptContent
             }
         }
-        .background(splitGradientBackground)
-        .overlay(dualAccentBars)
-        .overlay(expandedRadialGlow)
         .deviCard(theme: theme, elevation: .flat, cornerRadius: 12)
     }
 
-    // MARK: Collapsed Header — Dual-Tinted
+    // MARK: Header (collapsed + tap target)
 
-    private var dualTintedHeader: some View {
+    private var yamaNiyamaHeader: some View {
         Button {
             withAnimation(.spring(response: 0.4, dampingFraction: 0.78)) {
                 isDosDontsExpanded.toggle()
             }
-            if !isDosDontsExpanded {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    dosDontsGlowPhase = false
-                }
-            }
         } label: {
-            HStack(spacing: 0) {
-                // Do side — icon then label
-                HStack(spacing: 5) {
-                    Image(systemName: "checkmark.seal.fill")
-                        .font(.system(size: 13))
-                        .foregroundColor(theme.auspiciousColor)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("DO")
-                            .scaledFont(size: 12, weight: .bold)
-                            .tracking(1.5)
-                            .foregroundColor(theme.auspiciousColor)
-                        Text("\(horoscope.doList.count) guidelines")
-                            .scaledFont(size: 10, weight: .regular)
-                            .foregroundColor(theme.secondaryText.opacity(0.6))
-                    }
-                }
+            HStack(spacing: 10) {
+                Text("Yama · Niyama")
+                    .scaledFont(size: 14, weight: .regular, design: .serif)
+                    .italic()
+                    .foregroundColor(theme.accentColor.opacity(0.85))
+
+                Text("today\u{2019}s practice")
+                    .scaledFont(size: 11, weight: .regular)
+                    .tracking(0.5)
+                    .foregroundColor(theme.secondaryText.opacity(0.6))
 
                 Spacer()
 
-                // Center diamond fulcrum
-                Image(systemName: "diamond.fill")
-                    .font(.system(size: 5))
-                    .foregroundColor(theme.accentColor.opacity(0.4))
-
-                Spacer()
-
-                // Don't side — label then icon (mirrored)
-                HStack(spacing: 5) {
-                    VStack(alignment: .trailing, spacing: 1) {
-                        Text("DON\u{2019}T")
-                            .scaledFont(size: 12, weight: .bold)
-                            .tracking(1.5)
-                            .foregroundColor(theme.inauspiciousColor)
-                        Text("\(horoscope.dontList.count) cautions")
-                            .scaledFont(size: 10, weight: .regular)
-                            .foregroundColor(theme.secondaryText.opacity(0.6))
-                    }
-                    Image(systemName: "exclamationmark.shield.fill")
-                        .font(.system(size: 13))
-                        .foregroundColor(theme.inauspiciousColor)
-                }
-
-                // Chevron
                 Image(systemName: "chevron.down")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(theme.secondaryText.opacity(0.5))
                     .rotationEffect(.degrees(isDosDontsExpanded ? 180 : 0))
-                    .padding(.leading, 8)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
 
-    // MARK: Split Gradient Background
+    // MARK: Manuscript Content (Niyama → separator → Yama)
 
-    private var splitGradientBackground: some View {
-        let tint: Double = isDosDontsExpanded ? 0.08 : 0.04
-        return GeometryReader { geo in
-            HStack(spacing: 0) {
-                LinearGradient(
-                    colors: [theme.auspiciousColor.opacity(tint), .clear],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .frame(width: geo.size.width / 2)
+    private var manuscriptContent: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            manuscriptSection(
+                label: "Niyama",
+                subtitle: "observances",
+                items: horoscope.doList,
+                revealDirection: .fadeUp
+            )
 
-                LinearGradient(
-                    colors: [.clear, theme.inauspiciousColor.opacity(tint)],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .frame(width: geo.size.width / 2)
-            }
+            manuscriptSeparator
+
+            manuscriptSection(
+                label: "Yama",
+                subtitle: "restraints",
+                items: horoscope.dontList,
+                revealDirection: .fadeUp
+            )
         }
-    }
-
-    // MARK: Vertical Accent Bars
-
-    private var dualAccentBars: some View {
-        HStack {
-            RoundedRectangle(cornerRadius: 1)
-                .fill(theme.auspiciousColor.opacity(0.5))
-                .frame(width: 2)
-            Spacer()
-            RoundedRectangle(cornerRadius: 1)
-                .fill(theme.inauspiciousColor.opacity(0.5))
-                .frame(width: 2)
-        }
-        .allowsHitTesting(false)
-    }
-
-    // MARK: Radial Glow Overlay
-
-    @ViewBuilder
-    private var expandedRadialGlow: some View {
-        if isDosDontsExpanded {
-            ZStack {
-                RadialGradient(
-                    colors: [theme.auspiciousColor.opacity(dosDontsGlowPhase ? 0.06 : 0.02), .clear],
-                    center: .topLeading,
-                    startRadius: 0,
-                    endRadius: 150
-                )
-                RadialGradient(
-                    colors: [theme.inauspiciousColor.opacity(dosDontsGlowPhase ? 0.06 : 0.02), .clear],
-                    center: .topTrailing,
-                    startRadius: 0,
-                    endRadius: 150
-                )
-            }
-            .allowsHitTesting(false)
-            .transition(.opacity)
-            .onAppear {
-                withAnimation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true)) {
-                    dosDontsGlowPhase = true
-                }
-            }
-        }
-    }
-
-    // MARK: Expanded Guidance Content
-
-    private var expandedGuidanceContent: some View {
-        VStack(spacing: 12) {
-            OrnamentalDivider("GUIDANCE", theme: theme)
-                .deviReveal(delay: 0.05, direction: .fadeUp)
-
-            HStack(alignment: .top, spacing: 0) {
-                // Do column
-                VStack(spacing: 8) {
-                    ForEach(Array(horoscope.doList.enumerated()), id: \.offset) { index, item in
-                        doItemCard(item, index: index)
-                            .deviReveal(delay: 0.15 + Double(index) * 0.08, direction: .fadeLeft)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-
-                // Center spine
-                guidanceSpine(itemCount: max(horoscope.doList.count, horoscope.dontList.count))
-
-                // Don't column
-                VStack(spacing: 8) {
-                    ForEach(Array(horoscope.dontList.enumerated()), id: \.offset) { index, item in
-                        dontItemCard(item, index: index)
-                            .deviReveal(delay: 0.15 + Double(index) * 0.08, direction: .fadeRight)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .padding(.horizontal, 10)
-            .padding(.bottom, 14)
-        }
+        .padding(.horizontal, 18)
+        .padding(.bottom, 18)
         .transition(.opacity.combined(with: .move(edge: .top)))
     }
 
-    // MARK: Do Item Card
+    // MARK: Section (label + items)
 
-    private func doItemCard(_ text: String, index: Int) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill(theme.auspiciousColor.opacity(0.12))
-                Text("\(index + 1)")
-                    .scaledFont(size: 11, weight: .semibold)
-                    .foregroundColor(theme.auspiciousColor)
+    private func manuscriptSection(
+        label: String,
+        subtitle: String,
+        items: [String],
+        revealDirection: DeviRevealDirection
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(label)
+                    .scaledFont(size: 15, weight: .regular, design: .serif)
+                    .italic()
+                    .foregroundColor(theme.accentColor)
+
+                Text("·")
+                    .scaledFont(size: 11, weight: .regular)
+                    .foregroundColor(theme.secondaryText.opacity(0.5))
+
+                Text(subtitle)
+                    .scaledFont(size: 11, weight: .regular)
+                    .tracking(0.6)
+                    .foregroundColor(theme.secondaryText.opacity(0.7))
             }
-            .frame(width: 20, height: 20)
 
-            Text(text)
-                .scaledFont(size: 13, weight: .regular)
-                .foregroundColor(theme.primaryText)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .padding(8)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(theme.auspiciousColor.opacity(0.03))
-        )
-        .overlay(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 1)
-                .fill(theme.auspiciousColor.opacity(0.3))
-                .frame(width: 2)
-        }
-    }
-
-    // MARK: Don't Item Card (Mirrored)
-
-    private func dontItemCard(_ text: String, index: Int) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text(text)
-                .scaledFont(size: 13, weight: .regular)
-                .foregroundColor(theme.primaryText)
-                .fixedSize(horizontal: false, vertical: true)
-                .multilineTextAlignment(.trailing)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-
-            ZStack {
-                Circle()
-                    .fill(theme.inauspiciousColor.opacity(0.12))
-                Text("\(index + 1)")
-                    .scaledFont(size: 11, weight: .semibold)
-                    .foregroundColor(theme.inauspiciousColor)
-            }
-            .frame(width: 20, height: 20)
-        }
-        .padding(8)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(theme.inauspiciousColor.opacity(0.03))
-        )
-        .overlay(alignment: .trailing) {
-            RoundedRectangle(cornerRadius: 1)
-                .fill(theme.inauspiciousColor.opacity(0.3))
-                .frame(width: 2)
-        }
-    }
-
-    // MARK: Center Spine
-
-    private func guidanceSpine(itemCount: Int) -> some View {
-        VStack(spacing: 0) {
-            ForEach(0..<itemCount, id: \.self) { index in
-                Circle()
-                    .fill(theme.accentColor.opacity(0.4))
-                    .frame(width: 3, height: 3)
-                if index < itemCount - 1 {
-                    Rectangle()
-                        .fill(theme.primaryText.opacity(0.08))
-                        .frame(width: 0.5)
-                        .frame(maxHeight: .infinity)
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+                    manuscriptItem(item, numeral: Self.romanNumeral(for: index + 1))
+                        .deviReveal(
+                            delay: 0.08 + Double(index) * 0.05,
+                            direction: revealDirection
+                        )
                 }
             }
         }
-        .frame(width: 16)
+    }
+
+    // MARK: Single Manuscript Item
+
+    private func manuscriptItem(_ text: String, numeral: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Text(numeral)
+                .scaledFont(size: 13, weight: .regular, design: .serif)
+                .italic()
+                .foregroundColor(theme.accentColor.opacity(0.7))
+                .frame(width: 26, alignment: .trailing)
+
+            Text(text)
+                .scaledFont(size: 14, weight: .regular)
+                .foregroundColor(theme.primaryText)
+                .lineSpacing(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    // MARK: Separator (three small dots, gold accent)
+
+    private var manuscriptSeparator: some View {
+        HStack(spacing: 6) {
+            Spacer()
+            ForEach(0..<3, id: \.self) { _ in
+                Circle()
+                    .fill(theme.accentColor.opacity(0.35))
+                    .frame(width: 3, height: 3)
+            }
+            Spacer()
+        }
+        .padding(.vertical, 2)
+    }
+
+    // Lowercase roman numeral up to xii. Falls back to decimal beyond xii so
+    // longer guidance lists still render rather than crashing.
+    private static func romanNumeral(for n: Int) -> String {
+        let map = [
+            "i.", "ii.", "iii.", "iv.", "v.", "vi.",
+            "vii.", "viii.", "ix.", "x.", "xi.", "xii.",
+        ]
+        return (1...12).contains(n) ? map[n - 1] : "\(n)."
     }
 
     // MARK: - 5. Thin Divider
