@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devi v2 — Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME — Linear/Vercel-inspired, dark monochrome with one muted warm accent.
+   Change these to retheme the whole deck.
+   =========================================== */
+:root {
+  --bg: #08090a;
+  --bg-elevated: #0f1011;
+  --bg-card: #131517;
+  --border: #1f2123;
+  --border-strong: #2a2d31;
+  --text-primary: #f7f8f8;
+  --text-secondary: #a0a4ab;
+  --text-tertiary: #6b6f76;
+  --text-muted: #4a4d52;
+  --accent: #d4a574;        /* muted warm sand — quiet nod to Devi */
+  --accent-dim: #8a6d4d;
+  --accent-glow: rgba(212, 165, 116, 0.12);
+  --green: #4ade80;
+  --red: #f87171;
+  --amber: #fbbf24;
+
+  --font-display: 'Geist', system-ui, sans-serif;
+  --font-body: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --slide-pad-y: clamp(3rem, 7vh, 5rem);
+  --slide-pad-x: clamp(2rem, 6vw, 6rem);
+  --max-width: 1100px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration: 0.55s;
+}
+
+/* ===========================================
+   RESET + BASE
+   =========================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+*::selection { background: var(--accent); color: var(--bg); }
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  background: var(--bg);
+}
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.5;
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===========================================
+   PROGRESS BAR (top)
+   =========================================== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: var(--accent);
+  width: 0%;
+  z-index: 100;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+/* ===========================================
+   SLIDE NUMBER (bottom right)
+   =========================================== */
+.slide-number {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  z-index: 50;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.slide-number .current { color: var(--text-primary); }
+
+/* ===========================================
+   KEYBOARD HINT (bottom left, fades after first scroll)
+   =========================================== */
+.kbd-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  z-index: 50;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.kbd-hint.hidden { opacity: 0; }
+.kbd-hint kbd {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin: 0 2px;
+  font-family: inherit;
+  color: var(--text-secondary);
+}
+
+/* ===========================================
+   SLIDE CONTAINER
+   =========================================== */
+.slide {
+  min-height: 100vh;
+  padding: var(--slide-pad-y) var(--slide-pad-x);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.slide-inner {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+/* ===========================================
+   TYPOGRAPHY
+   =========================================== */
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 5.5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+}
+h3 {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+p {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 60ch;
+}
+p.lead {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  max-width: 56ch;
+  font-weight: 400;
+}
+strong { color: var(--text-primary); font-weight: 500; }
+.muted { color: var(--text-tertiary); }
+
+/* ===========================================
+   LISTS
+   =========================================== */
+ul.bullets {
+  list-style: none;
+  margin-top: 1.5rem;
+}
+ul.bullets li {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.85rem;
+  line-height: 1.55;
+  max-width: 64ch;
+}
+ul.bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65rem;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+ul.bullets li strong { color: var(--text-primary); }
+
+ol.numbered {
+  list-style: none;
+  counter-reset: step;
+  margin-top: 1.5rem;
+}
+ol.numbered li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 2.4rem;
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.55;
+  max-width: 64ch;
+}
+ol.numbered li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================================
+   CARDS / TABLES
+   =========================================== */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+@media (max-width: 800px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+.card h3 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+.card p { font-size: 0.97rem; }
+
+/* Decision table — Linear-style row layout */
+.decision-table {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.decision-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1.4fr;
+  border-bottom: 1px solid var(--border);
+  padding: 0.95rem 1.2rem;
+  align-items: baseline;
+  gap: 1rem;
+}
+.decision-row:last-child { border-bottom: none; }
+.decision-row .num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+.decision-row .label {
+  font-size: 0.97rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.decision-row .choice {
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.decision-row .choice .pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  background: var(--accent-glow);
+  color: var(--accent);
+  padding: 1px 7px;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Generic two-col table */
+.two-col-table {
+  margin-top: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  font-size: 0.95rem;
+}
+.two-col-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  border-bottom: 1px solid var(--border);
+  padding: 0.85rem 1.2rem;
+  gap: 1.2rem;
+  align-items: baseline;
+}
+.two-col-row:last-child { border-bottom: none; }
+.two-col-row .k {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.two-col-row .v { color: var(--text-secondary); }
+.two-col-row .v .mono {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.88rem;
+}
+
+/* Three-col compute placement table */
+.three-col-table {
+  margin-top: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+  font-size: 0.92rem;
+}
+.three-col-table .header {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 1.4fr;
+  background: var(--bg-elevated);
+  padding: 0.7rem 1.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  gap: 1rem;
+  border-bottom: 1px solid var(--border-strong);
+}
+.three-col-row {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr 1.4fr;
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 1.2rem;
+  gap: 1rem;
+  align-items: baseline;
+}
+.three-col-row:last-child { border-bottom: none; }
+.three-col-row .what { color: var(--text-primary); font-size: 0.92rem; }
+.three-col-row .where {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  color: var(--accent);
+}
+.three-col-row .where.device { color: var(--green); }
+.three-col-row .where.edge { color: var(--accent); }
+.three-col-row .where.external { color: var(--amber); }
+.three-col-row .why { color: var(--text-secondary); font-size: 0.9rem; }
+
+/* Week-by-week scope */
+.weeks {
+  margin-top: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.week-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.2rem;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+.week-row:last-child { border-bottom: none; }
+.week-row .week {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-top: 0.15rem;
+}
+.week-row .work {
+  font-size: 0.97rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.week-row .work strong { color: var(--text-primary); }
+
+/* ===========================================
+   CODE BLOCKS — for SQL schemas + system diagram
+   =========================================== */
+pre.code-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  overflow-x: auto;
+  margin-top: 1.25rem;
+}
+pre.code-block .kw { color: var(--accent); font-weight: 500; }
+pre.code-block .type { color: #93c5fd; }
+pre.code-block .comment { color: var(--text-tertiary); font-style: normal; }
+pre.code-block .pk { color: var(--green); }
+pre.code-block .name { color: var(--text-primary); font-weight: 500; }
+
+pre.diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  overflow-x: auto;
+  margin-top: 1rem;
+  white-space: pre;
+}
+pre.diagram .accent { color: var(--accent); }
+pre.diagram .label { color: var(--text-primary); font-weight: 500; }
+
+/* ===========================================
+   BADGES / TAGS
+   =========================================== */
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-right: 0.4rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tag.locked { background: var(--accent-glow); color: var(--accent); border-color: var(--accent-dim); }
+.tag.open { background: rgba(251, 191, 36, 0.1); color: var(--amber); border-color: rgba(251, 191, 36, 0.3); }
+
+/* ===========================================
+   TITLE SLIDE — distinctive layout
+   =========================================== */
+.title-slide {
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(212, 165, 116, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(212, 165, 116, 0.04) 0%, transparent 60%),
+    var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.title-slide .meta {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.title-slide h1 {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  margin-bottom: 1.5rem;
+}
+.title-slide h1 .accent { color: var(--accent); }
+.title-slide .sub {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 50ch;
+  margin-bottom: 2.5rem;
+}
+.title-slide .footer {
+  display: flex;
+  gap: 2.5rem;
+  margin-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+.title-slide .footer .v { color: var(--text-primary); }
+
+/* ===========================================
+   ANIMATIONS
+   =========================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration) var(--ease-out),
+              transform var(--duration) var(--ease-out);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.12s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.19s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.26s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.33s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.4s; }
+.slide.visible .reveal:nth-child(7) { transition-delay: 0.47s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: opacity 0.2s ease; transform: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+@media (max-width: 768px) {
+  :root { --slide-pad-x: 1.5rem; }
+  .decision-row { grid-template-columns: 40px 1fr; }
+  .decision-row .choice { grid-column: 2; }
+  .three-col-table .header,
+  .three-col-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  .three-col-row .where { font-size: 0.75rem; }
+  .week-row { grid-template-columns: 1fr; gap: 0.4rem; }
+  .kbd-hint { display: none; }
+  pre.diagram { font-size: 0.6rem; }
+}
+
+/* ===========================================
+   CALLOUT BOX
+   =========================================== */
+.callout {
+  margin-top: 1.5rem;
+  padding: 1.2rem 1.4rem;
+  background: var(--accent-glow);
+  border-left: 2px solid var(--accent);
+  border-radius: 6px;
+  font-size: 0.97rem;
+  color: var(--text-primary);
+  line-height: 1.55;
+  max-width: 70ch;
+}
+.callout .label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progress"></div>
+
+<!-- Slide number indicator -->
+<div class="slide-number"><span class="current" id="current">01</span> / <span id="total">20</span></div>
+
+<!-- Keyboard hint -->
+<div class="kbd-hint" id="kbd-hint"><kbd>↓</kbd> <kbd>↑</kbd> or <kbd>Space</kbd> to navigate</div>
+
+<!-- ===========================================
+     SLIDE 1 — TITLE
+=========================================== -->
+<section class="slide title-slide" data-num="01">
+  <div class="slide-inner">
+    <div class="meta reveal">
+      <span class="tag">internal alignment</span>
+      <span class="tag">draft</span>
+      <span class="tag locked">2026-04-29</span>
+    </div>
+    <h1 class="reveal">Devi <span class="accent">v2</span><br>Architecture.</h1>
+    <p class="sub reveal">From a Hindu Panchang almanac to a daily spiritual companion + community, built on the same sidereal engine.</p>
+    <div class="footer reveal">
+      <div><span class="muted">From</span> <span class="v">v1.3.0 · build 13</span></div>
+      <div><span class="muted">To</span> <span class="v">v2.0 · fresh concept</span></div>
+      <div><span class="muted">Source</span> <span class="v">plans/devi-v2-architecture.md</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 2 — WHAT CHANGED
+=========================================== -->
+<section class="slide" data-num="02">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">01 — Context</div>
+    <h2 class="reveal">What's actually changing.</h2>
+    <p class="lead reveal">Devi v2 is a fresh product concept that builds on the existing Swift codebase rather than starting from zero.</p>
+    <div class="grid-2 reveal">
+      <div class="card">
+        <h3>From — v1.3</h3>
+        <p>Hindu Panchang almanac. Free. Fully offline. No accounts. Single-user. iOS-only.</p>
+      </div>
+      <div class="card">
+        <h3>To — v2.0</h3>
+        <p>Daily spiritual companion + community. Free panchang tier + paid social tier. Backend-required for friends, synastry, content.</p>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <span class="label">Carry-forward ratio</span>
+      ~70% of the v1.3 codebase reuses unchanged: Swiss Ephemeris, panchang engine, Living Mandala, theme system. The other 30% is new infrastructure — backend, social graph, LLM pipeline, subscriptions.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 3 — 5 STRATEGIC COMMITMENTS
+=========================================== -->
+<section class="slide" data-num="03">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">02 — From the Gemini research</div>
+    <h2 class="reveal">Five strategic commitments.</h2>
+    <p class="reveal">Locked by the deep-research synthesis. Every architectural decision flows from these.</p>
+    <ol class="numbered reveal">
+      <li><strong>Diaspora-first, English-only, USD subscription.</strong> No localization scope at v1. Indian/Nepali diaspora + Western astrology natives.</li>
+      <li><strong>Hybrid Tropical/Sidereal "archetype builder"</strong> as the central novel feature. No competitor offers this.</li>
+      <li><strong>Prescriptive astrocartography</strong> — intent → highlighted geographic zones. Not a passive map.</li>
+      <li><strong>Vedic synastry (Ashtakoot/Kuta)</strong> powering compatibility. Granular, shareable, viral.</li>
+      <li><strong>Privacy-by-design at the schema level.</strong> DPDPA + GDPR + Apple 5.1.1 force decisions in Postgres, not in policy docs.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 4 — TIER 1 LOCKED
+=========================================== -->
+<section class="slide" data-num="04">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">03 — Decisions</div>
+    <h2 class="reveal">Tier 1 — locked.</h2>
+    <p class="reveal">The four decisions that fork the entire architecture.</p>
+    <div class="decision-table reveal">
+      <div class="decision-row">
+        <span class="num">T1.1</span>
+        <span class="label">Platform scope</span>
+        <span class="choice"><span class="pill">locked</span>iOS-only. Continue building on existing Swift/SwiftUI codebase. Android/web deferred indefinitely.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T1.2</span>
+        <span class="label">Migration path</span>
+        <span class="choice"><span class="pill">locked</span>Hybrid (option C). Existing panchang stays free. New paid layers added on top. Same App Store listing.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T1.3</span>
+        <span class="label">Backend ownership</span>
+        <span class="choice"><span class="pill">locked</span>BaaS — Supabase. Postgres + Apple Sign In + Realtime + Edge Functions. Re-evaluate above 50K paid users.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T1.4</span>
+        <span class="label">Friend birth-data privacy</span>
+        <span class="choice"><span class="pill">locked</span>Server-side plaintext for MVP. Functionality &gt; privacy at v1. Schema stays RLS-aware to tighten later.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 5 — TIER 2 LOCKED + OPEN
+=========================================== -->
+<section class="slide" data-num="05">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">03 — Decisions, cont'd</div>
+    <h2 class="reveal">Tier 2 — locked &amp; open.</h2>
+    <div class="decision-table reveal">
+      <div class="decision-row">
+        <span class="num">T2.5</span>
+        <span class="label">Auth</span>
+        <span class="choice"><span class="pill">locked</span>Apple Sign In first. Google added later via the same Supabase abstraction.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T2.6</span>
+        <span class="label">Content generation</span>
+        <span class="choice"><span class="pill">locked</span>LLM-involved, hybrid. Hand-written voice templates + LLM fills personalized variables. No visible "AI" branding.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T2.7</span>
+        <span class="label">Offline scope</span>
+        <span class="choice"><span class="pill">locked</span>Own data + panchang stay offline-capable. Friends, social, astrocartography online-only with stale-cache fallback.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T2.8</span>
+        <span class="label">Astrocartography map tech</span>
+        <span class="choice"><span class="tag open">open</span>Mapbox is the default if/when astrocartography ships. Decision deferred until v1 scope is finalized.</span>
+      </div>
+      <div class="decision-row">
+        <span class="num">T2.9</span>
+        <span class="label">Hybrid archetype model</span>
+        <span class="choice"><span class="tag open">open</span>Both tropical &amp; sidereal positions must be computed/stored. Picker UX deferred.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 6 — SYSTEM OVERVIEW DIAGRAM
+=========================================== -->
+<section class="slide" data-num="06">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">04 — Architecture</div>
+    <h2 class="reveal">System overview.</h2>
+    <p class="reveal">iOS client retains the offline engine. Supabase handles identity, social graph, content, subscriptions. External services for LLM, payments, push, maps.</p>
+<pre class="diagram reveal">
+<span class="label">┌──────────────────────────────────────────────────────────────────┐</span>
+<span class="label">│                       iOS Client (SwiftUI)                       │</span>
+<span class="label">│                                                                  │</span>
+<span class="label">│  ┌──────────────────┐  ┌──────────────────┐  ┌────────────────┐  │</span>
+<span class="label">│  │ Existing engine  │  │   New surfaces   │  │  Cached data   │  │</span>
+<span class="label">│  │ (offline)        │  │   (online)       │  │                │  │</span>
+<span class="label">│  │ • Swiss Ephem.   │  │ • Friends list   │  │ • Daily content│  │</span>
+<span class="label">│  │ • Panchang       │  │ • Synastry view  │  │ • Friend charts│  │</span>
+<span class="label">│  │ • Own chart      │  │ • Astrocartog.   │  │ • Subscription │  │</span>
+<span class="label">│  │ • Living Mandala │  │ • Hybrid arche-  │  │   status       │  │</span>
+<span class="label">│  │ • Themes         │  │   type builder   │  │                │  │</span>
+<span class="label">│  └──────────────────┘  └──────────────────┘  └────────────────┘  │</span>
+<span class="label">└────────────────────┬─────────────────────────────────────────────┘</span>
+                     <span class="accent">│ HTTPS (Supabase SDK + REST)</span>
+<span class="label">┌────────────────────┴─────────────────────────────────────────────┐</span>
+<span class="label">│                          Supabase                                │</span>
+<span class="label">│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────┐ │</span>
+<span class="label">│  │ Auth         │  │ Postgres+RLS │  │ Edge Functions (Deno)   │ │</span>
+<span class="label">│  │ • Apple SIWA │  │ • users      │  │ • LLM content gen       │ │</span>
+<span class="label">│  │              │  │ • birth_data │  │ • Synastry compute      │ │</span>
+<span class="label">│  │              │  │ • friends    │  │ • Astrocarto intent map │ │</span>
+<span class="label">│  │              │  │ • archetype  │  │ • Subscription verify   │ │</span>
+<span class="label">│  │              │  │ • synastry$  │  │                         │ │</span>
+<span class="label">│  │              │  │ • content$   │  │                         │ │</span>
+<span class="label">│  └──────────────┘  └──────────────┘  └─────────────────────────┘ │</span>
+<span class="label">│  Realtime (Postgres CDC) — friend activity, push triggers        │</span>
+<span class="label">└──────────────┬───────────────────────────────────────────────────┘</span>
+               <span class="accent">│ External</span>
+       <span class="label">┌───────┴────────┐</span>
+       <span class="label">│ Anthropic API  │</span>  <span class="accent">Claude — daily content + insights</span>
+       <span class="label">│ RevenueCat     │</span>  <span class="accent">Subscription mgmt + receipt validation</span>
+       <span class="label">│ APNs           │</span>  <span class="accent">Push (via Supabase or RevenueCat)</span>
+       <span class="label">│ Mapbox         │</span>  <span class="accent">TBD — astrocartography</span>
+       <span class="label">└────────────────┘</span>
+</pre>
+    <p class="muted reveal" style="margin-top: 1rem; font-size: 0.85rem;">$ = cache tables, derived data.</p>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 7 — STACK PICKS
+=========================================== -->
+<section class="slide" data-num="07">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">04 — Architecture, cont'd</div>
+    <h2 class="reveal">Stack picks at a glance.</h2>
+    <div class="two-col-table reveal">
+      <div class="two-col-row"><span class="k">Client</span><span class="v"><span class="mono">SwiftUI (existing)</span> · iOS 17+, no change.</span></div>
+      <div class="two-col-row"><span class="k">Backend</span><span class="v"><span class="mono">Supabase</span> · Postgres + auth + realtime + edge functions.</span></div>
+      <div class="two-col-row"><span class="k">Auth</span><span class="v"><span class="mono">Apple Sign In via Supabase</span> · Google later via same abstraction.</span></div>
+      <div class="two-col-row"><span class="k">Subscriptions</span><span class="v"><span class="mono">RevenueCat</span> · wraps StoreKit 2, server-side receipt validation, analytics free.</span></div>
+      <div class="two-col-row"><span class="k">LLM</span><span class="v"><span class="mono">Claude (Anthropic API)</span> · via Edge Function. Better long-form prose, prompt caching.</span></div>
+      <div class="two-col-row"><span class="k">Push</span><span class="v"><span class="mono">RevenueCat + Supabase</span> · entitlement and content events. APNs underneath both.</span></div>
+      <div class="two-col-row"><span class="k">Map</span><span class="v"><span class="mono">Mapbox (default, deferred)</span> · MapKit too limited for line/zone overlays.</span></div>
+      <div class="two-col-row"><span class="k">Analytics</span><span class="v"><span class="mono">PostHog or RevenueCat built-in</span> · pick deferred.</span></div>
+      <div class="two-col-row"><span class="k">Observability</span><span class="v"><span class="mono">Supabase logs + Sentry</span> · setup deferred.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 8 — DATA MODEL: users + birth_data
+=========================================== -->
+<section class="slide" data-num="08">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">05 — Data model</div>
+    <h2 class="reveal">Identity &amp; birth data.</h2>
+    <p class="reveal"><code style="font-family:var(--font-mono);font-size:0.9em;color:var(--accent);">birth_data</code> separates <span class="muted">owner</span> (who entered it) from <span class="muted">subject</span> (whose chart it represents) — friends added by birth date even before they sign up.</p>
+<pre class="code-block reveal"><span class="comment">-- Identity</span>
+<span class="kw">CREATE TABLE</span> <span class="name">users</span> (
+  id <span class="type">uuid</span> <span class="pk">PRIMARY KEY</span>,                <span class="comment">-- supabase auth.users.id</span>
+  display_name <span class="type">text</span>,
+  created_at <span class="type">timestamptz</span>,
+  <span class="comment">-- subscription state denormalized for fast reads</span>
+  <span class="comment">-- source-of-truth lives in RevenueCat</span>
+  subscription_tier <span class="type">text</span> <span class="kw">DEFAULT</span> <span class="type">'free'</span>,  <span class="comment">-- 'free' | 'paid'</span>
+  subscription_expires_at <span class="type">timestamptz</span>
+);
+
+<span class="comment">-- Birth data — yours, plus rows added for friends pre-signup.</span>
+<span class="kw">CREATE TABLE</span> <span class="name">birth_data</span> (
+  id <span class="type">uuid</span> <span class="pk">PRIMARY KEY</span>,
+  owner_user_id <span class="type">uuid</span> <span class="kw">REFERENCES</span> users(id),    <span class="comment">-- who entered it</span>
+  subject_user_id <span class="type">uuid</span> <span class="kw">REFERENCES</span> users(id),  <span class="comment">-- nullable for non-users</span>
+  display_name <span class="type">text</span>,
+  dob <span class="type">date</span>,
+  birth_time <span class="type">time</span>,
+  birth_time_unknown <span class="type">bool</span> <span class="kw">DEFAULT</span> <span class="type">false</span>,
+  birth_lat <span class="type">double precision</span>,
+  birth_lng <span class="type">double precision</span>,
+  birth_place_name <span class="type">text</span>,
+  birth_tz_identifier <span class="type">text</span>,
+  created_at <span class="type">timestamptz</span>
+);</pre>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 9 — DATA MODEL: friendships + archetypes
+=========================================== -->
+<section class="slide" data-num="09">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">05 — Data model, cont'd</div>
+    <h2 class="reveal">Friendships &amp; archetypes.</h2>
+    <p class="reveal">Canonical <span class="muted">least(a,b), greatest(a,b)</span> ordering simplifies synastry-cache lookup. Both tropical and sidereal positions stored per user — archetype is a <em>view</em> over them.</p>
+<pre class="code-block reveal"><span class="comment">-- Friend graph — single canonical row per pair.</span>
+<span class="kw">CREATE TABLE</span> <span class="name">friendships</span> (
+  user_a <span class="type">uuid</span> <span class="kw">REFERENCES</span> users(id),  <span class="comment">-- always least(a,b)</span>
+  user_b <span class="type">uuid</span> <span class="kw">REFERENCES</span> users(id),  <span class="comment">-- always greatest(a,b)</span>
+  status <span class="type">text</span>,                          <span class="comment">-- 'pending' | 'accepted' | 'blocked'</span>
+  initiated_by <span class="type">uuid</span> <span class="kw">REFERENCES</span> users(id),
+  created_at <span class="type">timestamptz</span>,
+  <span class="pk">PRIMARY KEY</span> (user_a, user_b)
+);
+
+<span class="comment">-- One archetype per user for v1 (multi-archetype deferred).</span>
+<span class="kw">CREATE TABLE</span> <span class="name">archetypes</span> (
+  user_id <span class="type">uuid</span> <span class="pk">PRIMARY KEY</span> <span class="kw">REFERENCES</span> users(id),
+  <span class="comment">-- per-planet system selection. jsonb for extensibility.</span>
+  <span class="comment">-- e.g., { "sun": "tropical", "moon": "sidereal", ... }</span>
+  system_mapping <span class="type">jsonb</span> <span class="kw">DEFAULT</span> <span class="type">'{}'</span>,
+  <span class="comment">-- precomputed positions in BOTH systems</span>
+  tropical_positions <span class="type">jsonb</span>,                <span class="comment">-- { sun: {sign,deg}, moon:..., ...}</span>
+  sidereal_positions <span class="type">jsonb</span>,                <span class="comment">-- same shape</span>
+  computed_at <span class="type">timestamptz</span>
+);</pre>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 10 — DATA MODEL: synastry + daily_content
+=========================================== -->
+<section class="slide" data-num="10">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">05 — Data model, cont'd</div>
+    <h2 class="reveal">Synastry &amp; daily content.</h2>
+    <p class="reveal">Both are caches keyed by deterministic inputs. Synastry by user-pair; daily content by (user, date). Astrocartography schema deferred until map tech is locked.</p>
+<pre class="code-block reveal"><span class="comment">-- Synastry cache (Ashtakoot/Kuta + tropical aspects)</span>
+<span class="kw">CREATE TABLE</span> <span class="name">synastry_results</span> (
+  user_a <span class="type">uuid</span>,
+  user_b <span class="type">uuid</span>,
+  kuta_scores <span class="type">jsonb</span>,                <span class="comment">-- 8-factor Vedic</span>
+  tropical_aspects <span class="type">jsonb</span>,           <span class="comment">-- western synastry layer</span>
+  llm_summary <span class="type">text</span>,                  <span class="comment">-- "communication clashes but soul missions align"</span>
+  computed_at <span class="type">timestamptz</span>,
+  <span class="pk">PRIMARY KEY</span> (user_a, user_b)
+);
+
+<span class="comment">-- Daily content cache — one row per (user, date)</span>
+<span class="kw">CREATE TABLE</span> <span class="name">daily_content</span> (
+  user_id <span class="type">uuid</span>,
+  content_date <span class="type">date</span>,                <span class="comment">-- user's local date</span>
+  ritual_prompt <span class="type">text</span>,               <span class="comment">-- Living Mandala framing</span>
+  transit_summary <span class="type">text</span>,             <span class="comment">-- "Mars squaring natal Venus today"</span>
+  hybrid_insight <span class="type">text</span>,              <span class="comment">-- pulls from archetype mapping</span>
+  llm_model <span class="type">text</span>,
+  generated_at <span class="type">timestamptz</span>,
+  <span class="pk">PRIMARY KEY</span> (user_id, content_date)
+);
+
+<span class="comment">-- astrocartography_intent — schema deferred until map decision</span></pre>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 11 — PRIVACY POSTURE
+=========================================== -->
+<section class="slide" data-num="11">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">06 — Privacy</div>
+    <h2 class="reveal">RLS-aware schema, even in permissive MVP.</h2>
+    <p class="lead reveal">"Privacy not really important for MVP" is a defensible call — but the <em>shape</em> of the system should still be RLS-aware so we can tighten the policy without rewriting the data layer.</p>
+    <ul class="bullets reveal">
+      <li><strong>Enable RLS on every table from day one.</strong> Default policies allow <span class="muted">auth.uid() = owner</span> for read/write on own rows.</li>
+      <li><strong>Friendship rows</strong> readable by both <span class="muted">user_a</span> and <span class="muted">user_b</span>.</li>
+      <li><strong>Synastry results</strong> readable by both parties of the pair.</li>
+      <li><strong>The MVP can run permissive policies</strong> while the structure stays correct — flipping to strict is a policy change, not a migration.</li>
+    </ul>
+    <div class="callout reveal">
+      <span class="label">Why this matters</span>
+      DPDPA 2023 has extra-territorial reach for any service offered to users in India. Even if v1 doesn't enforce strict privacy, the schema shape determines whether tightening later costs an afternoon or a quarter.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 12 — COMPUTE PLACEMENT
+=========================================== -->
+<section class="slide" data-num="12">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">07 — Compute</div>
+    <h2 class="reveal">Where work runs.</h2>
+    <p class="reveal">Existing on-device engine retained. Server-side compute only for what genuinely needs shared state.</p>
+    <div class="three-col-table reveal">
+      <div class="header">
+        <div>What</div><div>Where</div><div>Why</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Panchang (any date / location)</div>
+        <div class="where device">iOS device</div>
+        <div class="why">Already works, offline, fast. Don't move.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Own natal chart (tropical + sidereal)</div>
+        <div class="where device">iOS device</div>
+        <div class="why">Swiss Ephemeris already there. Push positions to <span class="muted">archetypes</span>.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Friend's natal chart</div>
+        <div class="where device">iOS device, on-demand</div>
+        <div class="why">Download <span class="muted">birth_data</span>, compute locally, cache. No server-side ephemeris needed.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Synastry (Ashtakoot + tropical aspects)</div>
+        <div class="where edge">Edge Function</div>
+        <div class="why">Both users' positions in Postgres after sign-in. Cache result; client reads.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Astrocartography lines</div>
+        <div class="where device">iOS device</div>
+        <div class="why">Geometric, identical tropical/sidereal. Compute once, cache locally.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Astrocartography intent → zone</div>
+        <div class="where edge">Edge Function + LLM</div>
+        <div class="why">Rule-based intent → planet → line, with optional LLM polish.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Daily content (ritual + transit + insight)</div>
+        <div class="where edge">Edge Function + LLM</div>
+        <div class="why">Generated server-side, cached per user per day, fetched on app open.</div>
+      </div>
+      <div class="three-col-row">
+        <div class="what">Subscription verification</div>
+        <div class="where external">RevenueCat → webhook</div>
+        <div class="why">RevenueCat = source of truth; Postgres caches the read.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 13 — AUTH FLOW
+=========================================== -->
+<section class="slide" data-num="13">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">08 — Auth</div>
+    <h2 class="reveal">Anonymous-first.</h2>
+    <p class="lead reveal">Apple 5.1.1 prohibits gating basic app function behind PII collection. So the free tier works without sign-in; the auth wall sits at the social or paid boundary.</p>
+    <ol class="numbered reveal">
+      <li>App launches → check Supabase session. <strong>Anonymous allowed.</strong></li>
+      <li>Free tier works without sign-in. Panchang, today's date, sample content — all visible immediately. <strong>No birth-data wall.</strong></li>
+      <li>Sign-in is triggered by adding friends OR subscribing → Sign in with Apple → Supabase creates <span class="muted">users</span> row.</li>
+      <li>Birth data prompt comes <em>after</em> sign-in, contextualized: "Add your birth details to see your chart."</li>
+      <li>Google added later via the same Supabase auth interface. No client-side change.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 14 — LLM PIPELINE
+=========================================== -->
+<section class="slide" data-num="14">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">09 — Content</div>
+    <h2 class="reveal">LLM pipeline — and avoiding the Co-Star trap.</h2>
+    <p class="reveal">The Co-Star failure mode is users feeling read by an algorithm. Mitigations are architectural, not stylistic.</p>
+    <ul class="bullets reveal">
+      <li><strong>Hand-written voice templates</strong> define structure and tone. LLM fills variables, doesn't generate freely.</li>
+      <li><strong>LLM operates on structured astrological context</strong>, not freeform prompts. Edge Function computes today's transits → builds structured input → Claude generates prose constrained by template + voice guide.</li>
+      <li><strong>Voice guide doc</strong> loaded into every prompt as system message. Defines vocabulary, prohibited phrases, sacred-vs-casual register.</li>
+      <li><strong>Prompt caching</strong> on the system message + voice guide → ~10× cost reduction.</li>
+      <li><strong>No "AI" branding visible to user.</strong> Don't say "Powered by Claude." Just deliver content.</li>
+    </ul>
+    <div class="callout reveal">
+      <span class="label">Critical path</span>
+      The voice guide is on the critical path. Without it — or without an astrologer partner to author it — content quality collapses to Co-Star-grade output regardless of model choice.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 15 — LLM COST ECONOMICS
+=========================================== -->
+<section class="slide" data-num="15">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">09 — Content, cont'd</div>
+    <h2 class="reveal">LLM cost economics.</h2>
+    <p class="lead reveal">With prompt caching, daily content is comfortably under 30% margin against a $10/mo subscription.</p>
+    <div class="two-col-table reveal">
+      <div class="two-col-row"><span class="k">Per-user-per-day</span><span class="v"><span class="mono">$0.01 – $0.03</span> · with prompt caching on voice guide + system message.</span></div>
+      <div class="two-col-row"><span class="k">10K paid users</span><span class="v"><span class="mono">$100 – $300 / day</span> · daily content alone.</span></div>
+      <div class="two-col-row"><span class="k">Monthly LLM spend</span><span class="v"><span class="mono">$3K – $9K / month</span> · at 10K paid users.</span></div>
+      <div class="two-col-row"><span class="k">Margin against $10/mo sub</span><span class="v"><span class="mono">&lt; 30%</span> · LLM is the dominant variable cost; everything else (Supabase, RevenueCat) is materially smaller.</span></div>
+    </div>
+    <div class="callout reveal">
+      <span class="label">Sanity check</span>
+      Synastry + astrocartography insights are episodic, not daily — they don't materially change the per-user-per-day cost ceiling unless we let the user re-roll the LLM output on demand.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 16 — WHAT CARRIES FORWARD
+=========================================== -->
+<section class="slide" data-num="16">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">10 — Carry-forward</div>
+    <h2 class="reveal">~70% of v1.3 reuses unchanged.</h2>
+    <p class="reveal">The new architecture is mostly additive. The existing engine is the moat.</p>
+    <div class="grid-2 reveal">
+      <div class="card">
+        <h3>Engine</h3>
+        <p><span class="muted">VedicCalculator</span> · Swiss Ephemeris singleton<br>
+        <span class="muted">PanchangCalculator</span> · all panchang formulas<br>
+        <span class="muted">Graha</span> enum + <span class="muted">GrahaSnapshot</span><br>
+        Time-window logic (Rahu Kalam, Brahma Muhurta, etc.)<br>
+        Festival engine</p>
+      </div>
+      <div class="card">
+        <h3>UI &amp; ritual</h3>
+        <p><span class="muted">DeviTheme</span> · adaptive theming, light/dark<br>
+        <span class="muted">MantraRitualPolicy</span> · Living Mandala state machine<br>
+        <span class="muted">LivingMandalaView</span> · ritual flow components<br>
+        <span class="muted">CelestialHeroView</span> · immersive views<br>
+        Ornamental dividers, typography system</p>
+      </div>
+    </div>
+    <div class="callout reveal">
+      <span class="label">The 30% that's new</span>
+      Backend layer (Supabase). Friend graph + synastry compute. LLM content pipeline. Subscription/auth (Apple SIWA + RevenueCat). Everything else is reuse.
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 17 — OPEN DECISIONS
+=========================================== -->
+<section class="slide" data-num="17">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">11 — Open</div>
+    <h2 class="reveal">Five forks before code starts.</h2>
+    <p class="reveal">Roughly priority-ordered. Item 1 is the difference between an 8-week and a 14-week build.</p>
+    <ol class="numbered reveal">
+      <li><strong>Astrocartography v1 vs v1.1.</strong> Most computationally + UX-novel surface. If v1 → pick map tech, design intent UI. If deferred → ship the diaspora wedge faster.</li>
+      <li><strong>Hybrid archetype UI.</strong> Does v1 even have a picker, or just show both systems side-by-side? Latter is dramatically simpler.</li>
+      <li><strong>LLM voice / writer partnership.</strong> Astrologer partner for voice guide and seed templates. Critical path — content quality determines premium feel.</li>
+      <li><strong>Subscription feature split.</strong> Free = panchang + own chart + daily mandala. Paid = friends/synastry + astrocartography + deep daily insight. Confirm before wiring entitlements.</li>
+      <li><strong>Push notification strategy.</strong> Daily ritual nudge? Time-window alerts (Brahma Muhurta)? Friend activity? Choose 1–2 for v1; more is spam.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 18 — V1 SCOPE
+=========================================== -->
+<section class="slide" data-num="18">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">12 — Roadmap</div>
+    <h2 class="reveal">v1 scope — 6–10 weeks solo.</h2>
+    <p class="reveal">Astrocartography slips to v1.1 unless explicitly pulled forward.</p>
+    <div class="weeks reveal">
+      <div class="week-row">
+        <div class="week">Week 1–2</div>
+        <div class="work"><strong>Foundation.</strong> Supabase project. Apple Sign In. RevenueCat. Paywall stub. New <span class="muted">users</span> + <span class="muted">birth_data</span> tables. Existing app continues working for non-signed-in users.</div>
+      </div>
+      <div class="week-row">
+        <div class="week">Week 3–4</div>
+        <div class="work"><strong>Birth data + chart.</strong> Capture flow (post-sign-in). <span class="muted">archetypes</span> schema. Push tropical + sidereal positions to server. Side-by-side chart view (no archetype picker yet).</div>
+      </div>
+      <div class="week-row">
+        <div class="week">Week 5–6</div>
+        <div class="work"><strong>Social + synastry.</strong> Friends graph (invites, accept, friend list). Synastry Edge Function (Ashtakoot first, tropical aspects second). Synastry detail view.</div>
+      </div>
+      <div class="week-row">
+        <div class="week">Week 7–8</div>
+        <div class="work"><strong>Content + paywall.</strong> LLM content pipeline. Daily content fetch on app open. Voice guide written. Premium gating wired up.</div>
+      </div>
+      <div class="week-row">
+        <div class="week">Week 9–10</div>
+        <div class="work"><strong>Polish + beta.</strong> TestFlight. Iterate on content voice with real users. Bug bash. Submit for review.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 19 — RISKS
+=========================================== -->
+<section class="slide" data-num="19">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">13 — Risks</div>
+    <h2 class="reveal">Risks we're architecting around.</h2>
+    <div class="grid-2 reveal">
+      <div class="card">
+        <h3>Apple 4.3 — spam</h3>
+        <p>Generic horoscope apps get rejected. Lifestyle-companion framing required. Living Mandala + hybrid archetype + prescriptive astrocartography are the differentiators that satisfy "elevate beyond a repackaged website."</p>
+      </div>
+      <div class="card">
+        <h3>Apple 5.1.1 — data collection</h3>
+        <p>Birth data cannot gate basic app function. Already addressed by anonymous-first auth flow. Birth-data prompts come after sign-in, contextualized.</p>
+      </div>
+      <div class="card">
+        <h3>DPDPA 2023 / GDPR</h3>
+        <p>Even with permissive MVP privacy posture, schema must be RLS-aware so tightening later doesn't require migration. Extra-territorial reach matters once we have any India-resident user.</p>
+      </div>
+      <div class="card">
+        <h3>Traditionalist backlash</h3>
+        <p>State Swiss Ephemeris + Lahiri ayanamsa prominently. Frame hybrid as "two lenses on the same sky," not "synthesis of contradictory systems."</p>
+      </div>
+      <div class="card">
+        <h3>Content credibility</h3>
+        <p>LLM voice without an astrologer partner risks Co-Star-style "feels generic" complaints. Voice guide partnership is on the critical path. Mitigation: hand-written templates, no visible AI branding.</p>
+      </div>
+      <div class="card">
+        <h3>Subscription rejection / refund cycles</h3>
+        <p>Nebula was hammered for deceptive billing. RevenueCat keeps the receipt-validation flow audit-ready. Free tier must remain genuinely useful — no dark-pattern paywall escalation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     SLIDE 20 — NEXT 3 ACTIONS
+=========================================== -->
+<section class="slide" data-num="20">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">14 — Next</div>
+    <h2 class="reveal">Three concrete actions.</h2>
+    <p class="lead reveal">In rough order of leverage.</p>
+    <ol class="numbered reveal">
+      <li><strong>Lock the 5 open decisions.</strong> Astrocartography v1 vs v1.1 is the highest-leverage one — decides whether we ship in 8 weeks or 14.</li>
+      <li><strong>Spike the foundation.</strong> One week: Supabase project, Apple Sign In end-to-end, RevenueCat sandbox. Validates the stack composes the way this doc sketches.</li>
+      <li><strong>Draft the LLM voice guide v0.</strong> Even one page. Critical path — easier to iterate from a rough draft than to wait for an astrologer partner.</li>
+    </ol>
+    <div class="callout reveal">
+      <span class="label">Source of truth</span>
+      <span class="mono" style="font-family:var(--font-mono); color: var(--text-primary);">plans/devi-v2-architecture.md</span> — keep that doc in sync with decisions; this deck is a snapshot.
+    </div>
+  </div>
+</section>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   - Keyboard navigation (↓ ↑ ← → space, Home, End)
+   - Intersection-Observer-driven .visible class for entrance animations
+   - Top progress bar + bottom-right slide number
+   - Keyboard hint fades after first navigation
+   =========================================== */
+
+(function() {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const progressEl = document.getElementById('progress');
+  const currentEl = document.getElementById('current');
+  const totalEl = document.getElementById('total');
+  const kbdHint = document.getElementById('kbd-hint');
+
+  totalEl.textContent = String(total).padStart(2, '0');
+
+  // ===== Intersection Observer — drives entrance animations =====
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const slide = entry.target;
+      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+        slide.classList.add('visible');
+        const num = slide.dataset.num || '01';
+        currentEl.textContent = num;
+        const idx = slides.indexOf(slide);
+        const pct = ((idx + 1) / total) * 100;
+        progressEl.style.width = pct + '%';
+      }
+    });
+  }, { threshold: [0.5] });
+
+  slides.forEach(s => io.observe(s));
+
+  // ===== Keyboard navigation =====
+  let hintHidden = false;
+  function hideHint() {
+    if (!hintHidden) { kbdHint.classList.add('hidden'); hintHidden = true; }
+  }
+
+  function currentIndex() {
+    // Find the slide whose top is closest to viewport top
+    let best = 0, bestDist = Infinity;
+    slides.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      const dist = Math.abs(rect.top);
+      if (dist < bestDist) { bestDist = dist; best = i; }
+    });
+    return best;
+  }
+
+  function go(idx) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    slides[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    hideHint();
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      e.preventDefault(); go(currentIndex() + 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault(); go(currentIndex() - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault(); go(0);
+    } else if (e.key === 'End') {
+      e.preventDefault(); go(total - 1);
+    }
+  });
+
+  // Hide keyboard hint on any scroll
+  let scrollHideTimer;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollHideTimer);
+    scrollHideTimer = setTimeout(hideHint, 100);
+  }, { passive: true });
+
+  // ===== Auto-hide keyboard hint after 8s anyway =====
+  setTimeout(hideHint, 8000);
+
+  // ===== Trigger first slide visible immediately =====
+  requestAnimationFrame(() => {
+    if (slides[0]) slides[0].classList.add('visible');
+  });
+})();
+</script>
+</body>
+</html>

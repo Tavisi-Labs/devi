@@ -1,0 +1,1938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devi — pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME — Devi v2 brand (post-autoplan typography inversion).
+   Geist sans for display + wordmark; Cormorant Italic for accent only;
+   Inter for body. Antique gold on warm dark.
+   =========================================== */
+:root {
+  --bg: #0a0805;
+  --bg-elevated: #14110c;
+  --bg-card: #1a160f;
+  --bg-card-elevated: #221c14;
+  --bg-screen: #0d0a05;
+  --border: #2a2218;
+  --border-strong: #3a3024;
+  --border-screen: #322817;
+
+  --text-primary: #f5ede0;
+  --text-secondary: #b8a98e;
+  --text-tertiary: #7a6b54;
+  --text-muted: #4a3f30;
+
+  --accent: #c9a96e;
+  --accent-bright: #e0c890;
+  --accent-dim: #8a7548;
+  --accent-soft: rgba(201, 169, 110, 0.12);
+  --accent-glow: rgba(201, 169, 110, 0.25);
+
+  --green: #6dd58c;
+  --pink: #d49591;
+
+  --font-display: 'Geist', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-accent: 'Cormorant Garamond', 'Times New Roman', serif;
+
+  --slide-pad-y: clamp(3rem, 7vh, 5.5rem);
+  --slide-pad-x: clamp(2rem, 6vw, 6rem);
+  --max-width: 1180px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration: 0.7s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+*::selection { background: var(--accent); color: var(--bg); }
+
+html { scroll-behavior: smooth; scroll-snap-type: y mandatory; background: var(--bg); }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.55;
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Starlight texture for atmospheric slides */
+.starlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 12% 24%, rgba(245, 237, 224, 0.5), transparent),
+    radial-gradient(1px 1px at 82% 18%, rgba(245, 237, 224, 0.4), transparent),
+    radial-gradient(1px 1px at 28% 78%, rgba(201, 169, 110, 0.6), transparent),
+    radial-gradient(1px 1px at 65% 92%, rgba(245, 237, 224, 0.4), transparent),
+    radial-gradient(1px 1px at 92% 55%, rgba(201, 169, 110, 0.5), transparent),
+    radial-gradient(1px 1px at 38% 12%, rgba(245, 237, 224, 0.3), transparent),
+    radial-gradient(1px 1px at 5% 65%, rgba(245, 237, 224, 0.4), transparent),
+    radial-gradient(1px 1px at 70% 35%, rgba(201, 169, 110, 0.5), transparent);
+  opacity: 0.55;
+}
+
+/* ===========================================
+   FIXED CHROME (progress, slide num, kbd hint)
+   =========================================== */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 1px;
+  background: var(--accent);
+  width: 0%;
+  z-index: 100;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+.slide-number {
+  position: fixed;
+  bottom: 1.7rem;
+  right: 2rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  z-index: 50;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+.slide-number .current { color: var(--accent); }
+.kbd-hint {
+  position: fixed;
+  bottom: 1.7rem;
+  left: 2rem;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
+  z-index: 50;
+  transition: opacity 0.5s ease;
+  text-transform: uppercase;
+}
+.kbd-hint.hidden { opacity: 0; }
+
+/* ===========================================
+   SLIDE
+   =========================================== */
+.slide {
+  min-height: 100vh;
+  padding: var(--slide-pad-y) var(--slide-pad-x);
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.slide-inner {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===========================================
+   EYEBROWS
+   =========================================== */
+.eyebrow {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-bottom: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.eyebrow::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--accent);
+}
+
+/* ===========================================
+   TYPOGRAPHY
+   - Display (Geist sans) for headlines, wordmarks, captions
+   - Cormorant Italic for accents and pull-quotes only
+   - Inter for body
+   =========================================== */
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.5vw, 4.4rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  margin-bottom: 1rem;
+}
+h1 em, h1 .accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.4vw, 2.8rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1.3rem;
+}
+h2 em, h2 .accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+h3 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.005em;
+}
+
+p {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  max-width: 60ch;
+  line-height: 1.7;
+  font-weight: 300;
+}
+p.lead {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  max-width: 56ch;
+  line-height: 1.5;
+  font-weight: 300;
+}
+p.lead em {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+strong { color: var(--text-primary); font-weight: 500; }
+em.accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+.muted { color: var(--text-tertiary); }
+
+/* Editorial pull-quote */
+.pullquote {
+  font-family: var(--font-accent);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.25;
+  color: var(--text-primary);
+  font-weight: 400;
+  font-style: italic;
+  max-width: 28ch;
+  margin: 1.5rem 0;
+}
+.pullquote .accent { color: var(--accent); }
+
+/* ===========================================
+   GRID LAYOUTS
+   =========================================== */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+.feature-grid.right-mock { grid-template-columns: 1fr 380px; }
+.feature-grid.left-mock { grid-template-columns: 380px 1fr; }
+
+@media (max-width: 900px) {
+  .feature-grid,
+  .feature-grid.right-mock,
+  .feature-grid.left-mock { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.feature-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.feature-text .label {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: -0.3rem;
+}
+
+ul.bullets {
+  list-style: none;
+  margin-top: 1.2rem;
+}
+ul.bullets li {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.7rem;
+  line-height: 1.55;
+  padding-left: 1.4rem;
+  position: relative;
+  font-weight: 300;
+  max-width: 50ch;
+}
+ul.bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 7px;
+  height: 1px;
+  background: var(--accent);
+}
+ul.bullets li strong { color: var(--text-primary); font-weight: 500; }
+
+/* ===========================================
+   IPHONE MOCK FRAME
+   =========================================== */
+.iphone {
+  width: 320px;
+  height: 660px;
+  background: var(--bg-elevated);
+  border-radius: 44px;
+  padding: 12px;
+  box-shadow:
+    0 0 0 1.5px var(--border-screen),
+    0 30px 60px -20px rgba(0, 0, 0, 0.6),
+    0 0 80px -20px var(--accent-glow);
+  position: relative;
+  margin: 0 auto;
+}
+.iphone::before {
+  content: '';
+  position: absolute;
+  top: 18px; left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 26px;
+  background: var(--bg-elevated);
+  border-radius: 14px;
+  z-index: 10;
+}
+.iphone-screen {
+  width: 100%;
+  height: 100%;
+  background: var(--bg-screen);
+  border-radius: 32px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.iphone-status {
+  height: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 22px 6px;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.iphone-status .dots { letter-spacing: 0.12em; }
+.iphone-content {
+  flex: 1;
+  padding: 0.6rem 1.1rem 1rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Smaller iPhone for split layouts */
+.iphone.sm { width: 280px; height: 580px; border-radius: 38px; padding: 10px; }
+.iphone.sm::before { width: 78px; height: 22px; top: 15px; }
+.iphone.sm .iphone-screen { border-radius: 28px; }
+
+/* ===========================================
+   MOCK SCREEN: CELESTIAL HERO (home)
+   =========================================== */
+.mock-celestial {
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201, 169, 110, 0.25) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 100%, rgba(94, 60, 40, 0.4) 0%, transparent 70%);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.mock-celestial .city {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 1rem 0 0.4rem;
+  font-weight: 500;
+}
+.mock-celestial .date {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.mock-celestial .arc {
+  position: relative;
+  height: 120px;
+  margin: 0.5rem 0;
+}
+.mock-celestial .arc-svg {
+  width: 100%;
+  height: 100%;
+}
+.mock-celestial .moon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, var(--text-primary) 0%, var(--text-secondary) 50%, var(--accent-dim) 100%);
+  margin: 1rem auto 1.2rem;
+  box-shadow: 0 0 30px rgba(245, 237, 224, 0.25), inset -8px -4px 20px rgba(0,0,0,0.4);
+  position: relative;
+}
+.mock-celestial .tithi {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+.mock-celestial .tithi em {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+}
+.mock-celestial .nakshatra {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+.mock-celestial .ribbon {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  margin-top: auto;
+}
+.mock-celestial .ribbon .ribbon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.mock-celestial .ribbon .ribbon-row:last-child { border-bottom: none; }
+.mock-celestial .ribbon .lbl {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.mock-celestial .ribbon .val {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+.mock-celestial .ribbon .val .accent { color: var(--accent); }
+
+/* ===========================================
+   MOCK SCREEN: HYBRID ARCHETYPE BUILDER
+   =========================================== */
+.mock-hybrid {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mock-hybrid .topnav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0 1rem;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 1rem;
+}
+.mock-hybrid .topnav .back {
+  font-family: var(--font-display);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.mock-hybrid .topnav .title {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+.mock-hybrid .skies-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 0.9rem;
+  border: 0.5px solid var(--border);
+}
+.mock-hybrid .skies-toggle div {
+  text-align: center;
+  padding: 0.45rem 0;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.mock-hybrid .skies-toggle .active {
+  background: var(--accent);
+  color: var(--bg);
+}
+.mock-hybrid .planet-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  align-items: center;
+  border-bottom: 0.5px solid var(--border);
+}
+.mock-hybrid .planet-row:last-child { border-bottom: none; }
+.mock-hybrid .planet-row .glyph {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 1rem;
+  text-align: center;
+}
+.mock-hybrid .planet-row .name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 400;
+}
+.mock-hybrid .planet-row .name .sec {
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  margin-top: 1px;
+}
+.mock-hybrid .pill {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  border: 0.5px solid var(--border);
+}
+.mock-hybrid .pill.trop { background: rgba(212, 149, 145, 0.12); color: var(--pink); border-color: rgba(212, 149, 145, 0.3); }
+.mock-hybrid .pill.sid { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-dim); }
+
+/* ===========================================
+   MOCK SCREEN: SYNASTRY
+   =========================================== */
+.mock-synastry {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mock-synastry .friend-header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.mock-synastry .avatars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+.mock-synastry .avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.2rem;
+  font-weight: 400;
+  background: var(--bg-card);
+  border: 0.5px solid var(--accent-dim);
+  color: var(--accent);
+}
+.mock-synastry .avatars .conj {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin: 0 -2px;
+}
+.mock-synastry .friend-name {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 0.15rem;
+}
+.mock-synastry .friend-meta {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+}
+.mock-synastry .kuta-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0.8rem 0;
+}
+.mock-synastry .kuta-cell {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.6rem;
+}
+.mock-synastry .kuta-cell .knm {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.15rem;
+}
+.mock-synastry .kuta-cell .kvl {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  color: var(--accent);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.mock-synastry .kuta-cell .kvl .full { color: var(--text-tertiary); font-weight: 400; font-size: 0.7rem; }
+.mock-synastry .summary-card {
+  background: var(--accent-soft);
+  border: 0.5px solid var(--accent-dim);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  margin-top: auto;
+}
+.mock-synastry .summary-card p {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* ===========================================
+   MOCK SCREEN: ASTROCARTOGRAPHY
+   =========================================== */
+.mock-astro {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mock-astro .topbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.7rem;
+  margin-bottom: 0.7rem;
+  border-bottom: 0.5px solid var(--border);
+}
+.mock-astro .topbar .lbl {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+.mock-astro .topbar .val {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.92rem;
+}
+.mock-astro .map-frame {
+  flex: 1;
+  background: linear-gradient(180deg, #0a1628 0%, #050a14 60%, #020308 100%);
+  border-radius: 10px;
+  border: 0.5px solid var(--border-screen);
+  position: relative;
+  overflow: hidden;
+}
+.mock-astro .continent {
+  position: absolute;
+  background: rgba(180, 165, 140, 0.18);
+  border: 0.5px solid rgba(180, 165, 140, 0.3);
+  border-radius: 30% 60% 40% 50%;
+}
+.mock-astro .c1 { top: 18%; left: 8%; width: 22%; height: 26%; border-radius: 50% 30% 40% 50%; }
+.mock-astro .c2 { top: 14%; left: 36%; width: 24%; height: 28%; border-radius: 40% 50% 60% 30%; }
+.mock-astro .c3 { top: 52%; left: 38%; width: 14%; height: 28%; border-radius: 50% 50% 40% 50%; }
+.mock-astro .c4 { top: 18%; left: 65%; width: 28%; height: 36%; border-radius: 30% 40% 50% 60%; }
+.mock-astro .c5 { top: 60%; left: 70%; width: 18%; height: 22%; border-radius: 50%; }
+.mock-astro .line {
+  position: absolute;
+  background: var(--accent);
+  opacity: 0.7;
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+.mock-astro .line.v {
+  width: 1px;
+  height: 100%;
+  top: 0;
+}
+.mock-astro .line.curve {
+  width: 1px;
+  background: linear-gradient(transparent, var(--accent), transparent);
+  height: 100%;
+  top: 0;
+}
+.mock-astro .hotspot {
+  position: absolute;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+.mock-astro .hotspot::after {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.mock-astro .hotspot.h1 { top: 22%; left: 22%; }
+.mock-astro .hotspot.h2 { top: 35%; left: 47%; }
+.mock-astro .hotspot.h3 { top: 56%; left: 78%; }
+.mock-astro .legend {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+}
+.mock-astro .legend .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  padding: 0.15rem 0;
+}
+.mock-astro .legend .row .accent {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* ===========================================
+   MOCK SCREEN: LIVING MANDALA
+   =========================================== */
+.mock-mandala {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1rem 0;
+}
+.mock-mandala .step-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+.mock-mandala .prompt {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+  line-height: 1.3;
+  max-width: 22ch;
+  margin: 0 auto 1.5rem;
+  font-weight: 400;
+}
+.mock-mandala .prompt .accent { color: var(--accent); }
+.mock-mandala .mandala-svg {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 1.5rem;
+}
+.mock-mandala .breath-counter {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+.mock-mandala .breath-counter .accent { color: var(--accent); }
+.mock-mandala .progress {
+  width: 60%;
+  height: 1px;
+  background: var(--border-strong);
+  position: relative;
+  margin: 0 auto;
+}
+.mock-mandala .progress::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0;
+  height: 1px;
+  width: 60%;
+  background: var(--accent);
+}
+
+/* ===========================================
+   MOCK SCREEN: SACRED TIMING
+   =========================================== */
+.mock-timing {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.mock-timing .header {
+  font-family: var(--font-accent);
+  font-style: italic;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+.mock-timing .clock {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border-strong);
+  margin: 0 auto 1rem;
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, var(--accent-soft) 0%, transparent 60%);
+}
+.mock-timing .clock-segment {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 30deg, var(--accent) 0deg, var(--accent) 35deg, transparent 35deg);
+  opacity: 0.4;
+  mask: radial-gradient(circle, transparent 40%, black 41%, black 100%);
+  -webkit-mask: radial-gradient(circle, transparent 40%, black 41%, black 100%);
+}
+.mock-timing .clock .center-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+.mock-timing .clock .center-label .num {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-style: normal;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.15rem;
+}
+.mock-timing .windows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.mock-timing .window-row {
+  background: var(--bg-card);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mock-timing .window-row.now {
+  background: var(--accent-soft);
+  border-color: var(--accent-dim);
+}
+.mock-timing .window-row .nm {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.mock-timing .window-row.now .nm { color: var(--accent); }
+.mock-timing .window-row .tm {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+.mock-timing .window-row.now .tm { color: var(--accent); }
+
+/* ===========================================
+   PRICING TABLE
+   =========================================== */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+@media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr; } }
+.tier {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.8rem;
+  background: var(--bg-card);
+  position: relative;
+}
+.tier.paid {
+  border-color: var(--accent-dim);
+  background: linear-gradient(180deg, var(--accent-soft) 0%, var(--bg-card) 100%);
+}
+.tier .tname {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.tier .price {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
+}
+.tier .price .per {
+  font-size: 0.95rem;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+.tier .tagline {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 0.5px solid var(--border);
+}
+.tier ul.feats {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.tier ul.feats li {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  padding-left: 1.2rem;
+  position: relative;
+  font-weight: 300;
+  line-height: 1.45;
+}
+.tier ul.feats li::before {
+  content: '—';
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+  font-family: var(--font-display);
+}
+
+/* ===========================================
+   COMPETITOR ROW
+   =========================================== */
+.compete-table {
+  margin-top: 2rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.compete-row {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr 1fr;
+  padding: 0.95rem 1.3rem;
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+  align-items: center;
+}
+.compete-row.devi { background: var(--accent-soft); }
+.compete-row:last-child { border-bottom: none; }
+.compete-row .nm {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+.compete-row.devi .nm {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+.compete-row .pitch {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+.compete-row .moat {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.compete-row.devi .moat { color: var(--accent); }
+@media (max-width: 700px) {
+  .compete-row { grid-template-columns: 1fr; gap: 0.4rem; padding: 0.85rem 1rem; }
+}
+
+/* ===========================================
+   STATS / METRICS ROW
+   =========================================== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 0.5px solid var(--border);
+}
+@media (max-width: 700px) { .stats-row { grid-template-columns: 1fr; gap: 1.5rem; padding-top: 1.5rem; } }
+.stat .num {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  color: var(--accent);
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+.stat .lbl {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  max-width: 24ch;
+}
+
+/* ===========================================
+   FOUNDER CARDS
+   =========================================== */
+.founder-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+@media (max-width: 700px) { .founder-grid { grid-template-columns: 1fr; } }
+.founder {
+  border-top: 1px solid var(--accent);
+  padding-top: 1.2rem;
+}
+.founder .role {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+.founder h4 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+.founder p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ===========================================
+   TITLE SLIDE — distinctive
+   =========================================== */
+.title-slide {
+  background:
+    radial-gradient(ellipse at 50% 110%, rgba(201, 169, 110, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse at 20% 30%, rgba(201, 169, 110, 0.05) 0%, transparent 50%),
+    var(--bg);
+}
+.title-slide .slide-inner { text-align: center; }
+.title-slide .top-line {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.32em;
+  margin-bottom: 3.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.title-slide h1.brand {
+  font-family: var(--font-display);
+  font-size: clamp(6.5rem, 16vw, 13rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+}
+.title-slide h1.brand .dot {
+  color: var(--accent);
+  display: inline-block;
+  width: 0.18em;
+  height: 0.18em;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-left: 0.05em;
+  vertical-align: 0.65em;
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+.title-slide .below {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  color: var(--accent);
+  font-weight: 400;
+  letter-spacing: 0.005em;
+  margin-bottom: 1.5rem;
+}
+.title-slide .ctx {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 50ch;
+  margin: 0 auto;
+  font-weight: 300;
+}
+.title-slide .footer {
+  margin-top: 5rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ===========================================
+   POSITIONING QUADRANT
+   =========================================== */
+.quadrant {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  margin-top: 2rem;
+  background: var(--border);
+  border: 1px solid var(--border);
+  aspect-ratio: 1.5 / 1;
+  max-width: 760px;
+}
+.quadrant > div {
+  background: var(--bg-card);
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+.quadrant .label-top {
+  font-family: var(--font-display);
+  color: var(--text-tertiary);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.quadrant .label-bottom {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+.quadrant .empty {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  position: relative;
+}
+.quadrant .empty::after {
+  content: 'Devi';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--accent);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.quadrant .empty .label-top,
+.quadrant .empty .label-bottom { opacity: 0; }
+.axis-label {
+  font-family: var(--font-accent);
+  font-style: italic;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 0.5rem;
+  max-width: 760px;
+}
+
+/* ===========================================
+   ANIMATIONS
+   =========================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration) var(--ease-out),
+              transform var(--duration) var(--ease-out);
+}
+.slide.visible .reveal { opacity: 1; transform: translateY(0); }
+.slide.visible .reveal:nth-child(1) { transition-delay: 0.1s; }
+.slide.visible .reveal:nth-child(2) { transition-delay: 0.22s; }
+.slide.visible .reveal:nth-child(3) { transition-delay: 0.34s; }
+.slide.visible .reveal:nth-child(4) { transition-delay: 0.46s; }
+.slide.visible .reveal:nth-child(5) { transition-delay: 0.58s; }
+.slide.visible .reveal:nth-child(6) { transition-delay: 0.70s; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: opacity 0.3s ease; transform: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  :root { --slide-pad-x: 1.5rem; }
+  .iphone { width: 280px; height: 580px; padding: 10px; border-radius: 38px; }
+  .iphone::before { width: 78px; height: 22px; }
+  .iphone .iphone-screen { border-radius: 28px; }
+  .kbd-hint { display: none; }
+  .quadrant { aspect-ratio: 1 / 1; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="slide-number"><span class="current" id="current">01</span> / <span id="total">17</span></div>
+<div class="kbd-hint" id="kbd-hint">↓ ↑ space</div>
+
+<!-- ===========================================
+     I — TITLE
+=========================================== -->
+<section class="slide title-slide" data-num="01">
+  <div class="starlight"></div>
+  <div class="slide-inner">
+    <div class="top-line reveal">a daily companion of the stars</div>
+    <h1 class="brand reveal">Devi<span class="dot"></span></h1>
+    <div class="below reveal">Two skies, one self.</div>
+    <p class="ctx reveal">A premium daily spiritual companion built on a sidereal engine, served with the polish of the best Western lifestyle apps — by the people whose tradition this is.</p>
+    <div class="footer reveal">pitch · 2026</div>
+  </div>
+</section>
+
+<!-- ===========================================
+     II — THESIS
+=========================================== -->
+<section class="slide" data-num="02">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">thesis</div>
+    <h1 class="reveal">Western apps have aesthetic.<br>Indian apps have authenticity.<br><em>Both fail the modern seeker.</em></h1>
+    <p class="lead reveal" style="margin-top: 1.5rem;">Devi is the bridge — the rigor of the tradition, the polish of a modern lifestyle app, and the synthesis of Western and Vedic systems that working astrologers practice but no software supports.</p>
+  </div>
+</section>
+
+<!-- ===========================================
+     III — POSITIONING QUADRANT
+=========================================== -->
+<section class="slide" data-num="03">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">the empty quadrant</div>
+    <h2 class="reveal">Premium <em>and</em> Vedic — currently vacant.</h2>
+    <p class="reveal">A polarized market: Western lifestyle on one axis, Indian utility on the other. The premium-Vedic quadrant is where the spiritual seeker actually lives.</p>
+    <div class="quadrant reveal">
+      <div>
+        <div class="label-top">premium · western</div>
+        <div class="label-bottom">Co-Star, Chani, The Pattern</div>
+      </div>
+      <div class="empty">
+        <div class="label-top">premium · vedic</div>
+        <div class="label-bottom">Devi</div>
+      </div>
+      <div>
+        <div class="label-top">utility · western</div>
+        <div class="label-bottom">Astro.com, TimePassages</div>
+      </div>
+      <div>
+        <div class="label-top">utility · vedic</div>
+        <div class="label-bottom">AstroSage, AstroTalk, Drik Panchang</div>
+      </div>
+    </div>
+    <div class="axis-label reveal">← tropical · sidereal →</div>
+  </div>
+</section>
+
+<!-- ===========================================
+     IV — AUDIENCE
+=========================================== -->
+<section class="slide" data-num="04">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">audience</div>
+    <h2 class="reveal">Five seekers. <em>One product.</em></h2>
+    <div class="stats-row reveal">
+      <div class="stat"><div class="num">~80M</div><div class="lbl">v1 launch wedge — diaspora + Western astro-natives</div></div>
+      <div class="stat"><div class="num">$15–20</div><div class="lbl">monthly WTP for the high-yield diaspora seeker</div></div>
+      <div class="stat"><div class="num">3.5×</div><div class="lbl">North America revenue multiplier vs. domestic India ARPU</div></div>
+    </div>
+    <p class="reveal" style="margin-top: 2.5rem; max-width: 64ch;">Diaspora seekers want their tradition without dogma. Western astro-natives want depth beyond sun-signs. SBNR Gen Z wants compatibility and community. Meditation converts want a real ritual. The same product, voiced thoughtfully, addresses all of them.</p>
+  </div>
+</section>
+
+<!-- ===========================================
+     V — PRODUCT IN ONE SENTENCE + HOME MOCK
+=========================================== -->
+<section class="slide" data-num="05">
+  <div class="slide-inner">
+    <div class="feature-grid right-mock">
+      <div class="feature-text">
+        <div class="eyebrow reveal">the product</div>
+        <h2 class="reveal">A daily companion <em>anchored in the sky</em>.</h2>
+        <p class="lead reveal">Devi opens onto a single page. Today's tithi, your nakshatra, the windows of sacred time, the Living Mandala ritual — calibrated to your exact location and computed in real time on the Swiss Ephemeris.</p>
+        <ul class="bullets reveal">
+          <li>Computed locally — no server lookups, no tracking, no ads</li>
+          <li>Built on the same engine professional <em class="accent">jyotishis</em> trust</li>
+          <li>Localized to your city's sunrise, sunset, and longitude</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>9:41</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-celestial">
+                <div class="city">Brooklyn, NY</div>
+                <div class="date">Vaishakha · Krishna Pratipada</div>
+                <div class="moon"></div>
+                <div class="tithi">Krishna <em>Trayodashi</em></div>
+                <div class="nakshatra">moon waning in Anuradha</div>
+                <div class="ribbon">
+                  <div class="ribbon-row"><span class="lbl">Brahma Muhurta</span><span class="val">04:38–05:26</span></div>
+                  <div class="ribbon-row"><span class="lbl">Abhijit</span><span class="val">11:54–12:46</span></div>
+                  <div class="ribbon-row"><span class="lbl">Rahu Kalam</span><span class="val"><span class="accent">15:12–16:48</span></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     VI — FEATURE 1 — TWO SKIES (HYBRID ARCHETYPE)
+=========================================== -->
+<section class="slide" data-num="06">
+  <div class="slide-inner">
+    <div class="feature-grid left-mock">
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>9:41</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-hybrid">
+                <div class="topnav">
+                  <div class="back">←</div>
+                  <div class="title">Two skies</div>
+                  <div style="width:12px;"></div>
+                </div>
+                <div class="skies-toggle">
+                  <div>Tropical</div>
+                  <div class="active">Hybrid</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">☉</div>
+                  <div class="name">Sun<span class="sec">Aries · Ashwini 2°</span></div>
+                  <div class="pill trop">Trop</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">☽</div>
+                  <div class="name">Moon<span class="sec">Pisces · Revati 14°</span></div>
+                  <div class="pill sid">Sid</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">↑</div>
+                  <div class="name">Asc.<span class="sec">Cancer · Pushya 7°</span></div>
+                  <div class="pill sid">Sid</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">♀</div>
+                  <div class="name">Venus<span class="sec">Taurus · Rohini 22°</span></div>
+                  <div class="pill trop">Trop</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">♂</div>
+                  <div class="name">Mars<span class="sec">Scorpio · Anuradha 9°</span></div>
+                  <div class="pill sid">Sid</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">♃</div>
+                  <div class="name">Jupiter<span class="sec">Sagittarius · Mula 3°</span></div>
+                  <div class="pill sid">Sid</div>
+                </div>
+                <div class="planet-row">
+                  <div class="glyph">♄</div>
+                  <div class="name">Saturn<span class="sec">Aquarius · Shatabhisha 18°</span></div>
+                  <div class="pill trop">Trop</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="eyebrow reveal">feature · 01</div>
+        <h2 class="reveal">Two skies, <em>one self</em>.</h2>
+        <p class="lead reveal">Your tropical chart shows the personality you wear. Your sidereal chart shows the soul beneath it. Devi shows you both — and lets you build a hybrid <em class="accent">archetype</em> from the elements that resonate.</p>
+        <ul class="bullets reveal">
+          <li>Per-planet lens selection — pick tropical or sidereal independently</li>
+          <li>Both systems computed natively from your birth data</li>
+          <li><strong>No competitor in any category does this</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     VII — FEATURE 2 — LIVING MANDALA
+=========================================== -->
+<section class="slide" data-num="07">
+  <div class="slide-inner">
+    <div class="feature-grid right-mock">
+      <div class="feature-text">
+        <div class="eyebrow reveal">feature · 02</div>
+        <h2 class="reveal"><em>A ritual</em>, not a horoscope.</h2>
+        <p class="lead reveal">The Living Mandala is a 1-to-3 minute interactive sacred-geometry practice anchored to your local sunrise, your nakshatra of the day, and the time windows that have organized Hindu spiritual life for millennia.</p>
+        <ul class="bullets reveal">
+          <li>Daily prompt drawn from a curated set of 30, voiced by founder + advisor</li>
+          <li>Breath-paced animation, haptic feedback, reduce-motion respected</li>
+          <li>The first thing you do when you wake — <em class="accent">an anchor, not an algorithm</em></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>5:14</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-mandala">
+                <div class="step-label">Brahma Muhurta · breath 14 of 21</div>
+                <div class="prompt">Light <em class="accent">one thing</em> before you check email.</div>
+                <svg class="mandala-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="100" cy="100" r="92" stroke="#c9a96e" stroke-width="0.6" opacity="0.5"/>
+                  <circle cx="100" cy="100" r="74" stroke="#c9a96e" stroke-width="0.5" opacity="0.4"/>
+                  <circle cx="100" cy="100" r="56" stroke="#c9a96e" stroke-width="0.5" opacity="0.5"/>
+                  <circle cx="100" cy="100" r="34" stroke="#c9a96e" stroke-width="0.7" opacity="0.7"/>
+                  <circle cx="100" cy="100" r="14" fill="#c9a96e" opacity="0.85"/>
+                  <g stroke="#c9a96e" stroke-width="0.4" opacity="0.45">
+                    <line x1="100" y1="8" x2="100" y2="192"/>
+                    <line x1="8" y1="100" x2="192" y2="100"/>
+                    <line x1="35" y1="35" x2="165" y2="165"/>
+                    <line x1="35" y1="165" x2="165" y2="35"/>
+                    <line x1="62" y1="13" x2="138" y2="187"/>
+                    <line x1="13" y1="62" x2="187" y2="138"/>
+                    <line x1="62" y1="187" x2="138" y2="13"/>
+                    <line x1="13" y1="138" x2="187" y2="62"/>
+                  </g>
+                  <g fill="#c9a96e" opacity="0.7">
+                    <circle cx="100" cy="34" r="2.4"/>
+                    <circle cx="100" cy="166" r="2.4"/>
+                    <circle cx="34" cy="100" r="2.4"/>
+                    <circle cx="166" cy="100" r="2.4"/>
+                    <circle cx="53" cy="53" r="1.8"/>
+                    <circle cx="147" cy="53" r="1.8"/>
+                    <circle cx="53" cy="147" r="1.8"/>
+                    <circle cx="147" cy="147" r="1.8"/>
+                  </g>
+                </svg>
+                <div class="breath-counter">in <span class="accent">·</span> hold <span class="accent">·</span> out</div>
+                <div class="progress"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     VIII — FEATURE 3 — SACRED TIMING
+=========================================== -->
+<section class="slide" data-num="08">
+  <div class="slide-inner">
+    <div class="feature-grid left-mock">
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>11:48</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-timing">
+                <div class="header">the hours, today</div>
+                <div class="clock">
+                  <div class="clock-segment"></div>
+                  <div class="center-label">
+                    <div class="num">12:46</div>
+                    <span>Abhijit ends</span>
+                  </div>
+                </div>
+                <div class="windows">
+                  <div class="window-row">
+                    <span class="nm">Brahma Muhurta</span>
+                    <span class="tm">04:38 — 05:26</span>
+                  </div>
+                  <div class="window-row now">
+                    <span class="nm">Abhijit Muhurta</span>
+                    <span class="tm">11:54 — 12:46 · NOW</span>
+                  </div>
+                  <div class="window-row">
+                    <span class="nm">Rahu Kalam</span>
+                    <span class="tm">15:12 — 16:48</span>
+                  </div>
+                  <div class="window-row">
+                    <span class="nm">Yama Gandam</span>
+                    <span class="tm">06:24 — 07:50</span>
+                  </div>
+                  <div class="window-row">
+                    <span class="nm">Sandhya</span>
+                    <span class="tm">19:05 — 19:52</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="eyebrow reveal">feature · 03</div>
+        <h2 class="reveal">The hours <em>your grandmother knew about</em>.</h2>
+        <p class="lead reveal">Brahma Muhurta. Abhijit Muhurta. Rahu Kalam. Yama Gandam. Computed to the second for your exact location, surfaced as gentle anchors — not anxiety triggers.</p>
+        <ul class="bullets reveal">
+          <li>Eight-segment <em class="accent">muhurta</em> tables, weekday-aware</li>
+          <li>Optional notifications for Brahma Muhurta and Abhijit only — never spam</li>
+          <li>Same calculations professional jyotishis use; calmly presented</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     IX — FEATURE 4 — SYNASTRY
+=========================================== -->
+<section class="slide" data-num="09">
+  <div class="slide-inner">
+    <div class="feature-grid right-mock">
+      <div class="feature-text">
+        <div class="eyebrow reveal">feature · 04</div>
+        <h2 class="reveal">Synastry built to <em>illuminate</em>, not weaponize.</h2>
+        <p class="lead reveal">Vedic <em class="accent">Ashtakoot</em> compatibility — eight dimensions of granular alignment. Specific, empathetic, deeply shareable. Co-Star's depth, Vedic precision.</p>
+        <ul class="bullets reveal">
+          <li>Eight kuta dimensions: Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi</li>
+          <li>Friend-graph virality — shareable result cards designed to travel</li>
+          <li><strong>"Your communication clashes — but your soul missions align."</strong></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>9:41</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-synastry">
+                <div class="friend-header">
+                  <div class="avatars">
+                    <div class="avatar">H</div>
+                    <span class="conj">·</span>
+                    <div class="avatar">M</div>
+                  </div>
+                  <div class="friend-name">Hareesh + Maya</div>
+                  <div class="friend-meta">Ashtakoot · 26.5 / 36</div>
+                </div>
+                <div class="kuta-grid">
+                  <div class="kuta-cell"><div class="knm">Varna</div><div class="kvl">1<span class="full"> / 1</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Vashya</div><div class="kvl">1<span class="full"> / 2</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Tara</div><div class="kvl">3<span class="full"> / 3</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Yoni</div><div class="kvl">3<span class="full"> / 4</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Graha Maitri</div><div class="kvl">5<span class="full"> / 5</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Gana</div><div class="kvl">5<span class="full"> / 6</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Bhakoot</div><div class="kvl">0<span class="full"> / 7</span></div></div>
+                  <div class="kuta-cell"><div class="knm">Nadi</div><div class="kvl">8<span class="full"> / 8</span></div></div>
+                </div>
+                <div class="summary-card">
+                  <p>Communication will need patience — your <em>Bhakoot</em> reads zero. But <em>Nadi</em> harmony is total. Your spiritual currents run the same direction.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     X — FEATURE 5 — ASTROCARTOGRAPHY
+=========================================== -->
+<section class="slide" data-num="10">
+  <div class="slide-inner">
+    <div class="feature-grid left-mock">
+      <div class="reveal">
+        <div class="iphone">
+          <div class="iphone-screen">
+            <div class="iphone-status"><span>9:41</span><span class="dots">•••</span></div>
+            <div class="iphone-content">
+              <div class="mock-astro">
+                <div class="topbar">
+                  <div>
+                    <div class="lbl">Intent</div>
+                    <div class="val">Deepen practice</div>
+                  </div>
+                </div>
+                <div class="map-frame">
+                  <div class="continent c1"></div>
+                  <div class="continent c2"></div>
+                  <div class="continent c3"></div>
+                  <div class="continent c4"></div>
+                  <div class="continent c5"></div>
+                  <div class="line v" style="left: 28%;"></div>
+                  <div class="line v" style="left: 52%;"></div>
+                  <div class="line v" style="left: 81%;"></div>
+                  <div class="hotspot h1"></div>
+                  <div class="hotspot h2"></div>
+                  <div class="hotspot h3"></div>
+                  <div class="legend">
+                    <div class="row"><span>Jupiter line</span><span class="accent">expansion</span></div>
+                    <div class="row"><span>Ketu line</span><span class="accent">retreat</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="eyebrow reveal">feature · 05</div>
+        <h2 class="reveal">Pick what your <em>soul is doing</em> this season.</h2>
+        <p class="lead reveal">Existing astrocartography tools require a textbook. Devi reverses it — pick an intent (deepen practice, recover from burnout, expand, return) and the app shows the geographic zones where your chart resonates.</p>
+        <ul class="bullets reveal">
+          <li>Sidereal/Vedic astrocartography — no other app does this</li>
+          <li>For travelers, sojourners, the <em class="accent">geographically curious</em></li>
+          <li>Group-travel hotspots when friends overlay their charts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     XI — BRAND LANGUAGE
+=========================================== -->
+<section class="slide" data-num="11">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">brand language</div>
+    <h2 class="reveal">Restraint over ornament. Editorial over marketing.</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2.5rem;" class="reveal">
+      <div>
+        <h3 style="margin-bottom: 1rem;">Voice — what the app sounds like</h3>
+        <p style="font-family: var(--font-accent); font-style: italic; font-size: 1.15rem; color: var(--text-primary); line-height: 1.45; max-width: 38ch;">
+          "Krishna Trayodashi, the moon waning in Anuradha — a day for quiet repair. Mars approaches your natal Venus today; what you tend to with care will hold."
+        </p>
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-tertiary);">
+          Hand-written voice templates fill structured astrological inputs. Banned-phrase regex prevents generic-spiritual drift. <strong style="color: var(--text-primary);">90 readings hand-reviewed before launch.</strong>
+        </p>
+      </div>
+      <div>
+        <h3 style="margin-bottom: 1rem;">Words we use · words we don't</h3>
+        <p style="font-family: var(--font-accent); font-style: italic; color: var(--accent); font-size: 0.95rem; margin-bottom: 0.4rem;">use</p>
+        <p style="font-size: 0.92rem; line-height: 1.7;">companion · mirror · lens · archetype · anchor · threshold · season · transit · <em class="accent">nakshatra</em> · <em class="accent">parampara</em> · <em class="accent">muhurta</em> · attention · returning</p>
+        <p style="font-family: var(--font-accent); font-style: italic; color: var(--accent); font-size: 0.95rem; margin: 1.2rem 0 0.4rem;">don't</p>
+        <p style="font-size: 0.92rem; line-height: 1.7; color: var(--text-tertiary); text-decoration: line-through; text-decoration-thickness: 0.5px;">manifestation · hustle · level up · biohack · vibe · cosmic alignment · sacred (loose) · soul (loose) · honor your truth</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     XII — COMPETITIVE
+=========================================== -->
+<section class="slide" data-num="12">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">positioning</div>
+    <h2 class="reveal">Why the <em>moat holds</em>.</h2>
+    <div class="compete-table reveal">
+      <div class="compete-row">
+        <div class="nm">Co-Star</div>
+        <div class="pitch">Brutal, pithy daily horoscopes. Tropical only. Optimized for engagement anxiety.</div>
+        <div class="moat">No Vedic depth</div>
+      </div>
+      <div class="compete-row">
+        <div class="nm">Chani</div>
+        <div class="pitch">Premium tropical with podcasts and rituals. Western voice.</div>
+        <div class="moat">Tropical only</div>
+      </div>
+      <div class="compete-row">
+        <div class="nm">AstroSage</div>
+        <div class="pitch">India's utility tool — kundli, matching, hora. Functionally dense, aesthetically incoherent.</div>
+        <div class="moat">No daily anchor</div>
+      </div>
+      <div class="compete-row">
+        <div class="nm">AstroTalk</div>
+        <div class="pitch">Pay-per-minute marketplace. Monetizes crisis events.</div>
+        <div class="moat">Predatory model</div>
+      </div>
+      <div class="compete-row devi">
+        <div class="nm">Devi</div>
+        <div class="pitch">Hybrid Tropical/Sidereal · Vedic synastry · prescriptive astrocartography · Living Mandala · founder authenticity</div>
+        <div class="moat">All five</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     XIII — FOUNDERS
+=========================================== -->
+<section class="slide" data-num="13">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">founders</div>
+    <h2 class="reveal">Engineer <em>and</em> yogi.</h2>
+    <p class="lead reveal">Two founders. One a software engineer who builds things; one a practicing yoga teacher with deep ties to a spiritual community. Both born into the panchang tradition. <em class="accent">Modernizing the tradition we grew up in</em> — not appropriating, not gatekeeping.</p>
+    <div class="founder-grid">
+      <div class="founder reveal">
+        <div class="role">technical · product</div>
+        <h4>Hareesh Nagaraj</h4>
+        <p>Engineering lead. Built the existing Devi v1 in SwiftUI. Technical architecture, Swiss Ephemeris integration, full app build.</p>
+      </div>
+      <div class="founder reveal">
+        <div class="role">voice · community</div>
+        <h4>Cofounder · Yoga teacher</h4>
+        <p>Practicing yoga teacher and active member of the spiritual-practice community. Voice guide, daily content authority, on-camera narrative.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     XIV — BUSINESS MODEL
+=========================================== -->
+<section class="slide" data-num="14">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">business model</div>
+    <h2 class="reveal">Free panchang. <em>Paid depth.</em></h2>
+    <div class="pricing-grid reveal">
+      <div class="tier">
+        <div class="tname">Free</div>
+        <div class="price">$0<span class="per"> / forever</span></div>
+        <div class="tagline">The almanac your grandmother had — modern, offline.</div>
+        <ul class="feats">
+          <li>Daily panchang for your city</li>
+          <li>Living Mandala morning ritual</li>
+          <li>Sacred timing windows (all five)</li>
+          <li>Festival calendar (pan-Indian + regional)</li>
+          <li>Your own natal chart, both lenses</li>
+        </ul>
+      </div>
+      <div class="tier paid">
+        <div class="tname">Devi · premium</div>
+        <div class="price">$12<span class="per"> / month</span></div>
+        <div class="tagline">Two skies. Friends. Where to be.</div>
+        <ul class="feats">
+          <li><strong>Hybrid archetype builder</strong> — both lenses, your way</li>
+          <li><strong>Vedic synastry</strong> — Ashtakoot for friends and partners</li>
+          <li><strong>Prescriptive astrocartography</strong> — intent-based geography</li>
+          <li>Personalized daily readings, voice-corpus-grounded</li>
+          <li>Friend graph + shareable compatibility cards</li>
+          <li>Priority support, no ads, no tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===========================================
+     XV — WHY NOW
+=========================================== -->
+<section class="slide" data-num="15">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">why now</div>
+    <h2 class="reveal">The window is open. <em>Briefly.</em></h2>
+    <ul class="bullets reveal" style="font-size: 1.1rem;">
+      <li><strong>Co-Star user fatigue is real.</strong> 30M+ users acquired by 2023; sun-sign content has hit its ceiling. The cohort is migrating toward depth.</li>
+      <li><strong>Vedic astrology is surfacing in Western spiritual culture.</strong> 2025-2026 transit cycles, podcast saturation, TikTok sidereal-curiosity at category-tipping volumes.</li>
+      <li><strong>Meditation app fatigue is documented.</strong> Calm revenue down 24% YoY 2025; Headspace flat. Subscribers want <em class="accent">structured ritual</em>, not generic breathwork.</li>
+      <li><strong>Diaspora willingness-to-pay is proven.</strong> AstroTalk's $140M+ ARR draws 47% of traffic from US/UK/Canada — the diaspora arbitrage is real, just badly served.</li>
+      <li><strong>No Vedic-native premium app exists yet.</strong> The premium-Vedic quadrant is empty. A serious player launching here defines the category.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===========================================
+     XVI — 12-MONTH VISION
+=========================================== -->
+<section class="slide" data-num="16">
+  <div class="slide-inner">
+    <div class="eyebrow reveal">twelve months</div>
+    <h2 class="reveal">By month twelve.</h2>
+    <div class="stats-row reveal">
+      <div class="stat"><div class="num">10K+</div><div class="lbl">paid subscribers at $12/mo</div></div>
+      <div class="stat"><div class="num">$1.5M</div><div class="lbl">ARR — profitable on operating costs</div></div>
+      <div class="stat"><div class="num">4.7+</div><div class="lbl">App Store rating, Tier-A press cited</div></div>
+    </div>
+    <ul class="bullets reveal" style="margin-top: 3rem;">
+      <li><strong>Featured on App Store Lifestyle</strong> — Apple loves apps with a strong design POV in saturated categories</li>
+      <li><strong>Cited in mainstream press</strong> as <em class="accent">"the app that bridges Western and Vedic astrology"</em></li>
+      <li><strong>Astrologer advisor</strong> publicly co-authoring voice — flywheel for credibility and PR</li>
+      <li><strong>A second product surface</strong> in closed beta — domestic India localized, group-travel hotspots, or partner-astrologer marketplace</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===========================================
+     XVII — CLOSER
+=========================================== -->
+<section class="slide title-slide" data-num="17">
+  <div class="starlight"></div>
+  <div class="slide-inner">
+    <div class="top-line reveal">in closing</div>
+    <p class="pullquote reveal" style="text-align: center; margin: 0 auto 3rem; font-size: clamp(2rem, 5vw, 3.5rem); max-width: 24ch;">
+      <em>The companion the stars wrote for you</em> — by the people whose tradition this is.
+    </p>
+    <h1 class="brand reveal" style="font-size: clamp(4rem, 9vw, 7rem); margin-bottom: 1rem;">Devi<span class="dot"></span></h1>
+    <div class="below reveal" style="font-size: clamp(1.1rem, 2.2vw, 1.5rem);">Two skies. One self.</div>
+    <div class="footer reveal">devi.app · 2026</div>
+  </div>
+</section>
+
+<script>
+(function() {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  const progressEl = document.getElementById('progress');
+  const currentEl = document.getElementById('current');
+  const totalEl = document.getElementById('total');
+  const kbdHint = document.getElementById('kbd-hint');
+  totalEl.textContent = String(total).padStart(2, '0');
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+        const slide = entry.target;
+        slide.classList.add('visible');
+        const idx = slides.indexOf(slide);
+        currentEl.textContent = String(idx + 1).padStart(2, '0');
+        progressEl.style.width = ((idx + 1) / total) * 100 + '%';
+      }
+    });
+  }, { threshold: [0.5] });
+  slides.forEach(s => io.observe(s));
+
+  let hintHidden = false;
+  function hideHint() { if (!hintHidden) { kbdHint.classList.add('hidden'); hintHidden = true; } }
+  function currentIndex() {
+    let best = 0, bestDist = Infinity;
+    slides.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      const dist = Math.abs(rect.top);
+      if (dist < bestDist) { bestDist = dist; best = i; }
+    });
+    return best;
+  }
+  function go(idx) {
+    idx = Math.max(0, Math.min(total - 1, idx));
+    slides[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    hideHint();
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(currentIndex() + 1); }
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(currentIndex() - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+  let scrollHideTimer;
+  window.addEventListener('scroll', () => { clearTimeout(scrollHideTimer); scrollHideTimer = setTimeout(hideHint, 100); }, { passive: true });
+  setTimeout(hideHint, 8000);
+  requestAnimationFrame(() => { if (slides[0]) slides[0].classList.add('visible'); });
+})();
+</script>
+</body>
+</html>
